@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rousto UI Kit</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <img src="./assets/rousto-logo.svg" alt="Rousto logo">
+            <div>
+                <p class="brand-overline">ROUSTO</p>
+                <h1>واجهات مشروع روستو</h1>
+            </div>
+        </div>
+        <nav class="menu">
+            <a href="#web-ui">واجهة الويب</a>
+            <a href="#mobile-ui">واجهة التطبيق</a>
+            <a href="#design-system">نظام التصميم</a>
+        </nav>
+    </header>
+
+    <main class="layout">
+        <section class="hero card">
+            <div>
+                <p class="kicker">تصميم مستوحى من الشعار</p>
+                <h2>هوية متكاملة للويب والتطبيق</h2>
+                <p>
+                    تم بناء واجهات روستو بالاعتماد على اللون الأحمر الأساسي في الشعار، مع درجات محايدة
+                    ونظام بطاقات واضح لعرض الطلبات، المركبات، وحالة التسليم.
+                </p>
+                <div class="cta-row">
+                    <button class="btn btn-primary">ابدأ مشروعك</button>
+                    <button class="btn btn-ghost">استعراض النماذج</button>
+                </div>
+            </div>
+            <aside class="hero-panel">
+                <h3>لوحة سريعة</h3>
+                <ul>
+                    <li><span>الطلبات النشطة</span><strong>128</strong></li>
+                    <li><span>قيد التسليم</span><strong>46</strong></li>
+                    <li><span>معدل الرضا</span><strong>96%</strong></li>
+                </ul>
+            </aside>
+        </section>
+
+        <section id="web-ui" class="card">
+            <div class="section-head">
+                <p class="kicker">Web Experience</p>
+                <h2>واجهة الويب</h2>
+            </div>
+            <div class="web-shell">
+                <aside class="web-sidebar">
+                    <h3>Rousto Control</h3>
+                    <a class="active" href="#">الرئيسية</a>
+                    <a href="#">الطلبات</a>
+                    <a href="#">الأسطول</a>
+                    <a href="#">المسارات</a>
+                    <a href="#">العملاء</a>
+                    <a href="#">التقارير</a>
+                </aside>
+                <div class="web-content">
+                    <div class="stats-grid">
+                        <article>
+                            <p>إجمالي الطلبات</p>
+                            <h4>2,480</h4>
+                        </article>
+                        <article>
+                            <p>زمن التوصيل</p>
+                            <h4>27 دقيقة</h4>
+                        </article>
+                        <article>
+                            <p>المركبات المتاحة</p>
+                            <h4>76</h4>
+                        </article>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-head">
+                            <h4>آخر الطلبات</h4>
+                            <button class="btn btn-primary">طلب جديد</button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>العميل</th>
+                                    <th>الحالة</th>
+                                    <th>المسار</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#RS-1048</td>
+                                    <td>مطعم المدينة</td>
+                                    <td><span class="tag onway">في الطريق</span></td>
+                                    <td>الرياض - العليا</td>
+                                </tr>
+                                <tr>
+                                    <td>#RS-1047</td>
+                                    <td>فروع روستو</td>
+                                    <td><span class="tag done">مكتمل</span></td>
+                                    <td>جدة - السلامة</td>
+                                </tr>
+                                <tr>
+                                    <td>#RS-1046</td>
+                                    <td>شركة لوجستيك</td>
+                                    <td><span class="tag delayed">متأخر</span></td>
+                                    <td>الدمام - الفيصلية</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mobile-ui" class="card">
+            <div class="section-head">
+                <p class="kicker">Mobile Experience</p>
+                <h2>واجهة التطبيق</h2>
+            </div>
+            <div class="mobile-grid">
+                <article class="phone">
+                    <div class="phone-header">
+                        <img src="./assets/rousto-logo.svg" alt="Rousto">
+                        <p>مرحبًا محمد</p>
+                    </div>
+                    <h3>اطلب توصيلك الآن</h3>
+                    <div class="quick-actions">
+                        <button>طلب فوري</button>
+                        <button>طلب مجدول</button>
+                    </div>
+                    <ul class="delivery-list">
+                        <li><span>#2019</span><strong>في الطريق</strong></li>
+                        <li><span>#2018</span><strong>تم التسليم</strong></li>
+                        <li><span>#2017</span><strong>جاري التحضير</strong></li>
+                    </ul>
+                </article>
+
+                <article class="phone">
+                    <div class="phone-header">
+                        <p class="tracking">تتبع مباشر</p>
+                    </div>
+                    <div class="map-placeholder">
+                        <p>موقع المندوب</p>
+                        <span>ETA 12 min</span>
+                    </div>
+                    <div class="driver-card">
+                        <h4>سامي الحربي</h4>
+                        <p>سيارة رقم RS-76</p>
+                        <div class="driver-actions">
+                            <button>اتصال</button>
+                            <button>محادثة</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="phone">
+                    <h3>إعدادات الحساب</h3>
+                    <ul class="settings">
+                        <li><span>اللغة</span><strong>العربية</strong></li>
+                        <li><span>المدفوعات</span><strong>بطاقة محفوظة</strong></li>
+                        <li><span>الإشعارات</span><strong>مفعلة</strong></li>
+                        <li><span>الوضع الليلي</span><strong>غير مفعل</strong></li>
+                    </ul>
+                    <button class="btn btn-primary full">حفظ التعديلات</button>
+                </article>
+            </div>
+        </section>
+
+        <section id="design-system" class="card">
+            <div class="section-head">
+                <p class="kicker">Design System</p>
+                <h2>ألوان وهوية روستو</h2>
+            </div>
+            <div class="palette">
+                <article style="--swatch:#bd001f;">
+                    <h4>Rousto Red</h4>
+                    <p>#BD001F</p>
+                </article>
+                <article style="--swatch:#8d0018;">
+                    <h4>Rousto Dark</h4>
+                    <p>#8D0018</p>
+                </article>
+                <article style="--swatch:#fff3f5;">
+                    <h4>Soft Background</h4>
+                    <p>#FFF3F5</p>
+                </article>
+                <article style="--swatch:#251015;">
+                    <h4>Text Primary</h4>
+                    <p>#251015</p>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

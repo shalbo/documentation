@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" role="img" aria-labelledby="title desc">
+  <title id="title">Rousto Logo</title>
+  <desc id="desc">Red rounded badge with a white car stroke line.</desc>
+  <rect x="8" y="20" width="624" height="180" rx="34" fill="#bd001f"/>
+  <path d="M58 132 C 108 132, 114 104, 148 104 C 192 104, 206 132, 244 132 L 426 132 C 455 132, 472 102, 508 102 C 541 102, 568 121, 583 144"
+        fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M145 104 C 196 84, 252 82, 304 93 C 324 98, 344 104, 365 108"
+        fill="none" stroke="#ffffff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M510 102 C 526 102, 542 115, 542 132 C 542 149, 528 162, 511 162 C 494 162, 480 148, 480 132 C 480 115, 494 102, 510 102 Z"
+        fill="none" stroke="#ffffff" stroke-width="13"/>
+  <path d="M257 148 H 355" fill="none" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+</svg>
