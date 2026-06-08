@@ -30,15 +30,15 @@ class OffersScreen extends StatelessWidget {
                 gradient: AppColors.redGradient,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('رصيد نقاطك',
+                  Text('رصيد نقاطك',
                       style: TextStyle(color: Color(0xFFFFE1E1))),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: const [
+                    children: [
                       Text('320',
                           style: TextStyle(
                               color: Colors.white,
@@ -52,14 +52,14 @@ class OffersScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  const Text('تكفي لخصم 30 ريال على خدمتك القادمة',
+                  SizedBox(height: 6),
+                  Text('تكفي لخصم 30 ريال على خدمتك القادمة',
                       style: TextStyle(color: Color(0xFFFFE1E1), fontSize: 12)),
                 ],
               ),
             ),
             const SizedBox(height: 18),
-            RowHeader('عروض حصرية'),
+            const RowHeader('عروض حصرية'),
             const SizedBox(height: 12),
             for (final o in offers) ...[
               SoftCard(

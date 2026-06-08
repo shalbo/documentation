@@ -97,18 +97,18 @@ class TrackingScreen extends StatelessWidget {
   }
 
   Widget _technician() {
-    return SoftCard(
+    return const SoftCard(
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 24,
             backgroundColor: AppColors.red,
             child: Text('أ',
                 style: TextStyle(
                     color: Colors.white, fontWeight: FontWeight.w800)),
           ),
-          const SizedBox(width: 12),
-          const Expanded(
+          SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -121,7 +121,7 @@ class TrackingScreen extends StatelessWidget {
               ],
             ),
           ),
-          const CircleAvatar(
+          CircleAvatar(
             radius: 20,
             backgroundColor: AppColors.green,
             child: Icon(Icons.call, color: Colors.white, size: 18),

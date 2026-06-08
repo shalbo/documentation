@@ -34,8 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(18, 4, 18, 0),
             child: _categories(),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(18, 16, 18, 0),
             child: RowHeader('الخدمات الشائعة', action: 'عرض الكل'),
           ),
           Padding(
@@ -129,12 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColors.ink900,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: Row(
+          child: const Row(
             children: [
-              const IconBadge(Icons.build_outlined,
+              IconBadge(Icons.build_outlined,
                   bg: AppColors.red, fg: Colors.white),
-              const SizedBox(width: 12),
-              const Expanded(
+              SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 15,
                 backgroundColor: Colors.white,
                 child: Icon(Icons.arrow_back,
@@ -248,9 +248,9 @@ class _HomeScreenState extends State<HomeScreen> {
         gradient: AppColors.darkGradient,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: Row(
+      child: const Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const Text('٢٥٪',
+          Text('٢٥٪',
               style: TextStyle(
                   color: AppColors.red,
                   fontSize: 30,

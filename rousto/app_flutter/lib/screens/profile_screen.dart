@@ -29,10 +29,10 @@ class ProfileScreen extends StatelessWidget {
               borderRadius:
                   BorderRadius.vertical(bottom: Radius.circular(28)),
             ),
-            child: SafeArea(
+            child: const SafeArea(
               bottom: false,
               child: Column(
-                children: const [
+                children: [
                   CircleAvatar(
                     radius: 36,
                     backgroundColor: Colors.white,
@@ -56,12 +56,12 @@ class ProfileScreen extends StatelessWidget {
           ),
           Transform.translate(
             offset: const Offset(0, -16),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18),
               child: SoftCard(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: EdgeInsets.symmetric(vertical: 14),
                 child: Row(
-                  children: const [
+                  children: [
                     _Stat('14', 'خدمة'),
                     _Stat('2', 'سيارة'),
                     _Stat('320', 'نقطة'),
