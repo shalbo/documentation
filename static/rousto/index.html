@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rousto | واجهات الويب والتطبيق</title>
+  <meta
+    name="description"
+    content="نموذج واجهات ويب وتطبيق لمشروع Rousto مستوحى من الشعار الأحمر وخدمات السيارات."
+  >
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header" aria-label="التنقل الرئيسي">
+    <a class="brand" href="#top" aria-label="Rousto">
+      <img src="./assets/rousto-logo.svg" width="72" height="42" alt="">
+      <span>Rousto</span>
+    </a>
+    <nav class="main-nav">
+      <a href="#web">الويب</a>
+      <a href="#app">التطبيق</a>
+      <a href="#services">الخدمات</a>
+      <a href="#contact">تواصل</a>
+    </nav>
+    <a class="header-cta" href="#contact">ابدأ الآن</a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">تجربة Rousto الموحدة</p>
+        <h1>واجهات حديثة لحجز ومتابعة خدمات السيارات بسرعة وثقة.</h1>
+        <p class="hero-lead">
+          تصميم عربي متجاوب يجمع بين لوحة ويب احترافية وتطبيق جوال عملي، مع اعتماد
+          اللون الأحمر الجريء والمساحات الفاتحة المستوحاة من شعار Rousto.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#web">استعراض الويب</a>
+          <a class="secondary-button" href="#app">مشاهدة التطبيق</a>
+        </div>
+        <dl class="hero-metrics" aria-label="مؤشرات الواجهة">
+          <div>
+            <dt>3</dt>
+            <dd>خطوات للحجز</dd>
+          </div>
+          <div>
+            <dt>24/7</dt>
+            <dd>متابعة الخدمة</dd>
+          </div>
+          <div>
+            <dt>+18</dt>
+            <dd>نوع خدمة</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="hero-preview" aria-label="معاينة واجهات Rousto">
+        <article class="desktop-window">
+          <div class="window-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="dashboard-preview">
+            <aside>
+              <img src="./assets/rousto-logo.svg" alt="" width="58" height="34">
+              <strong>لوحة Rousto</strong>
+              <small>مركز التحكم</small>
+            </aside>
+            <div class="preview-content">
+              <div class="search-card">
+                <span>أين تحتاج الخدمة؟</span>
+                <button>تحديد موقعي</button>
+              </div>
+              <div class="service-grid">
+                <span>صيانة دورية</span>
+                <span>سطحة ونقل</span>
+                <span>فحص سريع</span>
+                <span>إطارات وبطارية</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="phone phone-floating" aria-label="واجهة تطبيق Rousto">
+          <div class="phone-speaker"></div>
+          <div class="phone-screen">
+            <div class="app-top">
+              <span>مساء الخير، سارة</span>
+              <strong>ما الخدمة التي تحتاجينها؟</strong>
+            </div>
+            <button class="emergency-button">طلب مساعدة فورية</button>
+            <div class="ride-card">
+              <span class="pin"></span>
+              <div>
+                <strong>السطحة في الطريق</strong>
+                <small>الوصول المتوقع خلال 14 دقيقة</small>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section intro-panel">
+      <div>
+        <p class="eyebrow">هوية مرئية</p>
+        <h2>ألوان مستوحاة من الشعار وتدرجات مريحة للاستخدام اليومي.</h2>
+      </div>
+      <div class="palette" aria-label="لوحة ألوان Rousto">
+        <span style="--swatch:#c8102e">Rousto Red</span>
+        <span style="--swatch:#f7f4ef">Warm Light</span>
+        <span style="--swatch:#22191b">Carbon</span>
+        <span style="--swatch:#ffb8c2">Soft Red</span>
+      </div>
+    </section>
+
+    <section class="section interface-switcher" aria-labelledby="interfaces-title">
+      <div class="section-heading">
+        <p class="eyebrow">نموذج واجهات</p>
+        <h2 id="interfaces-title">تنقل بين واجهة الويب وواجهة التطبيق.</h2>
+      </div>
+      <div class="view-tabs" role="tablist" aria-label="اختيار الواجهة">
+        <button class="tab-button is-active" data-view="web" role="tab" aria-selected="true">
+          واجهة الويب
+        </button>
+        <button class="tab-button" data-view="app" role="tab" aria-selected="false">
+          واجهة التطبيق
+        </button>
+      </div>
+    </section>
+
+    <section id="web" class="section interface-panel is-active" data-panel="web">
+      <div class="web-shell">
+        <aside class="web-sidebar">
+          <div class="brand compact">
+            <img src="./assets/rousto-logo.svg" width="54" height="32" alt="">
+            <span>Rousto</span>
+          </div>
+          <a class="is-current" href="#web">الرئيسية</a>
+          <a href="#services">الخدمات</a>
+          <a href="#web">الحجوزات</a>
+          <a href="#web">المركبات</a>
+          <a href="#contact">الدعم</a>
+        </aside>
+        <div class="web-workspace">
+          <div class="workspace-header">
+            <div>
+              <p class="eyebrow">لوحة الويب</p>
+              <h3>إدارة الحجوزات والخدمات من مكان واحد</h3>
+            </div>
+            <button class="primary-button small">حجز جديد</button>
+          </div>
+
+          <div class="booking-card">
+            <div>
+              <span class="card-label">الخدمة المختارة</span>
+              <strong>فحص شامل قبل السفر</strong>
+            </div>
+            <div>
+              <span class="card-label">الموعد</span>
+              <strong>اليوم، 06:30 مساء</strong>
+            </div>
+            <div>
+              <span class="card-label">المركز</span>
+              <strong>Rousto Care - الرياض</strong>
+            </div>
+            <button>تأكيد الطلب</button>
+          </div>
+
+          <div class="cards-grid">
+            <article class="status-card red">
+              <span>طلبات نشطة</span>
+              <strong>12</strong>
+              <small>4 قيد التنفيذ الآن</small>
+            </article>
+            <article class="status-card">
+              <span>مركبات مسجلة</span>
+              <strong>38</strong>
+              <small>تم تحديث بيانات 6 مركبات</small>
+            </article>
+            <article class="status-card">
+              <span>متوسط الاستجابة</span>
+              <strong>09 د</strong>
+              <small>أسرع بنسبة 21% هذا الأسبوع</small>
+            </article>
+          </div>
+
+          <div class="tracking-board">
+            <div class="tracking-map" aria-label="خريطة متابعة الخدمة">
+              <span class="map-road road-one"></span>
+              <span class="map-road road-two"></span>
+              <span class="car-dot"></span>
+              <span class="target-dot"></span>
+            </div>
+            <div class="timeline">
+              <h4>مسار الطلب</h4>
+              <ol>
+                <li class="done">تم استلام الطلب</li>
+                <li class="done">الفني في الطريق</li>
+                <li class="active">بدء الفحص</li>
+                <li>إرسال التقرير</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="app" class="section interface-panel" data-panel="app">
+      <div class="mobile-showcase">
+        <article class="phone">
+          <div class="phone-speaker"></div>
+          <div class="phone-screen">
+            <div class="app-header">
+              <img src="./assets/rousto-logo.svg" alt="" width="48" height="28">
+              <span>الرئيسية</span>
+            </div>
+            <h3>اختر خدمتك</h3>
+            <div class="mobile-service-list">
+              <button>صيانة دورية <span>45 د</span></button>
+              <button>مساعدة على الطريق <span>فوري</span></button>
+              <button>تبديل بطارية <span>30 د</span></button>
+            </div>
+            <div class="bottom-nav">
+              <span class="active">الرئيسية</span>
+              <span>طلباتي</span>
+              <span>حسابي</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="phone featured-phone">
+          <div class="phone-speaker"></div>
+          <div class="phone-screen">
+            <div class="app-map">
+              <span class="route"></span>
+              <span class="driver"></span>
+            </div>
+            <div class="sheet-card">
+              <span class="card-label">الخدمة الحالية</span>
+              <h3>مساعدة على الطريق</h3>
+              <p>الفني محمد في طريقه إليك، ويمكنك متابعة الموقع لحظة بلحظة.</p>
+              <button class="primary-button full">محادثة الفني</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="phone-speaker"></div>
+          <div class="phone-screen">
+            <div class="report-card">
+              <span class="success-icon">✓</span>
+              <h3>تم إنجاز الفحص</h3>
+              <p>حصلت على تقرير مختصر وتوصيات الصيانة القادمة.</p>
+            </div>
+            <div class="invoice-list">
+              <div>
+                <span>قطع غيار</span>
+                <strong>240 ر.س</strong>
+              </div>
+              <div>
+                <span>أجرة فني</span>
+                <strong>90 ر.س</strong>
+              </div>
+              <div>
+                <span>الإجمالي</span>
+                <strong>330 ر.س</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="services" class="section services-section">
+      <div class="section-heading">
+        <p class="eyebrow">الخدمات الأساسية</p>
+        <h2>مكونات جاهزة لتجربة Rousto.</h2>
+      </div>
+      <div class="services-grid">
+        <article>
+          <span>01</span>
+          <h3>حجز سريع</h3>
+          <p>اختيار الخدمة، الموقع، والموعد في خطوات قليلة مع تأكيد واضح.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>تتبع مباشر</h3>
+          <p>بطاقات حالة وخريطة مختصرة تناسب الويب والتطبيق.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>تقارير ومحاسبة</h3>
+          <p>عرض تكاليف، توصيات، وفواتير مختصرة بعد انتهاء الخدمة.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="site-footer">
+    <div>
+      <img src="./assets/rousto-logo.svg" width="76" height="44" alt="">
+      <strong>Rousto</strong>
+      <p>واجهة أولية قابلة للتطوير لتطبيق وخدمة ويب تحمل هوية Rousto.</p>
+    </div>
+    <a class="primary-button" href="mailto:hello@rousto.example">تواصل مع الفريق</a>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
