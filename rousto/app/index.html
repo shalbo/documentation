@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تطبيق روستو | Rousto App Prototype</title>
+  <link rel="icon" href="../brand/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <div class="app-intro">
+    <span class="pill"><img src="../brand/logo.svg" style="height:18px" alt="" /> ROUSTO APP</span>
+    <h1>واجهات تطبيق روستو</h1>
+    <p>نموذج تفاعلي لشاشات التطبيق بهوية الشعار وألوانه. <a href="../web/index.html" style="color:var(--red-600);font-weight:700">عرض موقع الويب ←</a></p>
+  </div>
+
+  <div class="screens">
+
+    <!-- ===== 1) Onboarding / Splash ===== -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="statusbar on-red"><span>9:41</span><span>● ⬤ 100%</span></div>
+          <div class="onb">
+            <div class="logo-wrap"><img src="../brand/logo.svg" alt="روستو" /></div>
+            <div class="dots"><i class="on"></i><i></i><i></i></div>
+            <h2>عناية ذكية بسيارتك</h2>
+            <p>احجز خدمة الصيانة في ثوانٍ وتابعها مباشرةً من هاتفك.</p>
+            <button class="appbtn" style="margin-top:14px">ابدأ الآن</button>
+            <p style="text-align:center;margin:14px 0 0;font-size:.8rem">لديك حساب؟ <b style="color:var(--red-500)">تسجيل الدخول</b></p>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">١ · شاشة الترحيب</div>
+    </div>
+
+    <!-- ===== 2) Home ===== -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="statusbar on-red"><span>9:41</span><span>● ⬤ 100%</span></div>
+          <div class="body">
+            <div class="app-hero">
+              <div class="top">
+                <div class="brand"><img src="../brand/logo.svg" alt="" /> روستو</div>
+                <div class="av">س</div>
+              </div>
+              <div class="greet"><small>أهلاً بعودتك 👋</small><b>سعود العتيبي</b></div>
+              <div class="search">🔍 ابحث عن خدمة…</div>
+            </div>
+
+            <div class="active-card">
+              <div class="ic">🔧</div>
+              <div><b>خدمة جارية</b><span>تغيير الزيت · الفني في الطريق</span></div>
+              <div class="go">←</div>
+            </div>
+
+            <div class="pad">
+              <div class="chips">
+                <span class="chip active">الكل</span>
+                <span class="chip">زيت</span>
+                <span class="chip">إطارات</span>
+                <span class="chip">فرامل</span>
+                <span class="chip">تكييف</span>
+              </div>
+            </div>
+
+            <div class="pad" style="padding-top:0">
+              <div class="row-between"><b>الخدمات الشائعة</b><a>عرض الكل</a></div>
+              <div class="grid2">
+                <div class="scard"><div class="ic">🛢️</div><b>تغيير الزيت</b><div class="meta">45 دقيقة</div><div class="p">120 ريال</div></div>
+                <div class="scard"><div class="ic">🛞</div><b>الإطارات</b><div class="meta">30 دقيقة</div><div class="p">90 ريال</div></div>
+                <div class="scard"><div class="ic">🛑</div><b>الفرامل</b><div class="meta">60 دقيقة</div><div class="p">180 ريال</div></div>
+                <div class="scard"><div class="ic">❄️</div><b>التكييف</b><div class="meta">50 دقيقة</div><div class="p">150 ريال</div></div>
+              </div>
+            </div>
+
+            <div class="pad" style="padding-top:0">
+              <div class="promo">
+                <div><b style="font-size:.95rem">خصم على أول حجز</b><div style="font-size:.74rem;color:#c7c8cf">استخدم كود ROUSTO</div></div>
+                <div class="big" style="margin-inline-start:auto">٢٥٪</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tabbar">
+            <div class="tab active"><span class="ti">⌂</span>الرئيسية</div>
+            <div class="tab"><span class="ti">🧾</span>طلباتي</div>
+            <div class="tab fab"><span class="ti">＋</span></div>
+            <div class="tab"><span class="ti">🎁</span>عروض</div>
+            <div class="tab"><span class="ti">☰</span>حسابي</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">٢ · الرئيسية</div>
+    </div>
+
+    <!-- ===== 3) Booking / Service detail ===== -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>● ⬤ 100%</span></div>
+          <div class="body">
+            <div class="pad">
+              <div class="row-between" style="margin-bottom:16px"><span style="font-weight:800;font-size:1.1rem">→ تأكيد الحجز</span><span style="color:var(--ink-300)">✕</span></div>
+
+              <div class="lrow" style="background:var(--red-050)">
+                <div class="ic" style="background:#fff">🛢️</div>
+                <div><b>تغيير الزيت والفلاتر</b><span>زيت أصلي + فحص شامل</span></div>
+                <div class="end"><b style="color:var(--red-600)">120 ريال</b></div>
+              </div>
+
+              <div class="row-between" style="margin:18px 0 10px"><b>سيارتك</b><a>تغيير</a></div>
+              <div class="lrow"><div class="ic">🚗</div><div><b>تويوتا كامري 2022</b><span>أبيض · أ ب ج 1234</span></div></div>
+
+              <div class="row-between" style="margin:18px 0 10px"><b>الموعد</b></div>
+              <div class="chips">
+                <span class="chip">السبت</span>
+                <span class="chip active">الأحد 9 ص</span>
+                <span class="chip">الاثنين</span>
+                <span class="chip">الثلاثاء</span>
+              </div>
+
+              <div class="row-between" style="margin:18px 0 10px"><b>المكان</b><a>تغيير</a></div>
+              <div class="lrow"><div class="ic">📍</div><div><b>خدمة في موقعك</b><span>حي النخيل، الرياض</span></div></div>
+
+              <div class="row-between" style="margin:18px 0 10px"><b>طريقة الدفع</b></div>
+              <div class="lrow"><div class="ic">💳</div><div><b>مدى **** 4421</b><span>بطاقة افتراضية</span></div></div>
+
+              <div style="background:#fff;border-radius:16px;padding:14px;box-shadow:var(--shadow-sm);margin-top:8px">
+                <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-500)"><span>الخدمة</span><span>120 ريال</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-500);margin-top:6px"><span>خصم (ROUSTO)</span><span style="color:var(--green)">- 30 ريال</span></div>
+                <div style="display:flex;justify-content:space-between;font-weight:800;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><span>الإجمالي</span><span style="color:var(--red-600)">90 ريال</span></div>
+              </div>
+
+              <button class="appbtn" style="margin-top:14px">تأكيد ودفع 90 ريال</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">٣ · تأكيد الحجز</div>
+    </div>
+
+    <!-- ===== 4) Live tracking ===== -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>● ⬤ 100%</span></div>
+          <div class="body">
+            <div class="pad" style="padding-bottom:6px">
+              <div class="row-between"><span style="font-weight:800;font-size:1.1rem">تتبّع الخدمة</span><span class="tag run">جارية</span></div>
+            </div>
+            <div class="track">
+              <div class="map"><div class="road"></div><div class="pin">🚐</div></div>
+
+              <div class="tech">
+                <div class="av">أ</div>
+                <div><b>أحمد الفني</b><span>★ 4.9 · يصل خلال 12 دقيقة</span></div>
+                <div class="call">✆</div>
+              </div>
+
+              <div class="steps-v">
+                <div class="tstep"><div class="dot done">✓</div><div><b>تم تأكيد الحجز</b><span>9:02 ص</span></div></div>
+                <div class="tstep"><div class="dot done">✓</div><div><b>تم تعيين الفني</b><span>9:05 ص</span></div></div>
+                <div class="tstep"><div class="dot now">●</div><div><b>الفني في الطريق إليك</b><span>الآن · 12 دقيقة</span></div></div>
+                <div class="tstep"><div class="dot todo">○</div><div><b>تنفيذ الخدمة</b><span>قيد الانتظار</span></div></div>
+                <div class="tstep"><div class="dot todo">○</div><div><b>اكتمال الخدمة</b><span>قيد الانتظار</span></div></div>
+              </div>
+
+              <button class="appbtn" style="margin-top:14px;background:var(--ink-900);box-shadow:none">مراسلة الفني 💬</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">٤ · التتبّع المباشر</div>
+    </div>
+
+    <!-- ===== 5) Profile ===== -->
+    <div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="statusbar on-red"><span>9:41</span><span>● ⬤ 100%</span></div>
+          <div class="body">
+            <div class="phead">
+              <div class="big-av">س</div>
+              <b>سعود العتيبي</b><br><span>saud@example.com</span>
+            </div>
+            <div class="pstats">
+              <div class="ps"><b>14</b><span>خدمة</span></div>
+              <div class="ps"><b>2</b><span>سيارة</span></div>
+              <div class="ps"><b>320</b><span>نقطة</span></div>
+            </div>
+            <div class="pad">
+              <div class="lrow"><div class="ic">🚗</div><div><b>سياراتي</b><span>إدارة المركبات</span></div><div class="end">←</div></div>
+              <div class="lrow"><div class="ic">🧾</div><div><b>سجل الطلبات</b><span>14 خدمة سابقة</span></div><div class="end">←</div></div>
+              <div class="lrow"><div class="ic">💳</div><div><b>طرق الدفع</b><span>مدى، آبل باي</span></div><div class="end">←</div></div>
+              <div class="lrow"><div class="ic">📍</div><div><b>العناوين</b><span>المنزل، العمل</span></div><div class="end">←</div></div>
+              <div class="lrow"><div class="ic">🎁</div><div><b>المكافآت</b><span>320 نقطة متاحة</span></div><div class="end">←</div></div>
+              <div class="lrow"><div class="ic">⚙️</div><div><b>الإعدادات</b><span>الإشعارات واللغة</span></div><div class="end">←</div></div>
+            </div>
+          </div>
+
+          <div class="tabbar">
+            <div class="tab"><span class="ti">⌂</span>الرئيسية</div>
+            <div class="tab"><span class="ti">🧾</span>طلباتي</div>
+            <div class="tab fab"><span class="ti">＋</span></div>
+            <div class="tab"><span class="ti">🎁</span>عروض</div>
+            <div class="tab active"><span class="ti">☰</span>حسابي</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label">٥ · الملف الشخصي</div>
+    </div>
+
+  </div>
+
+  <p style="color:var(--ink-500);font-size:.85rem;margin-top:10px">© 2026 روستو · نموذج واجهات تفاعلي</p>
+</body>
+</html>
