@@ -1,0 +1,66 @@
+name: Deploy Rousto to GitHub Pages
+
+# ينشر واجهات روستو (الموقع + نموذج HTML + تطبيق Flutter للويب) على GitHub Pages.
+# فعّل النشر من: Settings → Pages → Source: "GitHub Actions".
+
+on:
+  push:
+    branches:
+      - cursor/build-rousto-ui-db36
+    paths:
+      - "rousto/**"
+      - ".github/workflows/deploy-rousto-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: rousto-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build Flutter web
+        working-directory: rousto/app_flutter
+        run: |
+          flutter pub get
+          flutter build web --release --base-href "/${GITHUB_REPOSITORY#*/}/flutter/"
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp rousto/index.html _site/index.html
+          cp -r rousto/brand _site/brand
+          cp -r rousto/web   _site/web
+          cp -r rousto/app   _site/app
+          cp -r rousto/app_flutter/build/web _site/flutter
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
