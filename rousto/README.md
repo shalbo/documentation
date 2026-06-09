@@ -12,9 +12,11 @@ rousto/
 │   ├── logo-wordmark.svg  # الشعار + الاسم
 │   └── colors.md          # دليل الألوان والخطوط
 ├── docs/                  # مواصفات المشروع
-│   └── 01_DATABASE_SCHEMA.md
-├── backend/               # قاعدة البيانات (PostgreSQL)
+│   ├── 01_DATABASE_SCHEMA.md
+│   └── 02_BACKEND_APIS.md
+├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
+│   ├── api/               # FastAPI
 │   └── database/          # 001_schema.sql, 002_seed.sql
 ├── web/                   # موقع الويب (متجاوب، RTL)
 │   ├── index.html
@@ -65,15 +67,18 @@ python3 -m http.server 8080
 4. التتبّع المباشر للفني
 5. الملف الشخصي
 
-## قاعدة البيانات
-
-مخطط PostgreSQL كامل مع بيانات تجريبية:
+## Backend (قاعدة البيانات + API)
 
 ```bash
 cd rousto/backend && docker compose up -d
 ```
 
-انظر [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md) للمواصفات الكاملة.
+- قاعدة البيانات: PostgreSQL على المنفذ `5432`
+- REST API: http://localhost:8000/docs
+
+المواصفات:
+- [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md)
+- [`docs/02_BACKEND_APIS.md`](docs/02_BACKEND_APIS.md)
 
 ## الهوية
 انظر [`brand/colors.md`](brand/colors.md) لدليل الألوان والخطوط الكامل.

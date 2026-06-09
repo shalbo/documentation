@@ -29,6 +29,11 @@ docker compose exec db psql -U rousto -d rousto -c "SELECT reference, status FRO
 postgresql://rousto:rousto_dev@localhost:5432/rousto
 ```
 
+## API
+
+After `docker compose up -d`, the REST API is available at http://localhost:8000/docs.
+See [`../api/README.md`](../api/README.md).
+
 ## Reset
 
 ```bash

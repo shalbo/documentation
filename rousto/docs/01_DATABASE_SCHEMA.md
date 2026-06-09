@@ -266,5 +266,5 @@ docker compose exec db psql -U rousto -d rousto -f /docker-entrypoint-initdb.d/0
 
 ## الخطوة التالية
 
-- `02_API_ENDPOINTS` — واجهات REST للتطبيق والويب
+- [`02_BACKEND_APIS`](02_BACKEND_APIS.md) — واجهات REST للتطبيق والويب ✅
 - `03_AUTH` — المصادقة (OTP / JWT)

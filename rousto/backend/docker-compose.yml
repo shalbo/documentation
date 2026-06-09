@@ -20,5 +20,18 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build: ./api
+    container_name: rousto-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://rousto:rousto_dev@db:5432/rousto
+      CORS_ORIGINS: "*"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   rousto_pgdata:
