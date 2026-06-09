@@ -16,7 +16,7 @@
 | 1 | الترحيب | `onboarding_screen.dart` | — |
 | 2 | الرئيسية | `home_screen.dart` | `/categories/tree`, `/bookings/active`, `/me` |
 | 3 | تأكيد الحجز | `booking_screen.dart` | `/me/*`, `/promotions/validate`, `POST /bookings` |
-| 4 | التتبّع | `tracking_screen.dart` | `/bookings/active`, `/bookings/{id}/tracking` |
+| 4 | التتبّع | `tracking_screen.dart` | `/bookings/active`, `/bookings/{id}/delivery-map` |
 | 5 | العروض | `offers_screen.dart` | `/promotions`, `/me/loyalty` |
 | 6 | الملف الشخصي | `profile_screen.dart` | `/me`, `/me/vehicles` |
 | 7 | فحص بالصورة | `ai_scan_screen.dart` | `POST /scans`, `/scans/types` |

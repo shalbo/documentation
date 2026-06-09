@@ -24,6 +24,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   TechnicianModel? _technician;
   TrackingDestinationModel? _destination;
   double? _distanceKm;
+  double? _progressPercent;
+  String? _deliveryPhaseLabel;
+  List<DeliveryTrailPointModel> _trail = [];
+  int _refreshSeconds = 20;
   List<TrackStepModel> _steps = [];
 
   @override
@@ -38,10 +42,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
     super.dispose();
   }
 
-  void _schedulePolling(String? status) {
+  void _schedulePolling(String? status, {int? refreshSeconds}) {
     _pollTimer?.cancel();
     if (status == 'en_route' || status == 'technician_assigned') {
-      _pollTimer = Timer.periodic(const Duration(seconds: 20), (_) => _load());
+      final seconds = refreshSeconds ?? _refreshSeconds;
+      _pollTimer = Timer.periodic(Duration(seconds: seconds), (_) => _load());
     }
   }
 
@@ -65,10 +70,19 @@ class _TrackingScreenState extends State<TrackingScreen> {
       _technician = result.technician;
       _destination = result.destination;
       _distanceKm = result.distanceKm;
+      _progressPercent = result.progressPercent;
+      _deliveryPhaseLabel = result.deliveryPhaseLabelAr;
+      _trail = result.trail;
+      if (result.refreshIntervalSeconds != null) {
+        _refreshSeconds = result.refreshIntervalSeconds!;
+      }
       _steps = result.steps;
       _loading = false;
     });
-    _schedulePolling(result.booking.status);
+    _schedulePolling(
+      result.booking.status,
+      refreshSeconds: result.refreshIntervalSeconds,
+    );
   }
 
   @override
@@ -126,7 +140,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      _booking!.statusLabelAr,
+                      _deliveryPhaseLabel ?? _booking!.statusLabelAr,
                       style: const TextStyle(
                           color: Color(0xFFB07D00),
                           fontWeight: FontWeight.w800,
@@ -135,6 +149,33 @@ class _TrackingScreenState extends State<TrackingScreen> {
                   ),
                 ],
               ),
+              if (_progressPercent != null) ...[
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(999),
+                        child: LinearProgressIndicator(
+                          value: (_progressPercent! / 100).clamp(0.0, 1.0),
+                          minHeight: 8,
+                          backgroundColor: AppColors.line,
+                          color: AppColors.green,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '${_progressPercent!.toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                        color: AppColors.ink500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               if (_distanceKm != null) ...[
                 const SizedBox(height: 8),
                 Text(
@@ -144,7 +185,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 ),
               ],
               const SizedBox(height: 14),
-              _map(_technician?.location, _destination),
+              _map(_technician?.location, _destination, _trail),
               const SizedBox(height: 14),
               if (_technician != null) _technicianCard(_technician!),
               const SizedBox(height: 14),
@@ -164,29 +205,55 @@ class _TrackingScreenState extends State<TrackingScreen> {
     );
   }
 
-  Widget _map(GeoLocationModel? tech, TrackingDestinationModel? dest) {
+  Widget _map(
+    GeoLocationModel? tech,
+    TrackingDestinationModel? dest,
+    List<DeliveryTrailPointModel> trail,
+  ) {
     Alignment techAlign = const Alignment(0.2, -0.1);
     Alignment destAlign = const Alignment(-0.5, 0.4);
+    final trailAlignments = <Alignment>[];
 
-    if (tech != null && dest != null) {
-      final minLat = tech.lat < dest.lat ? tech.lat : dest.lat;
-      final maxLat = tech.lat > dest.lat ? tech.lat : dest.lat;
-      final minLng = tech.lng < dest.lng ? tech.lng : dest.lng;
-      final maxLng = tech.lng > dest.lng ? tech.lng : dest.lng;
+    final points = <({double lat, double lng})>[];
+    if (dest != null) points.add((lat: dest.lat, lng: dest.lng));
+    for (final p in trail) {
+      points.add((lat: p.lat, lng: p.lng));
+    }
+    if (tech != null) points.add((lat: tech.lat, lng: tech.lng));
+
+    if (points.length >= 2) {
+      final lats = points.map((p) => p.lat);
+      final lngs = points.map((p) => p.lng);
+      final minLat = lats.reduce((a, b) => a < b ? a : b);
+      final maxLat = lats.reduce((a, b) => a > b ? a : b);
+      final minLng = lngs.reduce((a, b) => a < b ? a : b);
+      final maxLng = lngs.reduce((a, b) => a > b ? a : b);
       final latSpan = (maxLat - minLat).abs().clamp(0.0001, 1.0);
       final lngSpan = (maxLng - minLng).abs().clamp(0.0001, 1.0);
 
       double normX(double lng) => ((lng - minLng) / lngSpan) * 2 - 1;
       double normY(double lat) => -(((lat - minLat) / latSpan) * 2 - 1);
 
-      techAlign = Alignment(normX(tech.lng).clamp(-0.85, 0.85),
-          normY(tech.lat).clamp(-0.85, 0.85));
-      destAlign = Alignment(normX(dest.lng).clamp(-0.85, 0.85),
-          normY(dest.lat).clamp(-0.85, 0.85));
+      if (tech != null) {
+        techAlign = Alignment(normX(tech.lng).clamp(-0.85, 0.85),
+            normY(tech.lat).clamp(-0.85, 0.85));
+      }
+      if (dest != null) {
+        destAlign = Alignment(normX(dest.lng).clamp(-0.85, 0.85),
+            normY(dest.lat).clamp(-0.85, 0.85));
+      }
+      for (final p in trail) {
+        trailAlignments.add(
+          Alignment(
+            normX(p.lng).clamp(-0.85, 0.85),
+            normY(p.lat).clamp(-0.85, 0.85),
+          ),
+        );
+      }
     }
 
     return Container(
-      height: 180,
+      height: 200,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
@@ -210,6 +277,18 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ),
             ),
           ),
+          for (final align in trailAlignments)
+            Align(
+              alignment: align,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: AppColors.green,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
           if (dest != null)
             Align(
               alignment: destAlign,

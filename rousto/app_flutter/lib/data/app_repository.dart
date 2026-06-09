@@ -46,9 +46,13 @@ class AppRepository {
         TrackingDestinationModel? destination,
         double? distanceKm,
         int? etaMinutes,
+        double? progressPercent,
+        String? deliveryPhaseLabelAr,
+        List<DeliveryTrailPointModel> trail,
+        int? refreshIntervalSeconds,
       })> loadTracking(String bookingId) async {
     try {
-      final data = await _api.getBookingTracking(bookingId);
+      final data = await _api.getBookingDeliveryMap(bookingId);
       final bookingJson = data['booking'] as Map<String, dynamic>;
       final booking = BookingModel(
         id: bookingId,
@@ -62,10 +66,17 @@ class AppRepository {
       if (techJson != null) technician = TechnicianModel.fromJson(techJson);
 
       TrackingDestinationModel? destination;
-      final destJson = data['destination'] as Map<String, dynamic>?;
+      final destJson = (data['customer_location'] ?? data['destination'])
+          as Map<String, dynamic>?;
       if (destJson != null) {
         destination = TrackingDestinationModel.fromJson(destJson);
       }
+
+      final trailJson = data['trail'] as List<dynamic>? ?? [];
+      final trail = trailJson
+          .map((p) =>
+              DeliveryTrailPointModel.fromJson(p as Map<String, dynamic>))
+          .toList();
 
       final stepsJson = data['steps'] as List<dynamic>? ?? [];
       final steps = stepsJson.map((step) {
@@ -95,6 +106,10 @@ class AppRepository {
         destination: destination,
         distanceKm: (data['distance_km'] as num?)?.toDouble(),
         etaMinutes: data['eta_minutes'] as int? ?? technician?.etaMinutes,
+        progressPercent: (data['progress_percent'] as num?)?.toDouble(),
+        deliveryPhaseLabelAr: data['delivery_phase_label_ar'] as String?,
+        trail: trail,
+        refreshIntervalSeconds: data['refresh_interval_seconds'] as int?,
       );
     } catch (_) {
       return (
@@ -104,6 +119,10 @@ class AppRepository {
         destination: MockData.trackingDestination,
         distanceKm: MockData.trackingDistanceKm,
         etaMinutes: MockData.technician.etaMinutes,
+        progressPercent: 35,
+        deliveryPhaseLabelAr: 'الفني في الطريق إليك',
+        trail: const [],
+        refreshIntervalSeconds: 20,
       );
     }
   }

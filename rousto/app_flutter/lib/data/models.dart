@@ -256,6 +256,20 @@ class TrackingDestinationModel {
   }
 }
 
+class DeliveryTrailPointModel {
+  final double lat;
+  final double lng;
+
+  const DeliveryTrailPointModel({required this.lat, required this.lng});
+
+  factory DeliveryTrailPointModel.fromJson(Map<String, dynamic> json) {
+    return DeliveryTrailPointModel(
+      lat: (json['lat'] as num).toDouble(),
+      lng: (json['lng'] as num).toDouble(),
+    );
+  }
+}
+
 class TechnicianModel {
   final String fullName;
   final double rating;

@@ -201,6 +201,8 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 | GET | `/api/v1/bookings/active` | الحجز الجاري (للتتبّع) | نعم |
 | GET | `/api/v1/bookings/{id}` | تفاصيل حجز | نعم |
 | GET | `/api/v1/bookings/{id}/tracking` | خط زمني التتبّع + الفني | نعم |
+| GET | `/api/v1/bookings/{id}/delivery-map` | خريطة توصيل غنية (مسار + تقدّم) | نعم |
+| GET | `/api/v1/bookings/active/delivery-map` | خريطة الحجز النشط | نعم |
 | POST | `/api/v1/bookings` | إنشاء حجز جديد | نعم |
 
 **إنشاء حجز — `POST /api/v1/bookings`**
@@ -281,6 +283,17 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 | POST | `/api/v1/admin/vendors/{id}/reject` | الرفض | Admin |
 
 **مصادقة مؤقتة:** `X-Vendor-Id: v0000000-0000-4000-8000-000000000001` (فني seed مُوافَق).
+
+---
+
+### خريطة توصيل العميل
+
+انظر [`11_CUSTOMER_DELIVERY_MAP`](11_CUSTOMER_DELIVERY_MAP.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/bookings/{id}/delivery-map` | فني + عميل + مسار + تقدّم % | Customer |
+| GET | `/api/v1/bookings/active/delivery-map` | خريطة الحجز الجاري | Customer |
 
 ---
 
@@ -416,4 +429,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`08_SPLIT_PAYMENTS_ENGINE`](../docs/08_SPLIT_PAYMENTS_ENGINE.md) — محرك تقسيم المدفوعات ✅
 - [`09_VENDOR_ONBOARDING_FINANCIALS`](../docs/09_VENDOR_ONBOARDING_FINANCIALS.md) — انضمام الفنيين والمالية ✅
 - [`10_VENDOR_MAP_LOCATION`](../docs/10_VENDOR_MAP_LOCATION.md) — خريطة وموقع الفني ✅
-- `11_AUTH` — OTP عبر الجوال + JWT
+- [`11_CUSTOMER_DELIVERY_MAP`](../docs/11_CUSTOMER_DELIVERY_MAP.md) — خريطة توصيل العميل ✅
+- `12_AUTH` — OTP عبر الجوال + JWT

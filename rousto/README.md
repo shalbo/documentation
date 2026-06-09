@@ -21,7 +21,8 @@ rousto/
 │   ├── 07_LOGISTICS_AND_LAST_MILE.md
 │   ├── 08_SPLIT_PAYMENTS_ENGINE.md
 │   ├── 09_VENDOR_ONBOARDING_FINANCIALS.md
-│   └── 10_VENDOR_MAP_LOCATION.md
+│   ├── 10_VENDOR_MAP_LOCATION.md
+│   └── 11_CUSTOMER_DELIVERY_MAP.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -62,6 +63,7 @@ python3 -m http.server 8080
 
 ثم افتح:
 - موقع الويب: <http://localhost:8080/web/index.html>
+- خريطة التوصيل: <http://localhost:8080/web/delivery-map.html>
 - نموذج التطبيق: <http://localhost:8080/app/index.html>
 
 أو افتح ملفات `index.html` مباشرةً في المتصفح.
@@ -103,6 +105,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/08_SPLIT_PAYMENTS_ENGINE.md`](docs/08_SPLIT_PAYMENTS_ENGINE.md)
 - [`docs/09_VENDOR_ONBOARDING_FINANCIALS.md`](docs/09_VENDOR_ONBOARDING_FINANCIALS.md)
 - [`docs/10_VENDOR_MAP_LOCATION.md`](docs/10_VENDOR_MAP_LOCATION.md)
+- [`docs/11_CUSTOMER_DELIVERY_MAP.md`](docs/11_CUSTOMER_DELIVERY_MAP.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

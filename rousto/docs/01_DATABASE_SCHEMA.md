@@ -351,6 +351,7 @@ rousto/backend/database/
 ├── 012_vendor_seed.sql
 ├── 013_vendor_location_schema.sql
 ├── 014_vendor_location_seed.sql
+├── 016_customer_delivery_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 

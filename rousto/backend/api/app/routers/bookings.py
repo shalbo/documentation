@@ -8,6 +8,7 @@ from app.db import get_db
 from app.deps import get_current_user
 from app.models import Booking, User
 from app.schemas import BookingCreateIn
+from app.customer_delivery_services import build_customer_delivery_map
 from app.services import (
     ACTIVE_STATUSES,
     build_tracking,
@@ -50,6 +51,24 @@ def get_active_booking(
         return {"data": None}
     full = load_booking(db, booking.id, user.id)
     return {"data": serialize_booking(full) if full else None}
+
+
+@router.get("/active/delivery-map")
+def get_active_delivery_map(
+    user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
+    booking = db.scalar(
+        select(Booking)
+        .where(Booking.user_id == user.id, Booking.status.in_(ACTIVE_STATUSES))
+        .order_by(Booking.created_at.desc())
+        .limit(1)
+    )
+    if not booking:
+        return {"data": None}
+    full = load_booking(db, booking.id, user.id)
+    if not full:
+        return {"data": None}
+    return {"data": build_customer_delivery_map(db, full)}
 
 
 @router.get("/{booking_id}")
@@ -101,6 +120,21 @@ def get_booking_tracking(
             detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
         )
     return {"data": build_tracking(booking)}
+
+
+@router.get("/{booking_id}/delivery-map")
+def get_booking_delivery_map(
+    booking_id: UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    booking = load_booking(db, booking_id, user.id)
+    if not booking:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
+        )
+    return {"data": build_customer_delivery_map(db, booking)}
 
 
 @router.post("", status_code=201)

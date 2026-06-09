@@ -90,6 +90,11 @@ class ApiClient {
     return body['data'] as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> getBookingDeliveryMap(String bookingId) async {
+    final body = await _get('/bookings/$bookingId/delivery-map', auth: true);
+    return body['data'] as Map<String, dynamic>;
+  }
+
   Future<List<dynamic>> getPromotions() async {
     final body = await _get('/promotions');
     return body['data'] as List<dynamic>;
