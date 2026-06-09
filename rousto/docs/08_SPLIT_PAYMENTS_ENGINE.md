@@ -140,5 +140,5 @@ curl -X POST http://localhost:8000/api/v1/payments/split/preview \
 
 ## الخطوة التالية
 
-- `09_AUTH` — OTP + JWT
+- `10_AUTH` — OTP + JWT
 - `10_PAYMENT_GATEWAY` — بوابة دفع حقيقية

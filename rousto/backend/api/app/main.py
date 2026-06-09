@@ -15,6 +15,7 @@ from app.routers import (
     scans,
     split_payments,
     testimonials,
+    vendors,
 )
 
 app = FastAPI(
@@ -50,6 +51,7 @@ app.include_router(promotions.router, prefix=prefix)
 app.include_router(testimonials.router, prefix=prefix)
 app.include_router(monetization.router, prefix=prefix)
 app.include_router(split_payments.router, prefix=prefix)
+app.include_router(vendors.router, prefix=prefix)
 
 
 @app.exception_handler(HTTPException)

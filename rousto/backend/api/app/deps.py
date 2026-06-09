@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
-from app.models import User
+from app.models import User, Vendor
 
 
 def get_current_user(
@@ -42,3 +42,29 @@ def require_admin_key(
             status_code=401,
             detail={"code": "UNAUTHORIZED", "message": "مفتاح الإدارة غير صالح"},
         )
+
+
+def get_current_vendor(
+    x_vendor_id: str | None = Header(default=None, alias="X-Vendor-Id"),
+    db: Session = Depends(get_db),
+) -> Vendor:
+    if not x_vendor_id:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "UNAUTHORIZED", "message": "مطلوب هيدر X-Vendor-Id"},
+        )
+    try:
+        vendor_uuid = uuid.UUID(x_vendor_id)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "INVALID_VENDOR_ID", "message": "معرّف الفني غير صالح"},
+        ) from exc
+
+    vendor = db.get(Vendor, vendor_uuid)
+    if not vendor:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "UNAUTHORIZED", "message": "الفني غير موجود"},
+        )
+    return vendor

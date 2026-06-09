@@ -266,6 +266,24 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### انضمام الفنيين والمالية
+
+انظر [`09_VENDOR_ONBOARDING_FINANCIALS`](09_VENDOR_ONBOARDING_FINANCIALS.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| POST | `/api/v1/vendors/applications` | تقديم طلب انضمام | لا |
+| GET | `/api/v1/vendor/me` | ملف الفني + ملخص المدفوعات | Vendor |
+| PUT | `/api/v1/vendor/me/financials` | تحديث IBAN | Vendor |
+| GET | `/api/v1/vendor/me/payouts` | حصص الدفع | Vendor |
+| GET | `/api/v1/admin/vendors` | قائمة الطلبات | Admin |
+| POST | `/api/v1/admin/vendors/{id}/approve` | الموافقة | Admin |
+| POST | `/api/v1/admin/vendors/{id}/reject` | الرفض | Admin |
+
+**مصادقة مؤقتة:** `X-Vendor-Id: v0000000-0000-4000-8000-000000000001` (فني seed مُوافَق).
+
+---
+
 ### اللوجستيات (dev/admin)
 
 انظر [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md).
@@ -381,4 +399,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`06_AI_AND_IMAGE_RECOGNITION`](../docs/06_AI_AND_IMAGE_RECOGNITION.md) — فحص بالصورة + تشخيص تجريبي ✅
 - [`07_LOGISTICS_AND_LAST_MILE`](../docs/07_LOGISTICS_AND_LAST_MILE.md) — توصيل الخدمة + ETA + تتبّع مباشر ✅
 - [`08_SPLIT_PAYMENTS_ENGINE`](../docs/08_SPLIT_PAYMENTS_ENGINE.md) — محرك تقسيم المدفوعات ✅
-- `09_AUTH` — OTP عبر الجوال + JWT
+- [`09_VENDOR_ONBOARDING_FINANCIALS`](../docs/09_VENDOR_ONBOARDING_FINANCIALS.md) — انضمام الفنيين والمالية ✅
+- `10_AUTH` — OTP عبر الجوال + JWT

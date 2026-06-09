@@ -298,6 +298,26 @@ erDiagram
 
 انظر [`08_SPLIT_PAYMENTS_ENGINE`](08_SPLIT_PAYMENTS_ENGINE.md).
 
+### 20. `vendors` — طلبات انضمام الفنيين
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `business_name` | VARCHAR(120) | اسم النشاط |
+| `contact_name` | VARCHAR(120) | اسم المسؤول |
+| `email` / `phone` | VARCHAR | فريدان |
+| `status` | VARCHAR(20) | pending / approved / rejected |
+| `technician_id` | UUID FK NULL | يُملأ عند الموافقة |
+
+### 21. `vendor_bank_accounts` — حسابات بنكية للفنيين
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `vendor_id` | UUID FK | الفني |
+| `iban` | VARCHAR(34) | رقم IBAN |
+| `is_primary` | BOOLEAN | حساب أساسي واحد لكل فني |
+
+انظر [`09_VENDOR_ONBOARDING_FINANCIALS`](09_VENDOR_ONBOARDING_FINANCIALS.md).
+
 ---
 
 ## الفهارس (Indexes)
@@ -325,6 +345,8 @@ rousto/backend/database/
 ├── 008_logistics_seed.sql
 ├── 009_split_payments_schema.sql
 ├── 010_split_payments_seed.sql
+├── 011_vendor_schema.sql
+├── 012_vendor_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 

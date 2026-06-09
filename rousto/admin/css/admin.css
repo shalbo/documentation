@@ -36,6 +36,15 @@ body {
 }
 .topbar h1 { margin: 0; font-size: 1.25rem; }
 .topbar p { margin: 4px 0 0; opacity: .85; font-size: .85rem; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn-ghost-light {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
 
 .layout {
   max-width: 1200px;
@@ -128,6 +137,7 @@ tr:hover td { background: #faf9f7; }
 }
 .badge-on { background: #e8f7f0; color: var(--green); }
 .badge-off { background: #f3f3f3; color: var(--ink-300); }
+.badge-warn { background: #fff4e5; color: #b86e00; }
 .badge-protected { background: var(--red-050); color: var(--red-600); }
 
 .actions { display: flex; gap: 6px; flex-wrap: wrap; }

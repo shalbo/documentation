@@ -19,7 +19,8 @@ rousto/
 │   ├── 05_ADMIN_CATALOG_MANAGEMENT.md
 │   ├── 06_AI_AND_IMAGE_RECOGNITION.md
 │   ├── 07_LOGISTICS_AND_LAST_MILE.md
-│   └── 08_SPLIT_PAYMENTS_ENGINE.md
+│   ├── 08_SPLIT_PAYMENTS_ENGINE.md
+│   └── 09_VENDOR_ONBOARDING_FINANCIALS.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -32,10 +33,11 @@ rousto/
 ├── app/                   # نموذج واجهات التطبيق بصيغة HTML (5 شاشات)
 │   ├── index.html
 │   └── css/app.css
-├── admin/                 # لوحة إدارة الكتالوج (تصنيفات + خدمات)
+├── admin/                 # لوحات الإدارة (كتالوج + انضمام الفنيين)
 │   ├── index.html
+│   ├── vendors.html
 │   ├── css/admin.css
-│   └── js/admin.js
+│   └── js/
 └── app_flutter/           # تطبيق Flutter كامل (الإصدار الرسمي للتطبيق)
     ├── lib/               # الكود المصدري (شاشات، ثيم، مكوّنات)
     ├── web/               # غلاف الويب
@@ -96,6 +98,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/06_AI_AND_IMAGE_RECOGNITION.md`](docs/06_AI_AND_IMAGE_RECOGNITION.md)
 - [`docs/07_LOGISTICS_AND_LAST_MILE.md`](docs/07_LOGISTICS_AND_LAST_MILE.md)
 - [`docs/08_SPLIT_PAYMENTS_ENGINE.md`](docs/08_SPLIT_PAYMENTS_ENGINE.md)
+- [`docs/09_VENDOR_ONBOARDING_FINANCIALS.md`](docs/09_VENDOR_ONBOARDING_FINANCIALS.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

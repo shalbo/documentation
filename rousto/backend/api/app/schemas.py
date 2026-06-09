@@ -313,3 +313,26 @@ class AdminServiceUpdate(BaseModel):
     price_sar: float | None = Field(default=None, gt=0)
     duration_minutes: int | None = Field(default=None, gt=0, le=480)
     is_active: bool | None = None
+
+
+class VendorApplicationIn(BaseModel):
+    business_name: str = Field(..., min_length=2, max_length=120)
+    contact_name: str = Field(..., min_length=2, max_length=120)
+    email: str = Field(..., min_length=5, max_length=255)
+    phone: str = Field(..., min_length=8, max_length=20)
+    city: str = Field(default="الرياض", min_length=2, max_length=60)
+    bank_name: str = Field(..., min_length=2, max_length=80)
+    account_holder: str = Field(..., min_length=2, max_length=120)
+    iban: str = Field(..., min_length=15, max_length=34)
+    national_id: str | None = Field(default=None, max_length=20)
+    commercial_reg: str | None = Field(default=None, max_length=40)
+
+
+class VendorFinancialsUpdateIn(BaseModel):
+    bank_name: str = Field(..., min_length=2, max_length=80)
+    account_holder: str = Field(..., min_length=2, max_length=120)
+    iban: str = Field(..., min_length=15, max_length=34)
+
+
+class VendorRejectIn(BaseModel):
+    reason: str = Field(..., min_length=3, max_length=500)

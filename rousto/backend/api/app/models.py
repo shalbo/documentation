@@ -434,3 +434,41 @@ class TechnicianLocationUpdate(Base):
     lat: Mapped[float] = mapped_column(Numeric(10, 7))
     lng: Mapped[float] = mapped_column(Numeric(10, 7))
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class Vendor(Base):
+    __tablename__ = "vendors"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    business_name: Mapped[str] = mapped_column(String(120))
+    contact_name: Mapped[str] = mapped_column(String(120))
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    phone: Mapped[str] = mapped_column(String(20), unique=True)
+    city: Mapped[str] = mapped_column(String(60), default="الرياض")
+    national_id: Mapped[str | None] = mapped_column(String(20))
+    commercial_reg: Mapped[str | None] = mapped_column(String(40))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    technician_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
+    rejection_reason: Mapped[str | None] = mapped_column(Text)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    approved_by: Mapped[str | None] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    bank_accounts: Mapped[list["VendorBankAccount"]] = relationship(back_populates="vendor")
+
+
+class VendorBankAccount(Base):
+    __tablename__ = "vendor_bank_accounts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    vendor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vendors.id"))
+    bank_name: Mapped[str] = mapped_column(String(80))
+    account_holder: Mapped[str] = mapped_column(String(120))
+    iban: Mapped[str] = mapped_column(String(34))
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    vendor: Mapped["Vendor"] = relationship(back_populates="bank_accounts")

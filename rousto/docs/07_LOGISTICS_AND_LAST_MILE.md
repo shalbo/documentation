@@ -138,5 +138,5 @@ curl -X POST http://localhost:8000/api/v1/logistics/bookings/i0000000-0000-4000-
 ## الخطوة التالية
 
 - [`08_SPLIT_PAYMENTS_ENGINE`](08_SPLIT_PAYMENTS_ENGINE.md) — إطلاق حصة الفني عند `completed` ✅
-- `09_AUTH` — OTP + JWT + أدوار (`technician`, `admin`)
+- `10_AUTH` — OTP + JWT + أدوار (`technician`, `admin`)
 - `10_LOGISTICS_REALTIME` — WebSocket + خرائط حقيقية
