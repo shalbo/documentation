@@ -8,6 +8,7 @@ from app.routers import (
     bookings,
     catalog,
     health,
+    logistics,
     monetization,
     profile,
     promotions,
@@ -43,6 +44,7 @@ app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
+app.include_router(logistics.router, prefix=prefix)
 app.include_router(promotions.router, prefix=prefix)
 app.include_router(testimonials.router, prefix=prefix)
 app.include_router(monetization.router, prefix=prefix)

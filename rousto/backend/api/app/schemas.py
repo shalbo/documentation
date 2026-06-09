@@ -292,6 +292,19 @@ class AdminServiceCreate(BaseModel):
     is_active: bool = True
 
 
+class BookingStatusUpdateIn(BaseModel):
+    status: str = Field(
+        pattern=r"^(confirmed|technician_assigned|en_route|in_progress|completed)$"
+    )
+    metadata: dict | None = None
+
+
+class TechnicianLocationUpdateIn(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+    booking_id: UUID | None = None
+
+
 class AdminServiceUpdate(BaseModel):
     category_id: UUID | None = None
     name_ar: str | None = Field(default=None, min_length=1, max_length=120)

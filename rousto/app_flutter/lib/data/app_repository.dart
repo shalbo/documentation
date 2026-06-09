@@ -38,8 +38,15 @@ class AppRepository {
     }
   }
 
-  Future<({BookingModel booking, TechnicianModel? technician, List<TrackStepModel> steps})>
-      loadTracking(String bookingId) async {
+  Future<
+      ({
+        BookingModel booking,
+        TechnicianModel? technician,
+        List<TrackStepModel> steps,
+        TrackingDestinationModel? destination,
+        double? distanceKm,
+        int? etaMinutes,
+      })> loadTracking(String bookingId) async {
     try {
       final data = await _api.getBookingTracking(bookingId);
       final bookingJson = data['booking'] as Map<String, dynamic>;
@@ -54,6 +61,12 @@ class AppRepository {
       final techJson = data['technician'] as Map<String, dynamic>?;
       if (techJson != null) technician = TechnicianModel.fromJson(techJson);
 
+      TrackingDestinationModel? destination;
+      final destJson = data['destination'] as Map<String, dynamic>?;
+      if (destJson != null) {
+        destination = TrackingDestinationModel.fromJson(destJson);
+      }
+
       final stepsJson = data['steps'] as List<dynamic>? ?? [];
       final steps = stepsJson.map((step) {
         final s = step as Map<String, dynamic>;
@@ -67,7 +80,7 @@ class AppRepository {
         } else {
           status = TrackStatus.todo;
         }
-        final occurredAt = s['occurred_at'] as String? ?? '';
+        final occurredAt = s['occurred_at'] as String?;
         return TrackStepModel(
           title: s['label_ar'] as String,
           time: _formatTime(occurredAt, isCurrent),
@@ -75,12 +88,22 @@ class AppRepository {
         );
       }).toList();
 
-      return (booking: booking, technician: technician, steps: steps);
+      return (
+        booking: booking,
+        technician: technician,
+        steps: steps,
+        destination: destination,
+        distanceKm: (data['distance_km'] as num?)?.toDouble(),
+        etaMinutes: data['eta_minutes'] as int? ?? technician?.etaMinutes,
+      );
     } catch (_) {
       return (
         booking: MockData.activeBooking,
         technician: MockData.technician,
         steps: MockData.trackSteps,
+        destination: MockData.trackingDestination,
+        distanceKm: MockData.trackingDistanceKm,
+        etaMinutes: MockData.technician.etaMinutes,
       );
     }
   }
@@ -284,9 +307,9 @@ class AppRepository {
     }
   }
 
-  String _formatTime(String iso, bool isCurrent) {
+  String _formatTime(String? iso, bool isCurrent) {
     if (isCurrent) return 'الآن';
-    if (iso.isEmpty) return 'قيد الانتظار';
+    if (iso == null || iso.isEmpty) return 'قيد الانتظار';
     try {
       final dt = DateTime.parse(iso).toLocal();
       final hour = dt.hour > 12 ? dt.hour - 12 : dt.hour;

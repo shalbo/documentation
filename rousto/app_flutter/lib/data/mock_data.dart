@@ -151,8 +151,18 @@ class MockData {
     fullName: 'أحمد الفني',
     rating: 4.9,
     avatarInitials: 'أ',
+    phone: '+966509876543',
     etaMinutes: 12,
+    location: GeoLocationModel(lat: 24.77, lng: 46.735),
   );
+
+  static const trackingDestination = TrackingDestinationModel(
+    label: 'المنزل · حي النخيل',
+    lat: 24.774265,
+    lng: 46.738586,
+  );
+
+  static const trackingDistanceKm = 0.42;
 
   static const trackSteps = <TrackStepModel>[
     TrackStepModel(title: 'تم تأكيد الحجز', time: '9:02 ص', status: TrackStatus.done),

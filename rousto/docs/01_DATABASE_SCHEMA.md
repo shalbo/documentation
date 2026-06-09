@@ -265,6 +265,18 @@ erDiagram
 
 `bookings.scan_id` — ربط اختياري بالفحص (انظر [`06_AI_AND_IMAGE_RECOGNITION`](06_AI_AND_IMAGE_RECOGNITION.md)).
 
+### 17. `technician_location_updates` — سجل مواقع الفني
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `id` | UUID PK | |
+| `technician_id` | UUID FK | الفني |
+| `booking_id` | UUID FK NULL | الحجز المرتبط |
+| `lat` / `lng` | NUMERIC(10,7) | الإحداثيات |
+| `recorded_at` | TIMESTAMPTZ | وقت التسجيل |
+
+انظر [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md).
+
 ---
 
 ## الفهارس (Indexes)
@@ -288,6 +300,8 @@ rousto/backend/database/
 ├── 002_seed.sql      # بيانات تجريبية (مطابقة للتطبيق)
 ├── 005_ai_schema.sql # جداول فحص الصور
 ├── 006_ai_seed.sql   # فحص تجريبي
+├── 007_logistics_schema.sql
+├── 008_logistics_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 

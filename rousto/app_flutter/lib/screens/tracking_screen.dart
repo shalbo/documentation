@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,9 +18,12 @@ class TrackingScreen extends StatefulWidget {
 }
 
 class _TrackingScreenState extends State<TrackingScreen> {
+  Timer? _pollTimer;
   bool _loading = true;
   BookingModel? _booking;
   TechnicianModel? _technician;
+  TrackingDestinationModel? _destination;
+  double? _distanceKm;
   List<TrackStepModel> _steps = [];
 
   @override
@@ -27,23 +32,43 @@ class _TrackingScreenState extends State<TrackingScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
+  }
+
+  void _schedulePolling(String? status) {
+    _pollTimer?.cancel();
+    if (status == 'en_route' || status == 'technician_assigned') {
+      _pollTimer = Timer.periodic(const Duration(seconds: 20), (_) => _load());
+    }
+  }
+
   Future<void> _load() async {
-    setState(() => _loading = true);
+    if (!mounted) return;
+    setState(() => _loading = _booking == null);
+
     final state = context.read<AppState>();
     final bookingId = widget.bookingId ?? state.activeBooking?.id;
     if (bookingId == null) {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
       return;
     }
 
     final repo = AppRepository();
     final result = await repo.loadTracking(bookingId);
+    if (!mounted) return;
+
     setState(() {
       _booking = result.booking;
       _technician = result.technician;
+      _destination = result.destination;
+      _distanceKm = result.distanceKm;
       _steps = result.steps;
       _loading = false;
     });
+    _schedulePolling(result.booking.status);
   }
 
   @override
@@ -81,55 +106,87 @@ class _TrackingScreenState extends State<TrackingScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 110),
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('تتبّع الخدمة',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w800)),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF3D6),
-                    borderRadius: BorderRadius.circular(999),
+        child: RefreshIndicator(
+          onRefresh: _load,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 110),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('تتبّع الخدمة',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w800)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF3D6),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      _booking!.statusLabelAr,
+                      style: const TextStyle(
+                          color: Color(0xFFB07D00),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12),
+                    ),
                   ),
-                  child: Text(
-                    _booking!.statusLabelAr,
-                    style: const TextStyle(
-                        color: Color(0xFFB07D00),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12),
-                  ),
+                ],
+              ),
+              if (_distanceKm != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'المسافة ${_distanceKm!.toStringAsFixed(1)} كم'
+                  '${_technician?.etaMinutes != null ? ' · يصل خلال ${_technician!.etaMinutes} دقيقة' : ''}',
+                  style: const TextStyle(color: AppColors.ink500, fontSize: 12),
                 ),
               ],
-            ),
-            const SizedBox(height: 14),
-            _map(),
-            const SizedBox(height: 14),
-            if (_technician != null) _technicianCard(_technician!),
-            const SizedBox(height: 14),
-            _stepsCard(),
-            const SizedBox(height: 14),
-            GradientButton(
-              label: 'مراسلة الفني',
-              icon: Icons.chat_bubble_outline,
-              gradient: const LinearGradient(
-                  colors: [AppColors.ink900, AppColors.ink700]),
-              onPressed: () {},
-            ),
-          ],
+              const SizedBox(height: 14),
+              _map(_technician?.location, _destination),
+              const SizedBox(height: 14),
+              if (_technician != null) _technicianCard(_technician!),
+              const SizedBox(height: 14),
+              _stepsCard(),
+              const SizedBox(height: 14),
+              GradientButton(
+                label: 'مراسلة الفني',
+                icon: Icons.chat_bubble_outline,
+                gradient: const LinearGradient(
+                    colors: [AppColors.ink900, AppColors.ink700]),
+                onPressed: () {},
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _map() {
+  Widget _map(GeoLocationModel? tech, TrackingDestinationModel? dest) {
+    Alignment techAlign = const Alignment(0.2, -0.1);
+    Alignment destAlign = const Alignment(-0.5, 0.4);
+
+    if (tech != null && dest != null) {
+      final minLat = tech.lat < dest.lat ? tech.lat : dest.lat;
+      final maxLat = tech.lat > dest.lat ? tech.lat : dest.lat;
+      final minLng = tech.lng < dest.lng ? tech.lng : dest.lng;
+      final maxLng = tech.lng > dest.lng ? tech.lng : dest.lng;
+      final latSpan = (maxLat - minLat).abs().clamp(0.0001, 1.0);
+      final lngSpan = (maxLng - minLng).abs().clamp(0.0001, 1.0);
+
+      double normX(double lng) => ((lng - minLng) / lngSpan) * 2 - 1;
+      double normY(double lat) => -(((lat - minLat) / latSpan) * 2 - 1);
+
+      techAlign = Alignment(normX(tech.lng).clamp(-0.85, 0.85),
+          normY(tech.lat).clamp(-0.85, 0.85));
+      destAlign = Alignment(normX(dest.lng).clamp(-0.85, 0.85),
+          normY(dest.lat).clamp(-0.85, 0.85));
+    }
+
     return Container(
-      height: 160,
+      height: 180,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
@@ -153,9 +210,30 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ),
             ),
           ),
-          const Align(
-            alignment: Alignment(0.2, -0.1),
-            child: CircleAvatar(
+          if (dest != null)
+            Align(
+              alignment: destAlign,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: AppColors.ink700,
+                    child: Icon(Icons.home_outlined,
+                        color: Colors.white, size: 16),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(dest.label,
+                      style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.ink700)),
+                ],
+              ),
+            ),
+          Align(
+            alignment: techAlign,
+            child: const CircleAvatar(
               radius: 20,
               backgroundColor: AppColors.red,
               child: Icon(Icons.local_shipping_outlined,
@@ -194,10 +272,14 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ],
             ),
           ),
-          const CircleAvatar(
+          CircleAvatar(
             radius: 20,
             backgroundColor: AppColors.green,
-            child: Icon(Icons.call, color: Colors.white, size: 18),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.call, color: Colors.white, size: 18),
+              onPressed: tech.phone != null ? () {} : null,
+            ),
           ),
         ],
       ),

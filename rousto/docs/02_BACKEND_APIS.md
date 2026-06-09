@@ -229,18 +229,39 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
     },
     "technician": {
       "full_name": "أحمد الفني",
+      "phone": "+966509876543",
       "rating": 4.9,
       "avatar_initials": "أ",
-      "eta_minutes": 12,
+      "eta_minutes": 2,
       "location": { "lat": 24.77, "lng": 46.735 }
     },
+    "destination": {
+      "label": "المنزل · حي النخيل",
+      "lat": 24.774265,
+      "lng": 46.738586
+    },
+    "distance_km": 0.42,
+    "eta_minutes": 2,
     "steps": [
-      { "status": "confirmed", "label_ar": "تم تأكيد الحجز", "occurred_at": "...", "is_current": false },
-      { "status": "en_route", "label_ar": "الفني في الطريق إليك", "occurred_at": "...", "is_current": true }
+      { "status": "confirmed", "label_ar": "تم تأكيد الحجز", "occurred_at": "...", "is_current": false, "is_done": true },
+      { "status": "en_route", "label_ar": "الفني في الطريق إليك", "occurred_at": "...", "is_current": true, "is_done": false },
+      { "status": "in_progress", "label_ar": "جاري تنفيذ الخدمة", "occurred_at": null, "is_current": false, "is_done": false }
     ]
   }
 }
 ```
+
+---
+
+### اللوجستيات (dev/admin)
+
+انظر [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| POST | `/api/v1/logistics/bookings/{id}/advance` | الحالة التالية | Admin |
+| PATCH | `/api/v1/logistics/technicians/{id}/location` | تحديث GPS | Admin |
+| POST | `/api/v1/logistics/bookings/{id}/simulate-move` | تحريك تجريبي | Admin |
 
 ---
 
@@ -345,4 +366,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`04_BUSINESS_MONETIZATION`](../docs/04_BUSINESS_MONETIZATION.md) — تحقيق الدخل والاشتراكات ✅
 - [`05_ADMIN_CATALOG_MANAGEMENT`](../docs/05_ADMIN_CATALOG_MANAGEMENT.md) — إدارة الكتالوج + لوحة الويب ✅
 - [`06_AI_AND_IMAGE_RECOGNITION`](../docs/06_AI_AND_IMAGE_RECOGNITION.md) — فحص بالصورة + تشخيص تجريبي ✅
-- `07_AUTH` — OTP عبر الجوال + JWT
+- [`07_LOGISTICS_AND_LAST_MILE`](../docs/07_LOGISTICS_AND_LAST_MILE.md) — توصيل الخدمة + ETA + تتبّع مباشر ✅
+- `08_AUTH` — OTP عبر الجوال + JWT

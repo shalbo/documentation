@@ -18,6 +18,8 @@ services:
       - ./database/004_monetization_seed.sql:/docker-entrypoint-initdb.d/004_monetization_seed.sql:ro
       - ./database/005_ai_schema.sql:/docker-entrypoint-initdb.d/005_ai_schema.sql:ro
       - ./database/006_ai_seed.sql:/docker-entrypoint-initdb.d/006_ai_seed.sql:ro
+      - ./database/007_logistics_schema.sql:/docker-entrypoint-initdb.d/007_logistics_schema.sql:ro
+      - ./database/008_logistics_seed.sql:/docker-entrypoint-initdb.d/008_logistics_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

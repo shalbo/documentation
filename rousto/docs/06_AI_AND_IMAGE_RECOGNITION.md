@@ -162,5 +162,6 @@ curl http://localhost:8000/api/v1/scans/types
 
 ## الخطوة التالية
 
-- `07_AUTH` — OTP + JWT
-- `08_AI_EXTERNAL` — موصل رؤية حقيقي (اختياري)
+- [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md) — توصيل الخدمة ✅
+- `08_AUTH` — OTP + JWT
+- `09_AI_EXTERNAL` — موصل رؤية حقيقي (اختياري)

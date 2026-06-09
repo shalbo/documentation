@@ -393,3 +393,14 @@ class ScanFinding(Base):
 
     scan: Mapped["VehicleScan"] = relationship(back_populates="findings")
     suggested_service: Mapped["Service | None"] = relationship()
+
+
+class TechnicianLocationUpdate(Base):
+    __tablename__ = "technician_location_updates"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    technician_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("technicians.id"))
+    booking_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("bookings.id"))
+    lat: Mapped[float] = mapped_column(Numeric(10, 7))
+    lng: Mapped[float] = mapped_column(Numeric(10, 7))
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

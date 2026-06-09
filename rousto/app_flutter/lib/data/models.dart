@@ -222,25 +222,66 @@ class TrackStepModel {
   });
 }
 
+class GeoLocationModel {
+  final double lat;
+  final double lng;
+
+  const GeoLocationModel({required this.lat, required this.lng});
+
+  factory GeoLocationModel.fromJson(Map<String, dynamic> json) {
+    return GeoLocationModel(
+      lat: (json['lat'] as num).toDouble(),
+      lng: (json['lng'] as num).toDouble(),
+    );
+  }
+}
+
+class TrackingDestinationModel {
+  final String label;
+  final double lat;
+  final double lng;
+
+  const TrackingDestinationModel({
+    required this.label,
+    required this.lat,
+    required this.lng,
+  });
+
+  factory TrackingDestinationModel.fromJson(Map<String, dynamic> json) {
+    return TrackingDestinationModel(
+      label: json['label'] as String,
+      lat: (json['lat'] as num).toDouble(),
+      lng: (json['lng'] as num).toDouble(),
+    );
+  }
+}
+
 class TechnicianModel {
   final String fullName;
   final double rating;
   final String? avatarInitials;
+  final String? phone;
   final int? etaMinutes;
+  final GeoLocationModel? location;
 
   const TechnicianModel({
     required this.fullName,
     required this.rating,
     this.avatarInitials,
+    this.phone,
     this.etaMinutes,
+    this.location,
   });
 
   factory TechnicianModel.fromJson(Map<String, dynamic> json) {
+    final loc = json['location'] as Map<String, dynamic>?;
     return TechnicianModel(
       fullName: json['full_name'] as String,
       rating: (json['rating'] as num).toDouble(),
       avatarInitials: json['avatar_initials'] as String?,
+      phone: json['phone'] as String?,
       etaMinutes: json['eta_minutes'] as int?,
+      location: loc != null ? GeoLocationModel.fromJson(loc) : null,
     );
   }
 

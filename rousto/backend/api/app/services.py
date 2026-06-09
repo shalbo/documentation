@@ -19,6 +19,10 @@ from app.models import (
     Vehicle,
     VehicleScan,
 )
+from app.logistics_services import (
+    build_full_tracking_steps,
+    compute_logistics_metrics,
+)
 from app.monetization import (
     calculate_membership_discount,
     get_membership_plan_for_user,
@@ -337,53 +341,19 @@ def create_booking(
     return load_booking(db, booking.id, user.id)
 
 
-TRACKING_ORDER = [
-    "confirmed",
-    "technician_assigned",
-    "en_route",
-    "in_progress",
-    "completed",
-]
-
-
 def build_tracking(booking: Booking) -> dict:
-    current_status = booking.status
-    current_idx = (
-        TRACKING_ORDER.index(current_status)
-        if current_status in TRACKING_ORDER
-        else -1
-    )
-    steps = []
-    for event in booking.status_events:
-        event_idx = (
-            TRACKING_ORDER.index(event.status)
-            if event.status in TRACKING_ORDER
-            else -1
-        )
-        is_current = event.status == current_status
-        is_done = event_idx >= 0 and current_idx >= 0 and event_idx < current_idx
-        steps.append(
-            {
-                "status": event.status,
-                "label_ar": event.label_ar,
-                "occurred_at": event.occurred_at,
-                "is_current": is_current,
-                "is_done": is_done,
-            }
-        )
+    metrics = compute_logistics_metrics(booking)
+    steps = build_full_tracking_steps(booking)
 
     technician_out = None
     if booking.technician:
-        eta = None
-        for event in reversed(booking.status_events):
-            if event.status == "en_route" and event.metadata_:
-                eta = event.metadata_.get("eta_minutes")
-                break
         technician_out = {
+            "id": str(booking.technician.id),
             "full_name": booking.technician.full_name,
+            "phone": booking.technician.phone,
             "rating": to_float(booking.technician.rating),
             "avatar_initials": booking.technician.avatar_initials,
-            "eta_minutes": eta,
+            "eta_minutes": metrics["eta_minutes"],
             "location": (
                 {
                     "lat": to_float(booking.technician.current_lat),
@@ -402,5 +372,8 @@ def build_tracking(booking: Booking) -> dict:
             "status_label_ar": status_label_ar(booking.status),
         },
         "technician": technician_out,
+        "destination": metrics["destination"],
+        "distance_km": metrics["distance_km"],
+        "eta_minutes": metrics["eta_minutes"],
         "steps": steps,
     }

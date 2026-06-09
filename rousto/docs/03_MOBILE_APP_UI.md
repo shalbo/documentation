@@ -124,4 +124,5 @@ flutter test
 - [`04_BUSINESS_MONETIZATION`](04_BUSINESS_MONETIZATION.md) — اشتراكات، باقات، استبدال نقاط ✅
 - [`05_ADMIN_CATALOG_MANAGEMENT`](05_ADMIN_CATALOG_MANAGEMENT.md) — لوحة إدارة الكتالوج ✅
 - [`06_AI_AND_IMAGE_RECOGNITION`](06_AI_AND_IMAGE_RECOGNITION.md) — فحص بالصورة ✅
-- `07_AUTH` — OTP + JWT (استبدال `X-User-Id`)
+- [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md) — تتبّع مباشر + خريطة نسبية ✅
+- `08_AUTH` — OTP + JWT (استبدال `X-User-Id`)
