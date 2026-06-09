@@ -249,6 +249,36 @@ class MockData {
     lifetimeSavingsSar: 30,
   );
 
+  static SplitPreviewModel splitPreviewFor(double amount) {
+    final platform = (amount * 0.15).roundToDouble();
+    final technician = (amount * 0.75).roundToDouble();
+    final reserve = (amount - platform - technician);
+    return SplitPreviewModel(
+      amountSar: amount,
+      ruleSlug: 'default',
+      legs: [
+        SplitLegPreviewModel(
+          recipientType: 'platform',
+          labelAr: 'عمولة المنصة',
+          rate: 0.15,
+          amountSar: platform,
+        ),
+        SplitLegPreviewModel(
+          recipientType: 'technician',
+          labelAr: 'حصة الفني',
+          rate: 0.75,
+          amountSar: technician,
+        ),
+        SplitLegPreviewModel(
+          recipientType: 'reserve',
+          labelAr: 'احتياطي المنصة',
+          rate: 0.10,
+          amountSar: reserve,
+        ),
+      ],
+    );
+  }
+
   static const scanTypes = <ScanTypeModel>[
     ScanTypeModel(
       id: 'dashboard_warning',

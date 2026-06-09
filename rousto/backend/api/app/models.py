@@ -334,6 +334,36 @@ class PromotionRedemption(Base):
     redeemed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class SplitRule(Base):
+    __tablename__ = "split_rules"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    platform_rate: Mapped[float] = mapped_column(Numeric(5, 4))
+    technician_rate: Mapped[float] = mapped_column(Numeric(5, 4))
+    reserve_rate: Mapped[float] = mapped_column(Numeric(5, 4))
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class PaymentSplitLeg(Base):
+    __tablename__ = "payment_split_legs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    payment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("payments.id"))
+    booking_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("bookings.id"))
+    rule_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("split_rules.id"))
+    recipient_type: Mapped[str] = mapped_column(String(20))
+    recipient_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
+    amount_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    rate_applied: Mapped[float] = mapped_column(Numeric(5, 4))
+    status: Mapped[str] = mapped_column(String(20), default="held")
+    released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class BookingRevenue(Base):
     __tablename__ = "booking_revenue"
 

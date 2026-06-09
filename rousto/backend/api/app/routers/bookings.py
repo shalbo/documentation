@@ -15,6 +15,7 @@ from app.services import (
     load_booking,
     serialize_booking,
 )
+from app.split_payments import get_booking_split
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
@@ -64,6 +65,27 @@ def get_booking(
             detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
         )
     return {"data": serialize_booking(booking)}
+
+
+@router.get("/{booking_id}/payment-split")
+def get_booking_payment_split(
+    booking_id: UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    booking = load_booking(db, booking_id, user.id)
+    if not booking:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
+        )
+    data = get_booking_split(db, booking_id)
+    if not data:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "NOT_FOUND", "message": "لا يوجد تقسيم لهذا الحجز"},
+        )
+    return {"data": data}
 
 
 @router.get("/{booking_id}/tracking")

@@ -13,6 +13,7 @@ from app.routers import (
     profile,
     promotions,
     scans,
+    split_payments,
     testimonials,
 )
 
@@ -48,6 +49,7 @@ app.include_router(logistics.router, prefix=prefix)
 app.include_router(promotions.router, prefix=prefix)
 app.include_router(testimonials.router, prefix=prefix)
 app.include_router(monetization.router, prefix=prefix)
+app.include_router(split_payments.router, prefix=prefix)
 
 
 @app.exception_handler(HTTPException)

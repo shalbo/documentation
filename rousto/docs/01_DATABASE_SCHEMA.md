@@ -277,6 +277,27 @@ erDiagram
 
 انظر [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md).
 
+### 18. `split_rules` — قواعد تقسيم المدفوعات
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `slug` | VARCHAR(40) | معرّف القاعدة |
+| `platform_rate` | NUMERIC(5,4) | نسبة المنصة |
+| `technician_rate` | NUMERIC(5,4) | نسبة الفني |
+| `reserve_rate` | NUMERIC(5,4) | نسبة الاحتياطي |
+
+### 19. `payment_split_legs` — أرجل التقسيم
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `payment_id` | UUID FK | الدفعة |
+| `booking_id` | UUID FK | الحجز |
+| `recipient_type` | VARCHAR(20) | platform / technician / reserve |
+| `amount_sar` | NUMERIC(10,2) | المبلغ |
+| `status` | VARCHAR(20) | held / released / paid |
+
+انظر [`08_SPLIT_PAYMENTS_ENGINE`](08_SPLIT_PAYMENTS_ENGINE.md).
+
 ---
 
 ## الفهارس (Indexes)
@@ -302,6 +323,8 @@ rousto/backend/database/
 ├── 006_ai_seed.sql   # فحص تجريبي
 ├── 007_logistics_schema.sql
 ├── 008_logistics_seed.sql
+├── 009_split_payments_schema.sql
+├── 010_split_payments_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 

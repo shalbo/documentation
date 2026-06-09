@@ -261,6 +261,15 @@ class AppRepository {
     }
   }
 
+  Future<SplitPreviewModel> previewPaymentSplit(double amountSar) async {
+    try {
+      final data = await _api.previewPaymentSplit(amountSar);
+      return SplitPreviewModel.fromJson(data);
+    } catch (_) {
+      return MockData.splitPreviewFor(amountSar);
+    }
+  }
+
   Future<ScanModel> submitScan({
     required String vehicleId,
     required String scanType,

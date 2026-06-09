@@ -18,7 +18,8 @@ rousto/
 │   ├── 04_BUSINESS_MONETIZATION.md
 │   ├── 05_ADMIN_CATALOG_MANAGEMENT.md
 │   ├── 06_AI_AND_IMAGE_RECOGNITION.md
-│   └── 07_LOGISTICS_AND_LAST_MILE.md
+│   ├── 07_LOGISTICS_AND_LAST_MILE.md
+│   └── 08_SPLIT_PAYMENTS_ENGINE.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -94,6 +95,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/05_ADMIN_CATALOG_MANAGEMENT.md`](docs/05_ADMIN_CATALOG_MANAGEMENT.md)
 - [`docs/06_AI_AND_IMAGE_RECOGNITION.md`](docs/06_AI_AND_IMAGE_RECOGNITION.md)
 - [`docs/07_LOGISTICS_AND_LAST_MILE.md`](docs/07_LOGISTICS_AND_LAST_MILE.md)
+- [`docs/08_SPLIT_PAYMENTS_ENGINE.md`](docs/08_SPLIT_PAYMENTS_ENGINE.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

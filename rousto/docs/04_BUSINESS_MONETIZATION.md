@@ -121,6 +121,12 @@ rousto/app_flutter/lib/screens/membership_screen.dart
 
 ---
 
+## تقسيم المدفوعات
+
+انظر [`08_SPLIT_PAYMENTS_ENGINE`](08_SPLIT_PAYMENTS_ENGINE.md) — أرجل الدفع `payment_split_legs` مع إطلاق حصة الفني عند اكتمال الخدمة.
+
+---
+
 ## التشغيل
 
 ```bash

@@ -23,6 +23,7 @@ from app.logistics_services import (
     build_full_tracking_steps,
     compute_logistics_metrics,
 )
+from app.split_payments import create_split_legs_for_payment
 from app.monetization import (
     calculate_membership_discount,
     get_membership_plan_for_user,
@@ -312,16 +313,23 @@ def create_booking(
         )
 
     db.add_all(events)
-    db.add(
-        Payment(
-            id=uuid4(),
-            booking_id=booking.id,
-            amount_sar=total_sar,
-            status="captured",
-            gateway_ref=f"PAY-{booking.reference}",
-            paid_at=datetime.now(timezone.utc),
-            created_at=datetime.now(timezone.utc),
-        )
+    payment = Payment(
+        id=uuid4(),
+        booking_id=booking.id,
+        amount_sar=total_sar,
+        status="captured",
+        gateway_ref=f"PAY-{booking.reference}",
+        paid_at=datetime.now(timezone.utc),
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(payment)
+    db.flush()
+    create_split_legs_for_payment(
+        db,
+        payment=payment,
+        booking=booking,
+        net_sar=total_sar,
+        technician_id=technician.id if technician else None,
     )
     record_booking_revenue(
         db,

@@ -192,6 +192,11 @@ def transition_booking_status(
             metadata_=event_metadata,
         )
     )
+    if new_status == "completed":
+        from app.split_payments import release_technician_splits
+
+        release_technician_splits(db, booking.id)
+
     db.commit()
     return booking
 

@@ -337,6 +337,52 @@ IconData iconFromKey(String? key) {
   }
 }
 
+class SplitLegPreviewModel {
+  final String recipientType;
+  final String labelAr;
+  final double rate;
+  final double amountSar;
+
+  const SplitLegPreviewModel({
+    required this.recipientType,
+    required this.labelAr,
+    required this.rate,
+    required this.amountSar,
+  });
+
+  factory SplitLegPreviewModel.fromJson(Map<String, dynamic> json) {
+    return SplitLegPreviewModel(
+      recipientType: json['recipient_type'] as String,
+      labelAr: json['label_ar'] as String,
+      rate: (json['rate'] as num).toDouble(),
+      amountSar: (json['amount_sar'] as num).toDouble(),
+    );
+  }
+}
+
+class SplitPreviewModel {
+  final double amountSar;
+  final String ruleSlug;
+  final List<SplitLegPreviewModel> legs;
+
+  const SplitPreviewModel({
+    required this.amountSar,
+    required this.ruleSlug,
+    required this.legs,
+  });
+
+  factory SplitPreviewModel.fromJson(Map<String, dynamic> json) {
+    final legsJson = json['legs'] as List<dynamic>? ?? [];
+    return SplitPreviewModel(
+      amountSar: (json['amount_sar'] as num).toDouble(),
+      ruleSlug: json['rule_slug'] as String? ?? 'default',
+      legs: legsJson
+          .map((e) => SplitLegPreviewModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 class ScanTypeModel {
   final String id;
   final String labelAr;

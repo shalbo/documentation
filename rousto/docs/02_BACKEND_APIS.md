@@ -253,6 +253,19 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### تقسيم المدفوعات
+
+انظر [`08_SPLIT_PAYMENTS_ENGINE`](08_SPLIT_PAYMENTS_ENGINE.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/payments/split-rules` | قواعد التقسيم | لا |
+| POST | `/api/v1/payments/split/preview` | معاينة التقسيم | لا |
+| GET | `/api/v1/bookings/{id}/payment-split` | تفاصيل تقسيم حجز | نعم |
+| POST | `/api/v1/payments/splits/release` | إطلاق حصة معلّقة | Admin |
+
+---
+
 ### اللوجستيات (dev/admin)
 
 انظر [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md).
@@ -367,4 +380,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`05_ADMIN_CATALOG_MANAGEMENT`](../docs/05_ADMIN_CATALOG_MANAGEMENT.md) — إدارة الكتالوج + لوحة الويب ✅
 - [`06_AI_AND_IMAGE_RECOGNITION`](../docs/06_AI_AND_IMAGE_RECOGNITION.md) — فحص بالصورة + تشخيص تجريبي ✅
 - [`07_LOGISTICS_AND_LAST_MILE`](../docs/07_LOGISTICS_AND_LAST_MILE.md) — توصيل الخدمة + ETA + تتبّع مباشر ✅
-- `08_AUTH` — OTP عبر الجوال + JWT
+- [`08_SPLIT_PAYMENTS_ENGINE`](../docs/08_SPLIT_PAYMENTS_ENGINE.md) — محرك تقسيم المدفوعات ✅
+- `09_AUTH` — OTP عبر الجوال + JWT

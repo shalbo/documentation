@@ -199,6 +199,13 @@ class ApiClient {
     final body = await _get('/me/scans', auth: true);
     return body['data'] as List<dynamic>;
   }
+
+  Future<Map<String, dynamic>> previewPaymentSplit(double amountSar) async {
+    final body = await _post('/payments/split/preview', {
+      'amount_sar': amountSar,
+    }, auth: false);
+    return body['data'] as Map<String, dynamic>;
+  }
 }
 
 class ApiException implements Exception {

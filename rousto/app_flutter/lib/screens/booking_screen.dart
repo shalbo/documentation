@@ -25,6 +25,7 @@ class _BookingScreenState extends State<BookingScreen> {
   int _slot = 1;
   double _discount = 30;
   double _total = 0;
+  SplitPreviewModel? _splitPreview;
 
   VehicleModel? _vehicle;
   AddressModel? _address;
@@ -41,12 +42,14 @@ class _BookingScreenState extends State<BookingScreen> {
     final price = service?.priceSar ?? 120.0;
     final contextData = await _repository.loadBookingContext();
     final promo = await _repository.validatePromo('ROUSTO', price);
+    final split = await _repository.previewPaymentSplit(promo.total);
     setState(() {
       _vehicle = contextData.vehicle;
       _address = contextData.address;
       _payment = contextData.payment;
       _discount = promo.discount;
       _total = promo.total;
+      _splitPreview = split;
       _loading = false;
     });
   }
@@ -181,6 +184,36 @@ class _BookingScreenState extends State<BookingScreen> {
                 ],
               ),
             ),
+            if (_splitPreview != null) ...[
+              const SizedBox(height: 12),
+              SoftCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('توزيع الدفع',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 13)),
+                    const SizedBox(height: 8),
+                    for (final leg in _splitPreview!.legs)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(leg.labelAr,
+                                style: const TextStyle(
+                                    fontSize: 12, color: AppColors.ink500)),
+                            Text(formatAmount(leg.amountSar),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),
