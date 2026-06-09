@@ -31,6 +31,30 @@ class CategoryBrief(BaseModel):
     name_ar: str
 
 
+class ServiceInTreeOut(BaseModel):
+    id: UUID
+    slug: str
+    name_ar: str
+    subtitle_ar: str | None
+    icon_key: str | None
+    price_sar: float
+    duration_minutes: int
+
+
+class CategoryTreeOut(BaseModel):
+    id: UUID
+    slug: str
+    name_ar: str
+    sort_order: int
+    services_count: int
+    services: list[ServiceInTreeOut]
+
+
+class CategoryTreeMeta(BaseModel):
+    total_categories: int
+    total_services: int
+
+
 class ServiceOut(BaseModel):
     id: UUID
     slug: str

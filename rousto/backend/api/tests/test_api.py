@@ -27,6 +27,25 @@ def test_health_endpoint_shape():
 
 
 @pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with running PostgreSQL")
+def test_categories_tree():
+    response = client.get("/api/v1/categories/tree")
+    assert response.status_code == 200
+    body = response.json()
+    assert "data" in body
+    assert "meta" in body
+    assert body["meta"]["total_categories"] == 6
+    assert body["meta"]["total_services"] == 6
+
+    all_node = next(n for n in body["data"] if n["slug"] == "all")
+    assert all_node["services_count"] == 6
+    assert len(all_node["services"]) == 6
+
+    oil_node = next(n for n in body["data"] if n["slug"] == "oil")
+    assert oil_node["services_count"] == 1
+    assert oil_node["services"][0]["slug"] == "oil-change"
+
+
+@pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with running PostgreSQL")
 def test_services_public():
     response = client.get("/api/v1/services")
     assert response.status_code == 200

@@ -34,6 +34,7 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ```bash
 # Public catalog
+curl http://localhost:8000/api/v1/categories/tree
 curl http://localhost:8000/api/v1/services
 
 # Profile

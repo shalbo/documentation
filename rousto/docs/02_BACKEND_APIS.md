@@ -80,8 +80,39 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 | Method | Path | الوصف | Auth |
 |--------|------|-------|------|
 | GET | `/api/v1/categories` | تصنيفات الخدمات | لا |
+| GET | `/api/v1/categories/tree` | شجرة التصنيفات + الخدمات المتداخلة | لا |
 | GET | `/api/v1/services` | قائمة الخدمات (`?category=oil`) | لا |
 | GET | `/api/v1/services/{id}` | تفاصيل خدمة | لا |
+
+**مثال — `GET /api/v1/categories/tree`**
+
+```json
+{
+  "data": [
+    {
+      "id": "e0000000-0000-4000-8000-000000000001",
+      "slug": "all",
+      "name_ar": "الكل",
+      "sort_order": 0,
+      "services_count": 6,
+      "services": [
+        {
+          "id": "f0000000-0000-4000-8000-000000000001",
+          "slug": "oil-change",
+          "name_ar": "تغيير الزيت والفلاتر",
+          "subtitle_ar": "زيت أصلي + فحص شامل",
+          "icon_key": "oil_barrel",
+          "price_sar": 120.0,
+          "duration_minutes": 45
+        }
+      ]
+    }
+  ],
+  "meta": { "total_categories": 6, "total_services": 6 }
+}
+```
+
+انظر [`GET_api_v1_categories_tree.md`](GET_api_v1_categories_tree.md) للمواصفات الكاملة.
 
 **مثال — `GET /api/v1/services`**
 

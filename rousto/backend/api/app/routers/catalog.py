@@ -6,9 +6,70 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.db import get_db
 from app.models import Service, ServiceCategory
-from app.schemas import CategoryBrief, CategoryOut, ServiceOut
+from app.schemas import (
+    CategoryBrief,
+    CategoryOut,
+    CategoryTreeMeta,
+    CategoryTreeOut,
+    ServiceInTreeOut,
+    ServiceOut,
+)
 
 router = APIRouter(tags=["catalog"])
+
+
+@router.get("/categories/tree")
+def categories_tree(db: Session = Depends(get_db)):
+    categories = db.scalars(
+        select(ServiceCategory)
+        .where(ServiceCategory.is_active.is_(True))
+        .order_by(ServiceCategory.sort_order)
+    ).all()
+    services = db.scalars(
+        select(Service)
+        .options(joinedload(Service.category))
+        .where(Service.is_active.is_(True))
+        .order_by(Service.name_ar)
+    ).unique().all()
+
+    services_by_category: dict[str, list[Service]] = {}
+    for service in services:
+        services_by_category.setdefault(str(service.category_id), []).append(service)
+
+    all_services = list(services)
+    tree = []
+    for category in categories:
+        if category.slug == "all":
+            category_services = all_services
+        else:
+            category_services = services_by_category.get(str(category.id), [])
+
+        node = CategoryTreeOut(
+            id=category.id,
+            slug=category.slug,
+            name_ar=category.name_ar,
+            sort_order=category.sort_order,
+            services_count=len(category_services),
+            services=[
+                ServiceInTreeOut(
+                    id=s.id,
+                    slug=s.slug,
+                    name_ar=s.name_ar,
+                    subtitle_ar=s.subtitle_ar,
+                    icon_key=s.icon_key,
+                    price_sar=float(s.price_sar),
+                    duration_minutes=s.duration_minutes,
+                )
+                for s in category_services
+            ],
+        )
+        tree.append(node.model_dump())
+
+    meta = CategoryTreeMeta(
+        total_categories=len(tree),
+        total_services=len(all_services),
+    )
+    return {"data": tree, "meta": meta.model_dump()}
 
 
 @router.get("/categories")
