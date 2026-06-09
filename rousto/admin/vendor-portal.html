@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — بوابة الفني</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — بوابة الفني</h1>
+      <p>الخريطة، الموقع المباشر، والمهمة النشطة</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="vendors.html" class="btn btn-ghost-light">إدارة الطلبات</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="vendorId">معرّف الفني (X-Vendor-Id)</label>
+          <input id="vendorId" value="v0000000-0000-4000-8000-000000000001" />
+        </div>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>الخريطة</h2>
+        <div id="mapView" class="map-host"></div>
+        <p id="jobSummary" class="map-caption">—</p>
+        <div class="actions" style="margin-top:12px">
+          <button id="toggleAvailBtn" class="btn btn-primary">تبديل التوفر</button>
+          <button id="nudgeBtn" class="btn btn-ghost">تحريك نحو العميل</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>تحديث الموقع</h2>
+        <form id="baseForm">
+          <h3 class="subheading">موقع القاعدة</h3>
+          <div class="form-row">
+            <div>
+              <label for="baseLat">خط العرض</label>
+              <input id="baseLat" type="number" step="0.0000001" required />
+            </div>
+            <div>
+              <label for="baseLng">خط الطول</label>
+              <input id="baseLng" type="number" step="0.0000001" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="radiusKm">نطاق التغطية (كم)</label>
+              <input id="radiusKm" type="number" min="1" max="100" step="0.5" value="20" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-secondary">حفظ القاعدة</button>
+        </form>
+
+        <form id="liveForm" style="margin-top:18px">
+          <h3 class="subheading">الموقع المباشر</h3>
+          <div class="form-row">
+            <div>
+              <label for="liveLat">خط العرض</label>
+              <input id="liveLat" type="number" step="0.0000001" required />
+            </div>
+            <div>
+              <label for="liveLng">خط الطول</label>
+              <input id="liveLng" type="number" step="0.0000001" required />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">إرسال GPS</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-map.js"></script>
+  <script>
+    const state = { map: null, apiBase: "http://localhost:8000", vendorId: "" };
+
+    function loadConfig() {
+      const saved = loadStoredConfig(VENDOR_STORAGE_KEY);
+      if (saved.apiBase) state.apiBase = saved.apiBase;
+      if (saved.vendorId) state.vendorId = saved.vendorId;
+      document.getElementById("apiBase").value = state.apiBase;
+      document.getElementById("vendorId").value = state.vendorId || "v0000000-0000-4000-8000-000000000001";
+    }
+
+    function saveConfig() {
+      state.apiBase = document.getElementById("apiBase").value.replace(/\/$/, "");
+      state.vendorId = document.getElementById("vendorId").value.trim();
+      saveStoredConfig(VENDOR_STORAGE_KEY, { apiBase: state.apiBase, vendorId: state.vendorId });
+    }
+
+    async function vendorApi(path, options = {}) {
+      saveConfig();
+      return fetchApi(state.apiBase, path, {
+        ...options,
+        headers: { "X-Vendor-Id": state.vendorId, ...(options.headers || {}) },
+      });
+    }
+
+    function fillForms(data) {
+      if (data.base_location) {
+        document.getElementById("baseLat").value = data.base_location.lat;
+        document.getElementById("baseLng").value = data.base_location.lng;
+        document.getElementById("radiusKm").value = data.base_location.service_radius_km || 20;
+      }
+      if (data.live_location) {
+        document.getElementById("liveLat").value = data.live_location.lat;
+        document.getElementById("liveLng").value = data.live_location.lng;
+      }
+      document.getElementById("jobSummary").textContent = formatJobSummary(data.active_job);
+      document.getElementById("toggleAvailBtn").textContent = data.is_available ? "إيقاف التوفر" : "تفعيل التوفر";
+    }
+
+    async function refreshMap() {
+      const body = await vendorApi("/vendor/me/map");
+      state.map = body.data;
+      renderRelativeMap(document.getElementById("mapView"), state.map);
+      fillForms(state.map);
+      toast("تم تحديث الخريطة");
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", () => {
+      refreshMap().catch((e) => toast(e.message, true));
+    });
+
+    document.getElementById("baseForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        await vendorApi("/vendor/me/location/base", {
+          method: "PUT",
+          body: JSON.stringify({
+            lat: Number(document.getElementById("baseLat").value),
+            lng: Number(document.getElementById("baseLng").value),
+            service_radius_km: Number(document.getElementById("radiusKm").value),
+          }),
+        });
+        await refreshMap();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
+
+    document.getElementById("liveForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const payload = {
+          lat: Number(document.getElementById("liveLat").value),
+          lng: Number(document.getElementById("liveLng").value),
+        };
+        if (state.map?.active_job?.booking_id) {
+          payload.booking_id = state.map.active_job.booking_id;
+        }
+        await vendorApi("/vendor/me/location/live", {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+        await refreshMap();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
+
+    document.getElementById("toggleAvailBtn").addEventListener("click", async () => {
+      try {
+        await vendorApi("/vendor/me/availability", {
+          method: "PATCH",
+          body: JSON.stringify({ is_available: !state.map?.is_available }),
+        });
+        await refreshMap();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    });
+
+    document.getElementById("nudgeBtn").addEventListener("click", async () => {
+      const job = state.map?.active_job;
+      const live = state.map?.live_location;
+      const dest = job?.destination;
+      if (!live || !dest) {
+        toast("لا توجد مهمة أو وجهة", true);
+        return;
+      }
+      const lat = live.lat + (dest.lat - live.lat) * 0.2;
+      const lng = live.lng + (dest.lng - live.lng) * 0.2;
+      document.getElementById("liveLat").value = lat.toFixed(7);
+      document.getElementById("liveLng").value = lng.toFixed(7);
+      document.getElementById("liveForm").dispatchEvent(new Event("submit"));
+    });
+
+    loadConfig();
+    refreshMap().catch(() => {});
+  </script>
+</body>
+</html>
