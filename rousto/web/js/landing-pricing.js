@@ -1,16 +1,18 @@
 (function () {
   "use strict";
 
-  var API_BASE = (function () {
+  function apiBase() {
+    if (typeof RoustoConfig !== "undefined") return RoustoConfig.apiBase;
     try {
-      return (localStorage.getItem("rousto_api_base") || "http://localhost:8000").replace(/\/$/, "");
+      var cfg = JSON.parse(localStorage.getItem("rousto_web_config") || "{}");
+      return (cfg.apiBase || "http://localhost:8000").replace(/\/$/, "");
     } catch (_) {
       return "http://localhost:8000";
     }
-  })();
+  }
 
   function fetchLanding(path) {
-    return fetch(API_BASE + "/api/v1" + path)
+    return fetch(apiBase() + "/api/v1" + path)
       .then(function (res) {
         if (!res.ok) throw new Error("API " + res.status);
         return res.json();

@@ -25,16 +25,19 @@ rousto/
 │   ├── 11_CUSTOMER_DELIVERY_MAP.md
 │   ├── 12_TOWING_DISPATCH_MAP.md
 │   ├── 13_CUSTOMER_SUPPORT_AND_SECURITY.md
-│   └── 14_LANDING_PAGE_PRICING.md
+│   ├── 14_LANDING_PAGE_PRICING.md
+│   └── 15_FRONT_END_WEB.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
 │   └── database/          # 001_schema.sql, 002_seed.sql
-├── web/                   # موقع الويب (متجاوب، RTL)
-│   ├── index.html
-│   ├── css/theme.css      # نظام التصميم (المتغيرات)
-│   ├── css/styles.css     # مكوّنات الموقع
-│   └── js/main.js         # التفاعلات (القائمة، الكشف عند التمرير، النموذج)
+├── web/                   # موقع الويب + بوابة العميل (RTL)
+│   ├── index.html         # صفحة الهبوط
+│   ├── dashboard.html     # لوحة تحكم العميل
+│   ├── booking.html       # حجز خدمة
+│   ├── account.html       # حسابي
+│   ├── css/               # theme, styles, portal
+│   └── js/                # api, portal-layout, صفحات
 ├── app/                   # نموذج واجهات التطبيق بصيغة HTML (5 شاشات)
 │   ├── index.html
 │   └── css/app.css
@@ -66,6 +69,9 @@ python3 -m http.server 8080
 
 ثم افتح:
 - موقع الويب: <http://localhost:8080/web/index.html>
+- لوحة العميل: <http://localhost:8080/web/dashboard.html>
+- الحجز: <http://localhost:8080/web/booking.html>
+- حسابي: <http://localhost:8080/web/account.html>
 - خريطة التوصيل: <http://localhost:8080/web/delivery-map.html>
 - تتبّع السطحة: <http://localhost:8080/web/towing-map.html>
 - الدعم والأمان: <http://localhost:8080/web/support.html>
@@ -115,6 +121,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/12_TOWING_DISPATCH_MAP.md`](docs/12_TOWING_DISPATCH_MAP.md)
 - [`docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md`](docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md)
 - [`docs/14_LANDING_PAGE_PRICING.md`](docs/14_LANDING_PAGE_PRICING.md)
+- [`docs/15_FRONT_END_WEB.md`](docs/15_FRONT_END_WEB.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

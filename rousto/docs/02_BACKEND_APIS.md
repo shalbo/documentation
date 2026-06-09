@@ -286,6 +286,20 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### بوابة عميل الويب
+
+انظر [`15_FRONT_END_WEB`](15_FRONT_END_WEB.md).
+
+الصفحات تستهلك نفس الـ API عبر `web/js/api.js` مع `X-User-Id` مؤقتاً.
+
+| الصفحة | Endpoints المستخدمة |
+|--------|---------------------|
+| `dashboard.html` | `/me`, `/bookings/active` |
+| `booking.html` | `/categories/tree`, `/me/*`, `POST /bookings` |
+| `account.html` | `/me`, `/me/vehicles`, `/bookings`, `/me/monetization` |
+
+---
+
 ### صفحة الهبوط والأسعار
 
 انظر [`14_LANDING_PAGE_PRICING`](14_LANDING_PAGE_PRICING.md).
@@ -480,4 +494,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`12_TOWING_DISPATCH_MAP`](../docs/12_TOWING_DISPATCH_MAP.md) — خريطة إرسال السطحات ✅
 - [`13_CUSTOMER_SUPPORT_AND_SECURITY`](../docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md) — دعم العملاء والأمان ✅
 - [`14_LANDING_PAGE_PRICING`](../docs/14_LANDING_PAGE_PRICING.md) — صفحة الهبوط والأسعار ✅
-- `15_AUTH` — OTP عبر الجوال + JWT
+- [`15_FRONT_END_WEB`](../docs/15_FRONT_END_WEB.md) — بوابة عميل الويب ✅
+- `16_AUTH` — OTP عبر الجوال + JWT
