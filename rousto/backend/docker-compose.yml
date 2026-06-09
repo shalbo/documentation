@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: rousto-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rousto
+      POSTGRES_PASSWORD: rousto_dev
+      POSTGRES_DB: rousto
+      TZ: Asia/Riyadh
+    ports:
+      - "5432:5432"
+    volumes:
+      - rousto_pgdata:/var/lib/postgresql/data
+      - ./database/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./database/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+      - ./database/003_monetization.sql:/docker-entrypoint-initdb.d/003_monetization.sql:ro
+      - ./database/004_monetization_seed.sql:/docker-entrypoint-initdb.d/004_monetization_seed.sql:ro
+      - ./database/005_ai_schema.sql:/docker-entrypoint-initdb.d/005_ai_schema.sql:ro
+      - ./database/006_ai_seed.sql:/docker-entrypoint-initdb.d/006_ai_seed.sql:ro
+      - ./database/007_logistics_schema.sql:/docker-entrypoint-initdb.d/007_logistics_schema.sql:ro
+      - ./database/008_logistics_seed.sql:/docker-entrypoint-initdb.d/008_logistics_seed.sql:ro
+      - ./database/009_split_payments_schema.sql:/docker-entrypoint-initdb.d/009_split_payments_schema.sql:ro
+      - ./database/010_split_payments_seed.sql:/docker-entrypoint-initdb.d/010_split_payments_seed.sql:ro
+      - ./database/011_vendor_schema.sql:/docker-entrypoint-initdb.d/011_vendor_schema.sql:ro
+      - ./database/012_vendor_seed.sql:/docker-entrypoint-initdb.d/012_vendor_seed.sql:ro
+      - ./database/013_vendor_location_schema.sql:/docker-entrypoint-initdb.d/013_vendor_location_schema.sql:ro
+      - ./database/014_vendor_location_seed.sql:/docker-entrypoint-initdb.d/014_vendor_location_seed.sql:ro
+      - ./database/016_customer_delivery_seed.sql:/docker-entrypoint-initdb.d/016_customer_delivery_seed.sql:ro
+      - ./database/017_towing_dispatch_schema.sql:/docker-entrypoint-initdb.d/017_towing_dispatch_schema.sql:ro
+      - ./database/018_towing_dispatch_seed.sql:/docker-entrypoint-initdb.d/018_towing_dispatch_seed.sql:ro
+      - ./database/019_support_security_schema.sql:/docker-entrypoint-initdb.d/019_support_security_schema.sql:ro
+      - ./database/020_support_security_seed.sql:/docker-entrypoint-initdb.d/020_support_security_seed.sql:ro
+      - ./database/021_landing_pricing_schema.sql:/docker-entrypoint-initdb.d/021_landing_pricing_schema.sql:ro
+      - ./database/022_landing_pricing_seed.sql:/docker-entrypoint-initdb.d/022_landing_pricing_seed.sql:ro
+      - ./database/023_auth_permissions_schema.sql:/docker-entrypoint-initdb.d/023_auth_permissions_schema.sql:ro
+      - ./database/024_auth_permissions_seed.sql:/docker-entrypoint-initdb.d/024_auth_permissions_seed.sql:ro
+      - ./database/025_advertising_marketing_schema.sql:/docker-entrypoint-initdb.d/025_advertising_marketing_schema.sql:ro
+      - ./database/026_advertising_marketing_seed.sql:/docker-entrypoint-initdb.d/026_advertising_marketing_seed.sql:ro
+      - ./database/027_device_tokens_schema.sql:/docker-entrypoint-initdb.d/027_device_tokens_schema.sql:ro
+      - ./database/028_notiv_schema.sql:/docker-entrypoint-initdb.d/028_notiv_schema.sql:ro
+      - ./database/029_notiv_seed.sql:/docker-entrypoint-initdb.d/029_notiv_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./api
+    container_name: rousto-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://rousto:rousto_dev@db:5432/rousto
+      CORS_ORIGINS: "*"
+      SCAN_STORAGE_PATH: /data/scans
+    ports:
+      - "8000:8000"
+    volumes:
+      - rousto_scans:/data/scans
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  rousto_pgdata:
+  rousto_scans:

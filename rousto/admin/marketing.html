@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة التسويق</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — إدارة التسويق</h1>
+      <p>حملات، بانرات، شركاء، عروض، ونشرة بريدية</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">الكتالوج</a>
+      <button id="connectBtn" class="btn btn-secondary">اتصال وتحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>ملخص إحصائي</h2>
+      <div id="analyticsGrid" class="config-grid"></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>الحملات</h2>
+        <table id="campaignsTable">
+          <thead><tr><th>الاسم</th><th>القناة</th><th>الحالة</th></tr></thead>
+          <tbody><tr><td colspan="3" class="empty">اضغط «اتصال وتحديث»</td></tr></tbody>
+        </table>
+      </section>
+      <section class="card">
+        <h2>البانرات</h2>
+        <table id="bannersTable">
+          <thead><tr><th>العنوان</th><th>الموضع</th><th>الحالة</th></tr></thead>
+          <tbody><tr><td colspan="3" class="empty">اضغط «اتصال وتحديث»</td></tr></tbody>
+        </table>
+      </section>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>الشركاء</h2>
+        <table id="partnersTable">
+          <thead><tr><th>الاسم</th><th>الترتيب</th></tr></thead>
+          <tbody><tr><td colspan="2" class="empty">اضغط «اتصال وتحديث»</td></tr></tbody>
+        </table>
+      </section>
+      <section class="card">
+        <h2>أكواد الخصم</h2>
+        <table id="promotionsTable">
+          <thead><tr><th>الكود</th><th>العنوان</th><th>الحالة</th></tr></thead>
+          <tbody><tr><td colspan="3" class="empty">اضغط «اتصال وتحديث»</td></tr></tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>مشتركو النشرة</h2>
+      <table id="newsletterTable">
+        <thead><tr><th>البريد</th><th>المصدر</th><th>التاريخ</th></tr></thead>
+        <tbody><tr><td colspan="3" class="empty">اضغط «اتصال وتحديث»</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/marketing-admin.js"></script>
+</body>
+</html>
