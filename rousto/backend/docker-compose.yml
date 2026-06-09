@@ -44,6 +44,8 @@ services:
       - ./database/031_i18n_seed.sql:/docker-entrypoint-initdb.d/031_i18n_seed.sql:ro
       - ./database/032_notification_engine_schema.sql:/docker-entrypoint-initdb.d/032_notification_engine_schema.sql:ro
       - ./database/033_notification_engine_seed.sql:/docker-entrypoint-initdb.d/033_notification_engine_seed.sql:ro
+      - ./database/034_driver_network_schema.sql:/docker-entrypoint-initdb.d/034_driver_network_schema.sql:ro
+      - ./database/035_driver_network_seed.sql:/docker-entrypoint-initdb.d/035_driver_network_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

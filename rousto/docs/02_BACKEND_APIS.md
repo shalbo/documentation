@@ -424,6 +424,17 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 | POST | `/api/v1/admin/towing/dispatches/{id}/dispatch` | تعيين سائق | Admin |
 | POST | `/api/v1/admin/towing/dispatches/{id}/advance` | التقدّم للمرحلة التالية | Admin |
 | PATCH | `/api/v1/admin/towing/dispatches/{id}/location` | تحديث GPS السطحة | Admin |
+| GET | `/api/v1/towing/dispatches` | سجل طلبات السحب | Customer |
+| POST | `/api/v1/towing/dispatches/{id}/cancel` | إلغاء طلب (pending/dispatched) | Customer |
+| POST | `/api/v1/towing/dispatches/{id}/rate` | تقييم السائق | Customer |
+| GET | `/api/v1/driver/me/jobs/available` | مهام سحب متاحة | Driver (JWT فني) |
+| POST | `/api/v1/driver/me/jobs/{id}/accept` | قبول مهمة سحب | Driver |
+| GET | `/api/v1/driver/me/jobs/active` | المهمة النشطة | Driver |
+| GET | `/api/v1/admin/drivers` | قائمة السائقين | Admin |
+| GET | `/api/v1/admin/drivers/analytics` | إحصائيات الشبكة | Admin |
+| PATCH | `/api/v1/admin/drivers/{id}/availability` | تفعيل/تعطيل التوفر | Admin |
+
+انظر [`24_LOGISTICS_DRIVER_NETWORK`](24_LOGISTICS_DRIVER_NETWORK.md).
 
 ---
 
@@ -592,3 +603,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`20_NOTIV`](../docs/20_NOTIV.md) — صندوق إشعارات in-app + FCM push ✅
 - [`22_CENTRALIZED_NOTIFICATION_ENGINE`](../docs/22_CENTRALIZED_NOTIFICATION_ENGINE.md) — محرك إشعارات مركزي + لوحة إدارة ✅
 - [`23_SECURITY_HARDENING`](../docs/23_SECURITY_HARDENING.md) — تصلّب أمني: رؤوس HTTP، تدقيق، rate limit إدارة ✅
+- [`24_LOGISTICS_DRIVER_NETWORK`](../docs/24_LOGISTICS_DRIVER_NETWORK.md) — شبكة السائقين، حوض مهام، تسعير سحب ✅

@@ -256,6 +256,10 @@ def build_towing_dispatch_map(db: Session, dispatch: TowingDispatch) -> dict:
             "dispatch_phase": phase_key,
             "dispatch_phase_label_ar": phase_label,
             "notes": dispatch.notes,
+            "base_fare_sar": float(dispatch.base_fare_sar) if dispatch.base_fare_sar else None,
+            "per_km_rate_sar": float(dispatch.per_km_rate_sar) if dispatch.per_km_rate_sar else None,
+            "total_fare_sar": float(dispatch.total_fare_sar) if dispatch.total_fare_sar else None,
+            "customer_rating": dispatch.customer_rating,
         },
         "pickup": pickup,
         "dropoff": dropoff,
@@ -316,6 +320,10 @@ def create_towing_dispatch(
     db.add(dispatch)
     db.flush()
     dispatch.total_route_km = compute_total_route_km(dispatch)
+
+    from app.driver_network_services import apply_dispatch_fare
+
+    apply_dispatch_fare(dispatch)
 
     db.add(
         TowingDispatchEvent(

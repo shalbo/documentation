@@ -32,7 +32,8 @@ rousto/
 │   ├── 19_PRODUCTION_HARDENING.md
 │   ├── 20_NOTIV.md
 │   ├── 22_CENTRALIZED_NOTIFICATION_ENGINE.md
-│   └── 23_SECURITY_HARDENING.md
+│   ├── 23_SECURITY_HARDENING.md
+│   └── 24_LOGISTICS_DRIVER_NETWORK.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -52,6 +53,7 @@ rousto/
 │   ├── index.html
 │   ├── marketing.html
 │   ├── notifications.html
+│   ├── drivers.html
 │   ├── vendors.html
 │   ├── vendor-portal.html
 │   ├── vendor-map.html
@@ -118,6 +120,7 @@ cd rousto/backend && docker compose up -d
 - لوحة الإدارة: http://localhost:8080/admin/index.html (بعد تشغيل `python3 -m http.server`)
 - محرك الإشعارات: http://localhost:8080/admin/notifications.html
 - سجل الأمان: http://localhost:8080/admin/security.html
+- شبكة السائقين: http://localhost:8080/admin/drivers.html
 
 المواصفات:
 - [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md)

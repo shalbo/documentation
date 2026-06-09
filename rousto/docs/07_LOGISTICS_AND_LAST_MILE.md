@@ -135,6 +135,13 @@ curl -X POST http://localhost:8000/api/v1/logistics/bookings/i0000000-0000-4000-
 
 ---
 
+## شبكة السائقين (Module 24)
+
+توسّع Driver Network — تمييز السائقين، حوض مهام السحب، تسعير، إلغاء وتقييم:
+
+- التوثيق: [`24_LOGISTICS_DRIVER_NETWORK`](24_LOGISTICS_DRIVER_NETWORK.md)
+- لوحة الإدارة: `admin/drivers.html`
+
 ## الخطوة التالية
 
 - [`08_SPLIT_PAYMENTS_ENGINE`](08_SPLIT_PAYMENTS_ENGINE.md) — إطلاق حصة الفني عند `completed` ✅

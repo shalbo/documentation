@@ -221,13 +221,14 @@ def notify_nearby_drivers_towing(
     radius_km: float = 15.0,
 ) -> int:
     from app.logistics_services import haversine_km
-    from app.models import Technician, User, UserVendorLink
+    from app.models import Technician, UserVendorLink, Vendor
     from app.notification_inbox_services import dispatch_user_notification
     from sqlalchemy import select
 
     technicians = db.scalars(
         select(Technician).where(
             Technician.is_available.is_(True),
+            Technician.driver_type == "tow",
             Technician.current_lat.isnot(None),
             Technician.current_lng.isnot(None),
         )
@@ -244,13 +245,20 @@ def notify_nearby_drivers_towing(
         if dist > radius_km:
             continue
 
-        link = db.scalar(
-            select(UserVendorLink).where(UserVendorLink.vendor_id.isnot(None)).limit(1)
+        vendor = db.scalar(
+            select(Vendor).where(
+                Vendor.technician_id == tech.id,
+                Vendor.status == "approved",
+            )
         )
-        driver_user = db.scalar(select(User).where(User.phone == tech.phone))
-        user_id = driver_user.id if driver_user else (link.user_id if link else None)
-        if not user_id:
+        if not vendor:
             continue
+        link = db.scalar(
+            select(UserVendorLink).where(UserVendorLink.vendor_id == vendor.id)
+        )
+        if not link:
+            continue
+        user_id = link.user_id
 
         try:
             dispatch_user_notification(

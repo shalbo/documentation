@@ -117,6 +117,12 @@ rousto/backend/api/app/routers/towing_dispatch.py
 
 ---
 
+## شبكة السائقين (Module 24)
+
+- قبول المهام ذاتياً: `POST /driver/me/jobs/{id}/accept`
+- تسعير: `base_fare_sar` + `per_km_rate_sar` → `total_fare_sar`
+- انظر [`24_LOGISTICS_DRIVER_NETWORK`](24_LOGISTICS_DRIVER_NETWORK.md)
+
 ## الخطوة التالية
 
 - [`13_CUSTOMER_SUPPORT_AND_SECURITY`](13_CUSTOMER_SUPPORT_AND_SECURITY.md) — دعم العملاء والأمان ✅

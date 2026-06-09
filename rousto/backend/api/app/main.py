@@ -17,6 +17,7 @@ from app.routers import (
     bookings,
     catalog,
     devices,
+    driver_network,
     health,
     landing,
     logistics,
@@ -73,6 +74,7 @@ app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(admin_notifications.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
+app.include_router(driver_network.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
