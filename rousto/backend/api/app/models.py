@@ -452,6 +452,9 @@ class Vendor(Base):
     rejection_reason: Mapped[str | None] = mapped_column(Text)
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     approved_by: Mapped[str | None] = mapped_column(String(80))
+    base_lat: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    base_lng: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    service_radius_km: Mapped[float] = mapped_column(Numeric(5, 2), default=15.0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 

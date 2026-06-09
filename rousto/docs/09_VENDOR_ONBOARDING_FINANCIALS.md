@@ -47,7 +47,7 @@
 | إدارة | `X-Admin-Key: rousto_admin_dev` |
 | فني (بعد الموافقة) | `X-Vendor-Id: <vendor_uuid>` |
 
-يُستبدل بـ JWT + أدوار في `10_AUTH`.
+يُستبدل بـ JWT + أدوار في `11_AUTH`.
 
 ---
 
@@ -177,4 +177,5 @@ rousto/admin/
 
 ## الخطوة التالية
 
-- `10_AUTH` — OTP + JWT + أدوار (`customer`, `technician`, `admin`)
+- [`10_VENDOR_MAP_LOCATION`](10_VENDOR_MAP_LOCATION.md) — خريطة وموقع الفني ✅
+- `11_AUTH` — OTP + JWT + أدوار (`customer`, `technician`, `admin`)

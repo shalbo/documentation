@@ -20,7 +20,8 @@ rousto/
 │   ├── 06_AI_AND_IMAGE_RECOGNITION.md
 │   ├── 07_LOGISTICS_AND_LAST_MILE.md
 │   ├── 08_SPLIT_PAYMENTS_ENGINE.md
-│   └── 09_VENDOR_ONBOARDING_FINANCIALS.md
+│   ├── 09_VENDOR_ONBOARDING_FINANCIALS.md
+│   └── 10_VENDOR_MAP_LOCATION.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -36,6 +37,8 @@ rousto/
 ├── admin/                 # لوحات الإدارة (كتالوج + انضمام الفنيين)
 │   ├── index.html
 │   ├── vendors.html
+│   ├── vendor-portal.html
+│   ├── vendor-map.html
 │   ├── css/admin.css
 │   └── js/
 └── app_flutter/           # تطبيق Flutter كامل (الإصدار الرسمي للتطبيق)
@@ -99,6 +102,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/07_LOGISTICS_AND_LAST_MILE.md`](docs/07_LOGISTICS_AND_LAST_MILE.md)
 - [`docs/08_SPLIT_PAYMENTS_ENGINE.md`](docs/08_SPLIT_PAYMENTS_ENGINE.md)
 - [`docs/09_VENDOR_ONBOARDING_FINANCIALS.md`](docs/09_VENDOR_ONBOARDING_FINANCIALS.md)
+- [`docs/10_VENDOR_MAP_LOCATION.md`](docs/10_VENDOR_MAP_LOCATION.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

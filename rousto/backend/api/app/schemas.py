@@ -336,3 +336,19 @@ class VendorFinancialsUpdateIn(BaseModel):
 
 class VendorRejectIn(BaseModel):
     reason: str = Field(..., min_length=3, max_length=500)
+
+
+class VendorBaseLocationIn(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+    service_radius_km: float | None = Field(default=None, gt=0, le=100)
+
+
+class VendorLiveLocationIn(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+    booking_id: UUID | None = None
+
+
+class VendorAvailabilityIn(BaseModel):
+    is_available: bool

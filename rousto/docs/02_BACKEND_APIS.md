@@ -284,6 +284,21 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### خريطة وموقع الفني
+
+انظر [`10_VENDOR_MAP_LOCATION`](10_VENDOR_MAP_LOCATION.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/vendor/me/map` | خريطة كاملة + مهمة نشطة | Vendor |
+| PUT | `/api/v1/vendor/me/location/base` | موقع القاعدة ونطاق التغطية | Vendor |
+| PATCH | `/api/v1/vendor/me/location/live` | تحديث GPS المباشر | Vendor |
+| GET | `/api/v1/vendor/me/jobs/active` | المهمة النشطة | Vendor |
+| PATCH | `/api/v1/vendor/me/availability` | تبديل التوفر | Vendor |
+| GET | `/api/v1/admin/vendors/map` | خريطة كل الفنيين | Admin |
+
+---
+
 ### اللوجستيات (dev/admin)
 
 انظر [`07_LOGISTICS_AND_LAST_MILE`](07_LOGISTICS_AND_LAST_MILE.md).
@@ -400,4 +415,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`07_LOGISTICS_AND_LAST_MILE`](../docs/07_LOGISTICS_AND_LAST_MILE.md) — توصيل الخدمة + ETA + تتبّع مباشر ✅
 - [`08_SPLIT_PAYMENTS_ENGINE`](../docs/08_SPLIT_PAYMENTS_ENGINE.md) — محرك تقسيم المدفوعات ✅
 - [`09_VENDOR_ONBOARDING_FINANCIALS`](../docs/09_VENDOR_ONBOARDING_FINANCIALS.md) — انضمام الفنيين والمالية ✅
-- `10_AUTH` — OTP عبر الجوال + JWT
+- [`10_VENDOR_MAP_LOCATION`](../docs/10_VENDOR_MAP_LOCATION.md) — خريطة وموقع الفني ✅
+- `11_AUTH` — OTP عبر الجوال + JWT

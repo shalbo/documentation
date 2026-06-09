@@ -318,6 +318,8 @@ erDiagram
 
 انظر [`09_VENDOR_ONBOARDING_FINANCIALS`](09_VENDOR_ONBOARDING_FINANCIALS.md).
 
+**أعمدة الموقع (013):** `base_lat`, `base_lng`, `service_radius_km` — انظر [`10_VENDOR_MAP_LOCATION`](10_VENDOR_MAP_LOCATION.md).
+
 ---
 
 ## الفهارس (Indexes)
@@ -347,6 +349,8 @@ rousto/backend/database/
 ├── 010_split_payments_seed.sql
 ├── 011_vendor_schema.sql
 ├── 012_vendor_seed.sql
+├── 013_vendor_location_schema.sql
+├── 014_vendor_location_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 
