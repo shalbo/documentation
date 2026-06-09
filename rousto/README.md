@@ -29,7 +29,8 @@ rousto/
 │   ├── 15_FRONT_END_WEB.md
 │   ├── 17_PERMISSIONS_AND_AUTH.md
 │   ├── 18_ADVERTISING_AND_MARKETING_MODULE.md
-│   └── 19_PRODUCTION_HARDENING.md
+│   ├── 19_PRODUCTION_HARDENING.md
+│   └── 20_NOTIV.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -81,6 +82,7 @@ python3 -m http.server 8080
 - خريطة التوصيل: <http://localhost:8080/web/delivery-map.html>
 - تتبّع السطحة: <http://localhost:8080/web/towing-map.html>
 - الدعم والأمان: <http://localhost:8080/web/support.html>
+- الإشعارات: <http://localhost:8080/web/notifications.html>
 - صفحة الأسعار: <http://localhost:8080/web/pricing.html>
 - نموذج التطبيق: <http://localhost:8080/app/index.html>
 

@@ -364,6 +364,24 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 
 ---
 
+### الإشعارات (NOTIV)
+
+انظر [`20_NOTIV`](20_NOTIV.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/me/notifications` | صندوق الإشعارات (`?unread_only=&category=`) | Customer |
+| GET | `/api/v1/me/notifications/unread-count` | عدد غير المقروء | Customer |
+| PATCH | `/api/v1/me/notifications/{id}/read` | تعليم كمقروء | Customer |
+| POST | `/api/v1/me/notifications/read-all` | تعليم الكل مقروء | Customer |
+| GET | `/api/v1/me/notification-preferences` | تفضيلات الفئات | Customer |
+| PUT | `/api/v1/me/notification-preferences` | تحديث التفضيلات | Customer |
+| POST | `/api/v1/me/devices/register` | تسجيل FCM token | Customer |
+| GET | `/api/v1/admin/notifications` | سجل الإشعارات | Admin |
+| POST | `/api/v1/admin/notifications/send` | إرسال إشعار لمستخدم | Admin |
+
+---
+
 ### دعم العملاء والأمان
 
 انظر [`13_CUSTOMER_SUPPORT_AND_SECURITY`](13_CUSTOMER_SUPPORT_AND_SECURITY.md).
@@ -562,3 +580,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`15_FRONT_END_WEB`](../docs/15_FRONT_END_WEB.md) — بوابة عميل الويب ✅
 - [`17_PERMISSIONS_AND_AUTH`](../docs/17_PERMISSIONS_AND_AUTH.md) — OTP + JWT + أدوار وصلاحيات ✅
 - [`18_ADVERTISING_AND_MARKETING_MODULE`](../docs/18_ADVERTISING_AND_MARKETING_MODULE.md) — حملات وبانرات وإحالات ✅
+- [`20_NOTIV`](../docs/20_NOTIV.md) — صندوق إشعارات in-app + FCM push ✅

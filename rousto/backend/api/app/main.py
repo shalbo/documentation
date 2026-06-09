@@ -18,6 +18,7 @@ from app.routers import (
     logistics,
     marketing,
     monetization,
+    notifications,
     profile,
     promotions,
     scans,
@@ -62,6 +63,7 @@ app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
+app.include_router(notifications.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(logistics.router, prefix=prefix)

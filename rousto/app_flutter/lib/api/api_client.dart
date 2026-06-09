@@ -241,6 +241,87 @@ class ApiClient {
       'platform': platform,
     });
   }
+
+  Future<List<Map<String, dynamic>>> getNotifications({
+    bool unreadOnly = false,
+    String? category,
+  }) async {
+    final query = <String, String>{};
+    if (unreadOnly) query['unread_only'] = 'true';
+    if (category != null) query['category'] = category;
+    final response = await _client.get(
+      _uri('/me/notifications', query.isEmpty ? null : query),
+      headers: _authHeaders,
+    );
+    _ensureSuccess(response);
+    final parsed = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = parsed['data'] as List<dynamic>;
+    return data.cast<Map<String, dynamic>>();
+  }
+
+  Future<int> getNotificationUnreadCount() async {
+    final body = await _get('/me/notifications/unread-count', auth: true);
+    final data = body['data'] as Map<String, dynamic>;
+    return data['count'] as int? ?? 0;
+  }
+
+  Future<void> markNotificationRead(String id) async {
+    await _patch('/me/notifications/$id/read');
+  }
+
+  Future<void> markAllNotificationsRead() async {
+    await _post('/me/notifications/read-all', {}, auth: true);
+  }
+
+  Future<List<Map<String, dynamic>>> getNotificationPreferences() async {
+    final body = await _get('/me/notification-preferences', auth: true);
+    final data = body['data'] as List<dynamic>;
+    return data.cast<Map<String, dynamic>>();
+  }
+
+  Future<void> updateNotificationPreferences(
+    List<Map<String, dynamic>> preferences,
+  ) async {
+    await _put('/me/notification-preferences', {
+      'preferences': preferences,
+    });
+  }
+
+  Future<Map<String, dynamic>> _put(
+    String path,
+    Map<String, dynamic> body, {
+    bool auth = true,
+  }) async {
+    final headers = {
+      'Content-Type': 'application/json',
+      if (auth) ..._authHeaders,
+    };
+    final response = await _client.put(
+      _uri(path),
+      headers: headers,
+      body: jsonEncode(body),
+    );
+    _ensureSuccess(response);
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> _patch(
+    String path, {
+    Map<String, dynamic>? body,
+    bool auth = true,
+  }) async {
+    final headers = {
+      'Content-Type': 'application/json',
+      if (auth) ..._authHeaders,
+    };
+    final response = await _client.patch(
+      _uri(path),
+      headers: headers,
+      body: body != null ? jsonEncode(body) : null,
+    );
+    _ensureSuccess(response);
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
 }
 
 class ApiException implements Exception {

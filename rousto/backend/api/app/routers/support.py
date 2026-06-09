@@ -266,6 +266,19 @@ def admin_reply_ticket(
         metadata={"reference": ticket.reference},
     )
     db.commit()
+
+    try:
+        from app.notifications import notify_support_reply
+
+        notify_support_reply(
+            db,
+            user_id=ticket.user_id,
+            ticket_ref=ticket.reference,
+            preview=body.message,
+        )
+    except Exception:
+        pass
+
     ticket = load_ticket(db, ticket_id)
     return {"data": ticket_detail(ticket)}
 

@@ -826,6 +826,47 @@ class UserDeviceToken(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class NotificationTemplate(Base):
+    __tablename__ = "notification_templates"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(60), unique=True)
+    category: Mapped[str] = mapped_column(String(30))
+    title_template: Mapped[str] = mapped_column(String(200))
+    body_template: Mapped[str] = mapped_column(Text)
+    action_url_template: Mapped[str | None] = mapped_column(String(300))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class UserNotificationPreference(Base):
+    __tablename__ = "user_notification_preferences"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    category: Mapped[str] = mapped_column(String(30))
+    push_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    in_app_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    category: Mapped[str] = mapped_column(String(30))
+    template_slug: Mapped[str | None] = mapped_column(String(60))
+    title: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    data_json: Mapped[dict] = mapped_column(JSONB, default=dict)
+    action_url: Mapped[str | None] = mapped_column(String(300))
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    push_sent: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class MarketingAttributionEvent(Base):
     __tablename__ = "marketing_attribution_events"
 

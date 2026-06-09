@@ -168,6 +168,20 @@ def admin_assign_dispatch(
             detail={"code": "ASSIGN_ERROR", "message": str(exc)},
         ) from exc
 
+    try:
+        from app.notifications import notify_towing_status_change
+        from app.towing_dispatch_services import STATUS_LABELS
+
+        notify_towing_status_change(
+            db,
+            user_id=dispatch.user_id,
+            dispatch_ref=dispatch.reference,
+            status=dispatch.status,
+            label_ar=STATUS_LABELS.get(dispatch.status, dispatch.status),
+        )
+    except Exception:
+        pass
+
     dispatch = load_dispatch(db, dispatch_id)
     return {"data": build_towing_dispatch_map(db, dispatch)}
 
@@ -192,6 +206,20 @@ def admin_advance_dispatch(
             status_code=400,
             detail={"code": "ADVANCE_ERROR", "message": str(exc)},
         ) from exc
+
+    try:
+        from app.notifications import notify_towing_status_change
+        from app.towing_dispatch_services import STATUS_LABELS
+
+        notify_towing_status_change(
+            db,
+            user_id=dispatch.user_id,
+            dispatch_ref=dispatch.reference,
+            status=dispatch.status,
+            label_ar=STATUS_LABELS.get(dispatch.status, dispatch.status),
+        )
+    except Exception:
+        pass
 
     dispatch = load_dispatch(db, dispatch_id)
     return {"data": build_towing_dispatch_map(db, dispatch)}

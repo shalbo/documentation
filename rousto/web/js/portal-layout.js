@@ -8,6 +8,7 @@
     { id: "tracking", href: "delivery-map.html", label: "تتبّع" },
     { id: "pricing", href: "pricing.html", label: "الأسعار" },
     { id: "support", href: "support.html", label: "الدعم" },
+    { id: "notifications", href: "notifications.html", label: "الإشعارات" },
     { id: "account", href: "account.html", label: "حسابي" },
   ];
 

@@ -220,6 +220,32 @@
         body: { fcm_token: fcmToken, platform: platform || "web" },
       });
     },
+    getNotifications: function (opts) {
+      opts = opts || {};
+      var q = [];
+      if (opts.unread_only) q.push("unread_only=true");
+      if (opts.category) q.push("category=" + encodeURIComponent(opts.category));
+      var suffix = q.length ? "?" + q.join("&") : "";
+      return request("/me/notifications" + suffix);
+    },
+    getNotificationUnreadCount: function () {
+      return request("/me/notifications/unread-count");
+    },
+    markNotificationRead: function (id) {
+      return request("/me/notifications/" + id + "/read", { method: "PATCH" });
+    },
+    markAllNotificationsRead: function () {
+      return request("/me/notifications/read-all", { method: "POST" });
+    },
+    getNotificationPreferences: function () {
+      return request("/me/notification-preferences");
+    },
+    updateNotificationPreferences: function (preferences) {
+      return request("/me/notification-preferences", {
+        method: "PUT",
+        body: { preferences: preferences },
+      });
+    },
   };
 
   function showToast(message, type) {

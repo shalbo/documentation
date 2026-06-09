@@ -85,15 +85,76 @@ def notify_booking_status_change(
     booking_ref: str,
     status: str,
     label_ar: str,
-) -> int:
-    return send_push_to_user(
-        db,
-        user_id,
-        title=f"تحديث حجز {booking_ref}",
-        body=label_ar,
-        data={
-            "type": "booking_status",
-            "booking_ref": booking_ref,
-            "status": status,
-        },
-    )
+) -> None:
+    from app.notification_inbox_services import notify_from_template
+
+    try:
+        notify_from_template(
+            db,
+            user_id,
+            "booking_status",
+            {"reference": booking_ref, "label": label_ar},
+            extra_data={
+                "booking_ref": booking_ref,
+                "status": status,
+                "type": "booking_status",
+            },
+        )
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        logger.warning("Booking notification failed: %s", exc)
+
+
+def notify_support_reply(
+    db: Session,
+    *,
+    user_id,
+    ticket_ref: str,
+    preview: str,
+) -> None:
+    from app.notification_inbox_services import notify_from_template
+
+    try:
+        notify_from_template(
+            db,
+            user_id,
+            "support_reply",
+            {"reference": ticket_ref, "preview": preview[:200]},
+            extra_data={
+                "ticket_ref": ticket_ref,
+                "type": "support_reply",
+            },
+        )
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        logger.warning("Support notification failed: %s", exc)
+
+
+def notify_towing_status_change(
+    db: Session,
+    *,
+    user_id,
+    dispatch_ref: str,
+    status: str,
+    label_ar: str,
+) -> None:
+    from app.notification_inbox_services import notify_from_template
+
+    try:
+        notify_from_template(
+            db,
+            user_id,
+            "towing_status",
+            {"reference": dispatch_ref, "label": label_ar},
+            extra_data={
+                "dispatch_ref": dispatch_ref,
+                "status": status,
+                "type": "towing_status",
+            },
+        )
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        logger.warning("Towing notification failed: %s", exc)

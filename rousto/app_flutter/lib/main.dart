@@ -7,7 +7,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'config/app_config.dart';
 import 'screens/login_screen.dart';
-import 'screens/onboarding_screen.dart';
+import 'screens/root_nav.dart';
 import 'services/auth_storage.dart';
 import 'services/error_reporter.dart';
 import 'services/push_notifications.dart';

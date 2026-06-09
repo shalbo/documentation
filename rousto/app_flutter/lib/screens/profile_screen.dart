@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
+import 'notifications_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -135,28 +136,39 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     for (final it in items) ...[
                       SoftCard(
-                        child: Row(
-                          children: [
-                            IconBadge(it.$1, size: 40),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(it.$2,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 14)),
-                                  Text(it.$3,
-                                      style: const TextStyle(
-                                          color: AppColors.ink500,
-                                          fontSize: 12)),
-                                ],
+                        child: InkWell(
+                          onTap: it.$2 == 'الإعدادات'
+                              ? () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const NotificationsScreen(),
+                                    ),
+                                  )
+                              : null,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Row(
+                            children: [
+                              IconBadge(it.$1, size: 40),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(it.$2,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 14)),
+                                    Text(it.$3,
+                                        style: const TextStyle(
+                                            color: AppColors.ink500,
+                                            fontSize: 12)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Icon(Icons.chevron_left,
-                                color: AppColors.ink300),
-                          ],
+                              const Icon(Icons.chevron_left,
+                                  color: AppColors.ink300),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
