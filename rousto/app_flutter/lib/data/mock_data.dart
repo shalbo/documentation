@@ -322,6 +322,63 @@ class MockData {
     ],
   );
 
+  static const landingPricing = LandingPricingModel(
+    heroStats: [
+      HeroStatModel(slug: 'happy_customers', valueAr: '+25K', labelAr: 'عميل سعيد'),
+      HeroStatModel(slug: 'rating', valueAr: '4.9★', labelAr: 'تقييم المتجر'),
+      HeroStatModel(slug: 'service_centers', valueAr: '+120', labelAr: 'مركز خدمة'),
+      HeroStatModel(slug: 'technicians', valueAr: '+500', labelAr: 'فني معتمد'),
+    ],
+    marketingPlans: [
+      MarketingPlanModel(
+        slug: 'individual',
+        nameAr: 'فردي',
+        descriptionAr: 'ادفع لكل خدمة — بدون التزام شهري',
+        priceSar: 0,
+        priceLabelAr: 'ادفع لكل خدمة',
+        priceDisplayAr: 'مجاني',
+        features: ['أسعار شفافة', 'حجز فوري', 'نقاط ولاء'],
+        ctaTextAr: 'احجز خدمتك',
+      ),
+      MarketingPlanModel(
+        slug: 'family',
+        nameAr: 'عائلي',
+        descriptionAr: 'خصم 10٪ + أولوية حجز',
+        priceSar: 29,
+        priceLabelAr: 'شهرياً',
+        priceDisplayAr: '29 دينار',
+        features: ['خصم 10٪', 'أولوية الحجز', 'دعم مخصص'],
+        ctaTextAr: 'اشترك الآن',
+        badgeAr: 'الأكثر شعبية',
+        isFeatured: true,
+      ),
+      MarketingPlanModel(
+        slug: 'business',
+        nameAr: 'أعمال',
+        descriptionAr: 'للأساطيل والشركات',
+        priceSar: 79,
+        priceLabelAr: 'شهرياً',
+        priceDisplayAr: '79 دينار',
+        features: ['خصم 20٪', 'فحص مجاني', 'مدير حساب'],
+        ctaTextAr: 'تواصل معنا',
+      ),
+    ],
+    services: services,
+    packages: servicePackages,
+    features: [
+      LandingFeatureModel(
+        slug: 'transparent-pricing',
+        titleAr: 'أسعار ثابتة وواضحة',
+        descriptionAr: 'تعرف على التكلفة قبل تأكيد الحجز.',
+      ),
+      LandingFeatureModel(
+        slug: 'certified-techs',
+        titleAr: 'فنيون معتمدون',
+        descriptionAr: 'فريق مدرّب وحاصل على شهادات معتمدة.',
+      ),
+    ],
+  );
+
   static const promotions = <PromotionModel>[
     PromotionModel(
       code: 'ROUSTO',

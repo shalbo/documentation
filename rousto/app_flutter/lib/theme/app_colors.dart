@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 
-/// ألوان روستو مستوحاة مباشرة من الشعار.
+/// ألوان روستو مستوحاة من الشعار: أحمر #D31E28 · كحلي #0B2C44 · أسود.
 class AppColors {
   AppColors._();
 
-  // Brand red
-  static const Color red = Color(0xFFE11B22);
-  static const Color red600 = Color(0xFFC2161C);
-  static const Color red700 = Color(0xFFA3141A);
-  static const Color red800 = Color(0xFF7A0F14);
-  static const Color red050 = Color(0xFFFDECEC);
+  // Logo red
+  static const Color red = Color(0xFFD31E28);
+  static const Color red600 = Color(0xFFB81922);
+  static const Color red700 = Color(0xFF9A151C);
+  static const Color red800 = Color(0xFF7A1016);
+  static const Color red050 = Color(0xFF2D1518);
 
-  // Neutrals
-  static const Color ink900 = Color(0xFF15161A);
-  static const Color ink700 = Color(0xFF2B2D34);
-  static const Color ink500 = Color(0xFF5B5E66);
-  static const Color ink300 = Color(0xFF9A9DA6);
-  static const Color line = Color(0xFFE4E2DD);
-  static const Color bg = Color(0xFFF2F1ED);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color cream = Color(0xFFF8F7F4);
+  // Logo navy
+  static const Color navy = Color(0xFF0B2C44);
+  static const Color navyLight = Color(0xFF123A5C);
+
+  // Dark surfaces
+  static const Color ink900 = Color(0xFFF5F6F8);
+  static const Color ink700 = Color(0xFFD0D8E0);
+  static const Color ink500 = Color(0xFF8FA3B3);
+  static const Color ink300 = Color(0xFF5C7080);
+  static const Color line = Color(0xFF1A3D5C);
+  static const Color bg = Color(0xFF000000);
+  static const Color surface = Color(0xFF0B2C44);
+  static const Color cream = Color(0xFF0E3248);
 
   // Accents
   static const Color gold = Color(0xFFF2B705);
@@ -27,13 +31,19 @@ class AppColors {
 
   // Gradients
   static const LinearGradient redGradient = LinearGradient(
-    colors: [Color(0xFFE11B22), Color(0xFFA3141A)],
+    colors: [Color(0xFFD31E28), Color(0xFF9A151C)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient darkGradient = LinearGradient(
-    colors: [Color(0xFF1D1E24), Color(0xFF2B2D34)],
+    colors: [Color(0xFF000000), Color(0xFF0B2C44)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient navyGradient = LinearGradient(
+    colors: [Color(0xFF0B2C44), Color(0xFF123A5C)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

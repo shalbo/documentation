@@ -6,40 +6,51 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get light {
-    final base = ThemeData.light(useMaterial3: true);
+  static ThemeData get dark {
+    final base = ThemeData.dark(useMaterial3: true);
     final textTheme = GoogleFonts.tajawalTextTheme(base.textTheme).apply(
       bodyColor: AppColors.ink900,
       displayColor: AppColors.ink900,
     );
 
     return base.copyWith(
+      brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.bg,
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.red,
-        secondary: AppColors.red700,
+        secondary: AppColors.navyLight,
         surface: AppColors.surface,
+        onSurface: AppColors.ink900,
         error: AppColors.red700,
       ),
       textTheme: textTheme,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.bg,
         elevation: 0,
         foregroundColor: AppColors.ink900,
         centerTitle: true,
+        titleTextStyle: GoogleFonts.tajawal(
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
+          color: AppColors.ink900,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: AppColors.line, width: 0.6),
         ),
       ),
+      dividerColor: AppColors.line,
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cream,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        labelStyle: const TextStyle(color: AppColors.ink500),
+        hintStyle: const TextStyle(color: AppColors.ink300),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.line),
@@ -66,6 +77,20 @@ class AppTheme {
           ),
         ),
       ),
+      bottomAppBarTheme: const BottomAppBarTheme(
+        color: AppColors.navy,
+        elevation: 8,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.navyLight,
+        contentTextStyle: GoogleFonts.tajawal(color: AppColors.ink900),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.red,
+      ),
     );
   }
+
+  /// Alias للتوافق مع الكود الحالي.
+  static ThemeData get light => dark;
 }

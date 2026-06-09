@@ -58,16 +58,18 @@ class IconBadge extends StatelessWidget {
   }
 }
 
-/// بطاقة بيضاء بظل ناعم.
+/// بطاقة كحلية بحد خفيف — أسلوب الشعار الداكن.
 class SoftCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final Color color;
+  final bool featured;
   const SoftCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(14),
     this.color = AppColors.surface,
+    this.featured = false,
   });
 
   @override
@@ -77,13 +79,25 @@ class SoftCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F15161A),
-            blurRadius: 14,
-            offset: Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: featured ? AppColors.red : AppColors.line,
+          width: featured ? 1.4 : 0.6,
+        ),
+        boxShadow: featured
+            ? [
+                BoxShadow(
+                  color: AppColors.red.withValues(alpha: 0.22),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : const [
+                BoxShadow(
+                  color: Color(0x40000000),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
       ),
       child: child,
     );

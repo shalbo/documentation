@@ -308,6 +308,35 @@ class AppRepository {
     }
   }
 
+  Future<LandingPricingModel> loadLandingPricing() async {
+    try {
+      final page = await _api.getLandingPage();
+      final pricing = page['pricing'] as Map<String, dynamic>;
+      final hero = page['hero'] as Map<String, dynamic>;
+      final featuresJson = page['features'] as List<dynamic>? ?? [];
+
+      return LandingPricingModel(
+        heroStats: (hero['stats'] as List<dynamic>)
+            .map((e) => HeroStatModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        marketingPlans: (pricing['marketing_plans'] as List<dynamic>)
+            .map((e) => MarketingPlanModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        services: (pricing['services'] as List<dynamic>)
+            .map((e) => ServiceModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        packages: (pricing['packages'] as List<dynamic>)
+            .map((e) => ServicePackageModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        features: featuresJson
+            .map((e) => LandingFeatureModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+    } catch (_) {
+      return MockData.landingPricing;
+    }
+  }
+
   Future<bool> createBooking({
     required String serviceId,
     required String vehicleId,

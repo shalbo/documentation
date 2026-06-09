@@ -17,8 +17,15 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.bg,
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.darkGradient),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF000000), Color(0xFF0B2C44), Color(0xFF000000)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Stack(
           children: [
             // وهج أحمر زخرفي

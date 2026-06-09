@@ -597,13 +597,113 @@ class MonetizationSummary {
   }
 }
 
+class HeroStatModel {
+  final String slug;
+  final String valueAr;
+  final String labelAr;
+
+  const HeroStatModel({
+    required this.slug,
+    required this.valueAr,
+    required this.labelAr,
+  });
+
+  factory HeroStatModel.fromJson(Map<String, dynamic> json) {
+    return HeroStatModel(
+      slug: json['slug'] as String,
+      valueAr: json['value_ar'] as String,
+      labelAr: json['label_ar'] as String,
+    );
+  }
+}
+
+class MarketingPlanModel {
+  final String slug;
+  final String nameAr;
+  final String descriptionAr;
+  final double priceSar;
+  final String priceLabelAr;
+  final String priceDisplayAr;
+  final List<String> features;
+  final String ctaTextAr;
+  final String? badgeAr;
+  final bool isFeatured;
+
+  const MarketingPlanModel({
+    required this.slug,
+    required this.nameAr,
+    required this.descriptionAr,
+    required this.priceSar,
+    required this.priceLabelAr,
+    required this.priceDisplayAr,
+    required this.features,
+    required this.ctaTextAr,
+    this.badgeAr,
+    this.isFeatured = false,
+  });
+
+  factory MarketingPlanModel.fromJson(Map<String, dynamic> json) {
+    final features = (json['features'] as List<dynamic>? ?? [])
+        .map((f) => f as String)
+        .toList();
+    return MarketingPlanModel(
+      slug: json['slug'] as String,
+      nameAr: json['name_ar'] as String,
+      descriptionAr: json['description_ar'] as String? ?? '',
+      priceSar: (json['price_sar'] as num).toDouble(),
+      priceLabelAr: json['price_label_ar'] as String? ?? '',
+      priceDisplayAr: json['price_display_ar'] as String? ?? '',
+      features: features,
+      ctaTextAr: json['cta_text_ar'] as String? ?? 'ابدأ الآن',
+      badgeAr: json['badge_ar'] as String?,
+      isFeatured: json['is_featured'] as bool? ?? false,
+    );
+  }
+}
+
+class LandingFeatureModel {
+  final String slug;
+  final String titleAr;
+  final String descriptionAr;
+
+  const LandingFeatureModel({
+    required this.slug,
+    required this.titleAr,
+    required this.descriptionAr,
+  });
+
+  factory LandingFeatureModel.fromJson(Map<String, dynamic> json) {
+    return LandingFeatureModel(
+      slug: json['slug'] as String,
+      titleAr: json['title_ar'] as String,
+      descriptionAr: json['description_ar'] as String? ?? '',
+    );
+  }
+}
+
+class LandingPricingModel {
+  final List<HeroStatModel> heroStats;
+  final List<MarketingPlanModel> marketingPlans;
+  final List<ServiceModel> services;
+  final List<ServicePackageModel> packages;
+  final List<LandingFeatureModel> features;
+
+  const LandingPricingModel({
+    required this.heroStats,
+    required this.marketingPlans,
+    required this.services,
+    required this.packages,
+    required this.features,
+  });
+}
+
 Color trackStatusColor(TrackStatus status) {
   switch (status) {
     case TrackStatus.done:
       return const Color(0xFF16A34A);
     case TrackStatus.current:
-      return const Color(0xFFE11B22);
+      return const Color(0xFFD31E28);
     case TrackStatus.todo:
-      return const Color(0xFF9CA3AF);
+      return const Color(0xFF5C7080);
   }
 }

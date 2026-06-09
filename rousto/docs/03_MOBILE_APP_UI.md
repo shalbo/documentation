@@ -4,7 +4,7 @@
 
 - **الإطار:** Flutter 3.x (Dart ≥3.0)
 - **الخط:** Tajawal (Google Fonts)
-- **الألوان:** `#E11B22` أحمر · `#F2F1ED` خلفية
+- **الألوان (الشعار):** `#D31E28` أحمر · `#0B2C44` كحلي · `#000000` خلفية داكنة
 - **الاتجاه:** RTL دائماً
 
 ---
@@ -18,6 +18,7 @@
 | 3 | تأكيد الحجز | `booking_screen.dart` | `/me/*`, `/promotions/validate`, `POST /bookings` |
 | 4 | التتبّع | `tracking_screen.dart` | `/bookings/active`, `/bookings/{id}/delivery-map` |
 | 5 | العروض | `offers_screen.dart` | `/promotions`, `/me/loyalty` |
+| 9 | الأسعار | `pricing_screen.dart` | `/landing/pricing`, `/landing/page` |
 | 6 | الملف الشخصي | `profile_screen.dart` | `/me`, `/me/vehicles` |
 | 7 | فحص بالصورة | `ai_scan_screen.dart` | `POST /scans`, `/scans/types` |
 | 8 | نتائج الفحص | `scan_results_screen.dart` | `/scans/{id}` → الحجز |

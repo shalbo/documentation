@@ -211,6 +211,16 @@ class ApiClient {
     }, auth: false);
     return body['data'] as Map<String, dynamic>;
   }
+
+  Future<Map<String, dynamic>> getLandingPricing() async {
+    final body = await _get('/landing/pricing');
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getLandingPage() async {
+    final body = await _get('/landing/page');
+    return body['data'] as Map<String, dynamic>;
+  }
 }
 
 class ApiException implements Exception {

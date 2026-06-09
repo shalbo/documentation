@@ -18,7 +18,7 @@ class RoustoApp extends StatelessWidget {
       child: MaterialApp(
         title: 'روستو',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
+        theme: AppTheme.dark,
         locale: const Locale('ar'),
         supportedLocales: const [Locale('ar'), Locale('en')],
         localizationsDelegates: const [

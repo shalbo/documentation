@@ -6,6 +6,7 @@ import '../data/models.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
+import 'pricing_screen.dart';
 
 class OffersScreen extends StatelessWidget {
   const OffersScreen({super.key});
@@ -35,6 +36,43 @@ class OffersScreen extends StatelessWidget {
                             fontSize: 20, fontWeight: FontWeight.w800)),
                     if (state.usingMockData) const DemoBadge(),
                   ],
+                ),
+                const SizedBox(height: 14),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PricingScreen()),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.navyGradient,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.line),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.payments_outlined,
+                            color: AppColors.red, size: 28),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('صفحة الأسعار الكاملة',
+                                  style: TextStyle(
+                                      color: AppColors.ink900,
+                                      fontWeight: FontWeight.w800)),
+                              Text('خطط · باقات · أسعار الخدمات',
+                                  style: TextStyle(
+                                      color: AppColors.ink500,
+                                      fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.chevron_left, color: AppColors.ink300),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 14),
                 _pointsCard(state.loyaltyPoints),
@@ -117,10 +155,10 @@ class OffersScreen extends StatelessWidget {
             width: 160,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isCurrent ? AppColors.red050 : AppColors.surface,
+              color: isCurrent ? AppColors.red050 : AppColors.cream,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isCurrent ? AppColors.red600 : AppColors.line,
+                color: isCurrent ? AppColors.red : AppColors.line,
               ),
             ),
             child: Column(

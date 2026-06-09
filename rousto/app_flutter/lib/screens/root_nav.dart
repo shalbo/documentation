@@ -56,7 +56,7 @@ class _RootNavState extends State<RootNav> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: AppColors.surface,
+        color: AppColors.navy,
         shape: const CircularNotchedRectangle(),
         notchMargin: 8,
         height: 70,

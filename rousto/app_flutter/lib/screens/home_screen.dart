@@ -9,6 +9,7 @@ import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import 'ai_scan_screen.dart';
 import 'booking_screen.dart';
+import 'pricing_screen.dart';
 import 'tracking_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -56,6 +57,10 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+                  child: _pricingTeaser(context),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
                   child: _aiScanCard(context),
                 ),
                 Padding(
@@ -116,7 +121,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text('أهلاً بعودتك 👋',
-                style: TextStyle(color: Color(0xFFFFD9DA), fontSize: 13)),
+                style: TextStyle(color: Color(0xFFE8C4C6), fontSize: 13)),
             Text(
               user?.fullName ?? 'ضيف',
               style: const TextStyle(
@@ -136,7 +141,7 @@ class HomeScreen extends StatelessWidget {
                   Icon(Icons.search, color: Colors.white, size: 20),
                   SizedBox(width: 8),
                   Text('ابحث عن خدمة…',
-                      style: TextStyle(color: Color(0xFFFFE1E1))),
+                      style: TextStyle(color: Color(0xFFE8D0D2))),
                 ],
               ),
             ),
@@ -158,8 +163,9 @@ class HomeScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.ink900,
+            gradient: AppColors.navyGradient,
             borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.line),
           ),
           child: Row(
             children: [
@@ -213,10 +219,10 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: active ? AppColors.red050 : AppColors.surface,
+                color: active ? AppColors.red050 : AppColors.cream,
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                    color: active ? Colors.transparent : AppColors.line),
+                    color: active ? AppColors.red : AppColors.line),
               ),
               child: Text(
                 state.categories[i].nameAr,
@@ -278,6 +284,44 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _pricingTeaser(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const PricingScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: AppColors.navyGradient,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Row(
+          children: [
+            const IconBadge(Icons.sell_outlined,
+                bg: AppColors.red050, fg: AppColors.red, size: 48),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('الأسعار والخطط',
+                      style: TextStyle(
+                          color: AppColors.ink900,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15)),
+                  Text('فردي · عائلي · أعمال — بالدينار',
+                      style: TextStyle(color: AppColors.ink500, fontSize: 12)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_left, color: AppColors.ink300),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _aiScanCard(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
@@ -289,13 +333,6 @@ class HomeScreen extends StatelessWidget {
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.line),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0F15161A),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
         ),
         child: Row(
           children: [
