@@ -30,7 +30,8 @@ rousto/
 │   ├── 17_PERMISSIONS_AND_AUTH.md
 │   ├── 18_ADVERTISING_AND_MARKETING_MODULE.md
 │   ├── 19_PRODUCTION_HARDENING.md
-│   └── 20_NOTIV.md
+│   ├── 20_NOTIV.md
+│   └── 22_CENTRALIZED_NOTIFICATION_ENGINE.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -46,9 +47,10 @@ rousto/
 ├── app/                   # نموذج واجهات التطبيق بصيغة HTML (5 شاشات)
 │   ├── index.html
 │   └── css/app.css
-├── admin/                 # لوحات الإدارة (كتالوج + تسويق + فنيين)
+├── admin/                 # لوحات الإدارة (كتالوج + تسويق + إشعارات)
 │   ├── index.html
 │   ├── marketing.html
+│   ├── notifications.html
 │   ├── vendors.html
 │   ├── vendor-portal.html
 │   ├── vendor-map.html
@@ -113,6 +115,7 @@ cd rousto/backend && docker compose up -d
 - قاعدة البيانات: PostgreSQL على المنفذ `5432`
 - REST API: http://localhost:8000/docs
 - لوحة الإدارة: http://localhost:8080/admin/index.html (بعد تشغيل `python3 -m http.server`)
+- محرك الإشعارات: http://localhost:8080/admin/notifications.html
 
 المواصفات:
 - [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md)

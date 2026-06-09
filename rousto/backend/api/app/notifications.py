@@ -89,7 +89,7 @@ def notify_booking_status_change(
     from app.notification_inbox_services import notify_from_template
 
     try:
-        notify_from_template(
+        notification = notify_from_template(
             db,
             user_id,
             "booking_status",
@@ -100,6 +100,20 @@ def notify_booking_status_change(
                 "type": "booking_status",
             },
         )
+        if notification:
+            from app.notification_engine_services import record_dispatch_log
+
+            record_dispatch_log(
+                db,
+                event_source="booking_hook",
+                user_id=user_id,
+                category="booking",
+                title=notification.title,
+                notification_id=notification.id,
+                template_slug="booking_status",
+                push_sent=notification.push_sent,
+                in_app_created=True,
+            )
         db.commit()
     except Exception as exc:
         db.rollback()
@@ -116,7 +130,7 @@ def notify_support_reply(
     from app.notification_inbox_services import notify_from_template
 
     try:
-        notify_from_template(
+        notification = notify_from_template(
             db,
             user_id,
             "support_reply",
@@ -126,6 +140,20 @@ def notify_support_reply(
                 "type": "support_reply",
             },
         )
+        if notification:
+            from app.notification_engine_services import record_dispatch_log
+
+            record_dispatch_log(
+                db,
+                event_source="support_hook",
+                user_id=user_id,
+                category="support",
+                title=notification.title,
+                notification_id=notification.id,
+                template_slug="support_reply",
+                push_sent=notification.push_sent,
+                in_app_created=True,
+            )
         db.commit()
     except Exception as exc:
         db.rollback()
@@ -260,7 +288,7 @@ def notify_towing_status_change(
     from app.notification_inbox_services import notify_from_template
 
     try:
-        notify_from_template(
+        notification = notify_from_template(
             db,
             user_id,
             "towing_status",
@@ -271,6 +299,20 @@ def notify_towing_status_change(
                 "type": "towing_status",
             },
         )
+        if notification:
+            from app.notification_engine_services import record_dispatch_log
+
+            record_dispatch_log(
+                db,
+                event_source="towing_hook",
+                user_id=user_id,
+                category="towing",
+                title=notification.title,
+                notification_id=notification.id,
+                template_slug="towing_status",
+                push_sent=notification.push_sent,
+                in_app_created=True,
+            )
         db.commit()
     except Exception as exc:
         db.rollback()

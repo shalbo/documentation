@@ -10,13 +10,10 @@ from app.deps import get_current_user, require_admin_key
 from app.models import User
 from app.notification_inbox_services import (
     NOTIFICATION_CATEGORIES,
-    admin_list_notifications,
-    dispatch_user_notification,
     list_notifications,
     list_user_preferences,
     mark_all_read,
     mark_read,
-    notify_from_template,
     unread_count,
     update_user_preferences,
 )
@@ -32,17 +29,6 @@ class PreferenceItemIn(BaseModel):
 
 class PreferencesUpdateIn(BaseModel):
     preferences: list[PreferenceItemIn]
-
-
-class AdminSendIn(BaseModel):
-    user_id: UUID
-    category: str = Field(default="system")
-    title: str = Field(min_length=1, max_length=200)
-    body: str = Field(min_length=1, max_length=2000)
-    action_url: str | None = Field(default=None, max_length=300)
-    template_slug: str | None = Field(default=None, max_length=60)
-    context: dict[str, str] = Field(default_factory=dict)
-    send_push: bool = True
 
 
 @router.get("/me/notifications")
@@ -142,67 +128,3 @@ def put_preferences(
     return {"data": data}
 
 
-@router.get("/admin/notifications")
-def admin_notifications(
-    user_id: UUID | None = Query(default=None),
-    category: str | None = Query(default=None),
-    limit: int = Query(default=100, ge=1, le=200),
-    offset: int = Query(default=0, ge=0),
-    _: None = Depends(require_admin_key),
-    db: Session = Depends(get_db),
-):
-    data, total = admin_list_notifications(
-        db,
-        user_id=user_id,
-        category=category,
-        limit=limit,
-        offset=offset,
-    )
-    return {"data": data, "meta": {"total": total}}
-
-
-@router.post("/admin/notifications/send", status_code=201)
-def admin_send_notification(
-    body: AdminSendIn,
-    _: None = Depends(require_admin_key),
-    db: Session = Depends(get_db),
-):
-    try:
-        if body.template_slug:
-            notification = notify_from_template(
-                db,
-                body.user_id,
-                body.template_slug,
-                body.context,
-                send_push=body.send_push,
-            )
-        else:
-            if body.category not in NOTIFICATION_CATEGORIES:
-                raise ValueError("فئة الإشعار غير مدعومة")
-            notification = dispatch_user_notification(
-                db,
-                body.user_id,
-                category=body.category,
-                title=body.title,
-                body=body.body,
-                action_url=body.action_url,
-                send_push=body.send_push,
-            )
-        db.commit()
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={"code": "SEND_ERROR", "message": str(exc)},
-        ) from exc
-
-    if notification is None:
-        return {
-            "data": {
-                "sent": False,
-                "reason": "disabled_by_preferences",
-            }
-        }
-
-    from app.notification_inbox_services import notification_out
-
-    return {"data": {"sent": True, "notification": notification_out(notification)}}

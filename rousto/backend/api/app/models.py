@@ -884,6 +884,47 @@ class Notification(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class NotificationBroadcast(Base):
+    __tablename__ = "notification_broadcasts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    reference: Mapped[str] = mapped_column(String(20), unique=True)
+    category: Mapped[str] = mapped_column(String(30))
+    title: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    target_segment: Mapped[str] = mapped_column(String(40))
+    template_slug: Mapped[str | None] = mapped_column(String(60))
+    recipients_count: Mapped[int] = mapped_column(Integer, default=0)
+    push_sent_count: Mapped[int] = mapped_column(Integer, default=0)
+    in_app_count: Mapped[int] = mapped_column(Integer, default=0)
+    skipped_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_by: Mapped[str | None] = mapped_column(String(120))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class NotificationDispatchLog(Base):
+    __tablename__ = "notification_dispatch_log"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    event_source: Mapped[str] = mapped_column(String(60))
+    notification_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("notifications.id")
+    )
+    broadcast_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("notification_broadcasts.id")
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    category: Mapped[str] = mapped_column(String(30))
+    template_slug: Mapped[str | None] = mapped_column(String(60))
+    title: Mapped[str] = mapped_column(String(200))
+    channel: Mapped[str] = mapped_column(String(20), default="both")
+    push_sent: Mapped[bool] = mapped_column(Boolean, default=False)
+    in_app_created: Mapped[bool] = mapped_column(Boolean, default=False)
+    status: Mapped[str] = mapped_column(String(20), default="delivered")
+    metadata_json: Mapped[dict] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class MarketingAttributionEvent(Base):
     __tablename__ = "marketing_attribution_events"
 

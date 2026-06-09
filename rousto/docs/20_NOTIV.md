@@ -112,6 +112,13 @@ flutter run --dart-define=ENABLE_FCM=true --dart-define=API_BASE_URL=http://loca
 | Flutter | `app_flutter/lib/screens/notifications_screen.dart` |
 | Tests | `backend/api/tests/test_notiv.py` |
 
+## المحرك المركزي (Module 22)
+
+طبقة **NOTIV Engine** فوق الصندوق — سجل إرسال مركزي، بث جماعي، ولوحة إدارة:
+
+- التوثيق: [`22_CENTRALIZED_NOTIFICATION_ENGINE`](22_CENTRALIZED_NOTIFICATION_ENGINE.md)
+- لوحة الإدارة: `admin/notifications.html`
+
 ## الخطوة التالية
 
 - WebSocket للإشعارات الفورية بدون polling

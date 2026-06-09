@@ -9,6 +9,7 @@ from app.error_reporting import capture_exception, init_error_reporting
 from app.routers import (
     admin_catalog,
     admin_marketing,
+    admin_notifications,
     auth,
     bookings,
     catalog,
@@ -61,6 +62,7 @@ app.include_router(auth.router, prefix=prefix)
 app.include_router(catalog.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
+app.include_router(admin_notifications.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)

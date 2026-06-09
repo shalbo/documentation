@@ -42,6 +42,8 @@ services:
       - ./database/029_notiv_seed.sql:/docker-entrypoint-initdb.d/029_notiv_seed.sql:ro
       - ./database/030_i18n_schema.sql:/docker-entrypoint-initdb.d/030_i18n_schema.sql:ro
       - ./database/031_i18n_seed.sql:/docker-entrypoint-initdb.d/031_i18n_seed.sql:ro
+      - ./database/032_notification_engine_schema.sql:/docker-entrypoint-initdb.d/032_notification_engine_schema.sql:ro
+      - ./database/033_notification_engine_seed.sql:/docker-entrypoint-initdb.d/033_notification_engine_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

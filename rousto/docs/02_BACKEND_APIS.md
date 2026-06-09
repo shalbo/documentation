@@ -366,7 +366,7 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 
 ### الإشعارات (NOTIV)
 
-انظر [`20_NOTIV`](20_NOTIV.md).
+انظر [`20_NOTIV`](20_NOTIV.md) و[`22_CENTRALIZED_NOTIFICATION_ENGINE`](22_CENTRALIZED_NOTIFICATION_ENGINE.md).
 
 | Method | Path | الوصف | Auth |
 |--------|------|-------|------|
@@ -377,8 +377,16 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 | GET | `/api/v1/me/notification-preferences` | تفضيلات الفئات | Customer |
 | PUT | `/api/v1/me/notification-preferences` | تحديث التفضيلات | Customer |
 | POST | `/api/v1/me/devices/register` | تسجيل FCM token | Customer |
-| GET | `/api/v1/admin/notifications` | سجل الإشعارات | Admin |
-| POST | `/api/v1/admin/notifications/send` | إرسال إشعار لمستخدم | Admin |
+| GET | `/api/v1/admin/notifications` | صندوق كل المستخدمين (`?user_id=&category=`) | Admin |
+| GET | `/api/v1/admin/notifications/analytics` | إحصائيات المحرك المركزي | Admin |
+| GET | `/api/v1/admin/notifications/dispatch-log` | سجل الإرسال (`?event_source=&category=`) | Admin |
+| GET | `/api/v1/admin/notifications/templates` | قائمة القوالب | Admin |
+| POST | `/api/v1/admin/notifications/templates` | إنشاء قالب | Admin |
+| PATCH | `/api/v1/admin/notifications/templates/{id}` | تحديث قالب | Admin |
+| GET | `/api/v1/admin/notifications/users/search?q=` | بحث مستخدم للإرسال | Admin |
+| POST | `/api/v1/admin/notifications/send` | إرسال فردي | Admin |
+| POST | `/api/v1/admin/notifications/broadcast` | بث جماعي حسب الشريحة | Admin |
+| GET | `/api/v1/admin/notifications/broadcasts` | سجل البثوث | Admin |
 
 ---
 
@@ -581,3 +589,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`17_PERMISSIONS_AND_AUTH`](../docs/17_PERMISSIONS_AND_AUTH.md) — OTP + JWT + أدوار وصلاحيات ✅
 - [`18_ADVERTISING_AND_MARKETING_MODULE`](../docs/18_ADVERTISING_AND_MARKETING_MODULE.md) — حملات وبانرات وإحالات ✅
 - [`20_NOTIV`](../docs/20_NOTIV.md) — صندوق إشعارات in-app + FCM push ✅
+- [`22_CENTRALIZED_NOTIFICATION_ENGINE`](../docs/22_CENTRALIZED_NOTIFICATION_ENGINE.md) — محرك إشعارات مركزي + لوحة إدارة ✅
