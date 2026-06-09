@@ -26,13 +26,15 @@ rousto/
 │   ├── 12_TOWING_DISPATCH_MAP.md
 │   ├── 13_CUSTOMER_SUPPORT_AND_SECURITY.md
 │   ├── 14_LANDING_PAGE_PRICING.md
-│   └── 15_FRONT_END_WEB.md
+│   ├── 15_FRONT_END_WEB.md
+│   └── 17_PERMISSIONS_AND_AUTH.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
 │   └── database/          # 001_schema.sql, 002_seed.sql
 ├── web/                   # موقع الويب + بوابة العميل (RTL)
 │   ├── index.html         # صفحة الهبوط
+│   ├── login.html         # تسجيل دخول OTP
 │   ├── dashboard.html     # لوحة تحكم العميل
 │   ├── booking.html       # حجز خدمة
 │   ├── account.html       # حسابي
@@ -69,6 +71,7 @@ python3 -m http.server 8080
 
 ثم افتح:
 - موقع الويب: <http://localhost:8080/web/index.html>
+- تسجيل الدخول: <http://localhost:8080/web/login.html>
 - لوحة العميل: <http://localhost:8080/web/dashboard.html>
 - الحجز: <http://localhost:8080/web/booking.html>
 - حسابي: <http://localhost:8080/web/account.html>
@@ -122,6 +125,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md`](docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md)
 - [`docs/14_LANDING_PAGE_PRICING.md`](docs/14_LANDING_PAGE_PRICING.md)
 - [`docs/15_FRONT_END_WEB.md`](docs/15_FRONT_END_WEB.md)
+- [`docs/17_PERMISSIONS_AND_AUTH.md`](docs/17_PERMISSIONS_AND_AUTH.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

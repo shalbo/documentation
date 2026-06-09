@@ -20,6 +20,11 @@
       return '<a class="portal-nav-link' + cls + '" href="' + p.href + '">' + p.label + "</a>";
     }).join("");
 
+    var authAction =
+      typeof RoustoConfig !== "undefined" && RoustoConfig.isLoggedIn
+        ? '<button type="button" class="btn btn-ghost btn-sm" id="portalLogoutBtn">خروج</button>'
+        : '<a href="login.html" class="btn btn-ghost btn-sm">دخول</a>';
+
     mount.innerHTML =
       '<header class="portal-header">' +
       '<div class="portal-header-inner">' +
@@ -28,10 +33,23 @@
       "<span>روستو</span></a>" +
       '<nav class="portal-nav" id="portalNav">' + links + "</nav>" +
       '<div class="portal-header-actions">' +
+      authAction +
       '<a href="booking.html" class="btn btn-primary btn-sm">احجز الآن</a>' +
       '<button class="portal-nav-toggle" id="portalNavToggle" aria-label="القائمة">' +
       "<span></span><span></span><span></span></button>" +
       "</div></div></header>";
+
+    var logoutBtn = document.getElementById("portalLogoutBtn");
+    if (logoutBtn && typeof RoustoAPI !== "undefined") {
+      logoutBtn.addEventListener("click", function () {
+        RoustoAPI.logout().finally(function () {
+          if (typeof RoustoToast === "function") {
+            RoustoToast("تم تسجيل الخروج");
+          }
+          window.location.href = "login.html";
+        });
+      });
+    }
 
     var toggle = document.getElementById("portalNavToggle");
     var nav = document.getElementById("portalNav");

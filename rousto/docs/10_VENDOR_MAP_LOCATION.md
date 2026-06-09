@@ -132,4 +132,4 @@ rousto/admin/
 ## الخطوة التالية
 
 - [`11_CUSTOMER_DELIVERY_MAP`](11_CUSTOMER_DELIVERY_MAP.md) — خريطة توصيل العميل ✅
-- `16_AUTH` — OTP + JWT + أدوار (`customer`, `technician`, `admin`)
+- `17_PERMISSIONS_AND_AUTH` — OTP + JWT + أدوار (`customer`, `technician`, `admin`)

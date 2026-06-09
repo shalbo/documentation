@@ -2,7 +2,7 @@
 
 تجميع **ديناميكي** لأسعار الخدمات وخطط الاشتراك والباقات لصفحة الهبوط وصفحة الأسعار.
 
-- **المصادقة (لاحقاً):** `16_AUTH`
+- **المصادقة (لاحقاً):** `17_PERMISSIONS_AND_AUTH`
 - **المخطط:** `landing_hero_stats`, `landing_pricing_plans`, `landing_page_features`
 
 ---
@@ -116,4 +116,4 @@
 
 ## الخطوة التالية
 
-- `16_AUTH` — OTP + JWT + أدوار
+- `17_PERMISSIONS_AND_AUTH` — OTP + JWT + أدوار

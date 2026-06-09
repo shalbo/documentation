@@ -178,4 +178,4 @@ rousto/admin/
 ## الخطوة التالية
 
 - [`10_VENDOR_MAP_LOCATION`](10_VENDOR_MAP_LOCATION.md) — خريطة وموقع الفني ✅
-- `16_AUTH` — OTP + JWT + أدوار (`customer`, `technician`, `admin`)
+- `17_PERMISSIONS_AND_AUTH` — OTP + JWT + أدوار (`customer`, `technician`, `admin`)

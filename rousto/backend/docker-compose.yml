@@ -33,6 +33,8 @@ services:
       - ./database/020_support_security_seed.sql:/docker-entrypoint-initdb.d/020_support_security_seed.sql:ro
       - ./database/021_landing_pricing_schema.sql:/docker-entrypoint-initdb.d/021_landing_pricing_schema.sql:ro
       - ./database/022_landing_pricing_seed.sql:/docker-entrypoint-initdb.d/022_landing_pricing_seed.sql:ro
+      - ./database/023_auth_permissions_schema.sql:/docker-entrypoint-initdb.d/023_auth_permissions_schema.sql:ro
+      - ./database/024_auth_permissions_seed.sql:/docker-entrypoint-initdb.d/024_auth_permissions_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

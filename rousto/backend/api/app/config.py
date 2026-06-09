@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     admin_api_key: str = "rousto_admin_dev"
     scan_storage_path: str = "/data/scans"
     ai_provider: str = "stub"
+    jwt_secret: str = "rousto_dev_jwt_secret_change_me"
+    jwt_access_minutes: int = 60
+    jwt_refresh_days: int = 7
+    otp_dev_mode: bool = True
+    otp_dev_code: str = "123456"
 
 
 settings = Settings()

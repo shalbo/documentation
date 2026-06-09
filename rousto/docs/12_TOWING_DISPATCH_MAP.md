@@ -120,4 +120,4 @@ rousto/backend/api/app/routers/towing_dispatch.py
 ## الخطوة التالية
 
 - [`13_CUSTOMER_SUPPORT_AND_SECURITY`](13_CUSTOMER_SUPPORT_AND_SECURITY.md) — دعم العملاء والأمان ✅
-- `16_AUTH` — OTP + JWT + أدوار
+- `17_PERMISSIONS_AND_AUTH` — OTP + JWT + أدوار

@@ -5,12 +5,14 @@ from datetime import datetime
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Column,
     DateTime,
     ForeignKey,
     Integer,
     Numeric,
     SmallInteger,
     String,
+    Table,
     Text,
     func,
 )
@@ -629,3 +631,94 @@ class LandingPageFeature(Base):
     icon_key: Mapped[str | None] = mapped_column(String(40))
     sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+role_permissions_table = Table(
+    "role_permissions",
+    Base.metadata,
+    Column("role_id", UUID(as_uuid=True), ForeignKey("roles.id"), primary_key=True),
+    Column(
+        "permission_id",
+        UUID(as_uuid=True),
+        ForeignKey("permissions.id"),
+        primary_key=True,
+    ),
+)
+
+
+class Role(Base):
+    __tablename__ = "roles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    description_ar: Mapped[str | None] = mapped_column(String(200))
+    is_system: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=role_permissions_table, back_populates="roles"
+    )
+
+
+class Permission(Base):
+    __tablename__ = "permissions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(60), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(120))
+    resource: Mapped[str] = mapped_column(String(40))
+    action: Mapped[str] = mapped_column(String(40))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    roles: Mapped[list["Role"]] = relationship(
+        secondary=role_permissions_table, back_populates="permissions"
+    )
+
+
+class UserRole(Base):
+    __tablename__ = "user_roles"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id"), primary_key=True
+    )
+    role_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("roles.id"), primary_key=True
+    )
+    granted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    granted_by: Mapped[str | None] = mapped_column(String(80))
+
+
+class UserVendorLink(Base):
+    __tablename__ = "user_vendor_links"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id"), primary_key=True
+    )
+    vendor_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("vendors.id"), primary_key=True
+    )
+    linked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class AuthOtpRequest(Base):
+    __tablename__ = "auth_otp_requests"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    phone: Mapped[str] = mapped_column(String(20))
+    code_hash: Mapped[str] = mapped_column(String(128))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    attempts: Mapped[int] = mapped_column(SmallInteger, default=0)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class AuthRefreshToken(Base):
+    __tablename__ = "auth_refresh_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    token_hash: Mapped[str] = mapped_column(String(128), unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

@@ -29,11 +29,29 @@
     get userId() {
       return loadConfig().userId || DEFAULT_USER;
     },
+    get accessToken() {
+      return loadConfig().accessToken || "";
+    },
+    get refreshToken() {
+      return loadConfig().refreshToken || "";
+    },
+    get isLoggedIn() {
+      return Boolean(loadConfig().accessToken);
+    },
     set apiBase(value) {
       saveConfig({ apiBase: String(value || "").replace(/\/$/, "") });
     },
     set userId(value) {
       saveConfig({ userId: String(value || "").trim() });
+    },
+    set accessToken(value) {
+      saveConfig({ accessToken: String(value || "").trim() });
+    },
+    set refreshToken(value) {
+      saveConfig({ refreshToken: String(value || "").trim() });
+    },
+    clearAuth: function () {
+      saveConfig({ accessToken: "", refreshToken: "", userId: "" });
     },
   };
 
@@ -41,7 +59,11 @@
     options = options || {};
     var headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
     if (options.auth !== false) {
-      headers["X-User-Id"] = RoustoConfig.userId;
+      if (RoustoConfig.accessToken) {
+        headers.Authorization = "Bearer " + RoustoConfig.accessToken;
+      } else {
+        headers["X-User-Id"] = RoustoConfig.userId;
+      }
     }
     var res = await fetch(RoustoConfig.apiBase + "/api/v1" + path, {
       method: options.method || "GET",
@@ -64,6 +86,42 @@
     },
     getMe: function () {
       return request("/me");
+    },
+    authMe: function () {
+      return request("/auth/me");
+    },
+    sendOtp: function (phone) {
+      return request("/auth/otp/send", {
+        method: "POST",
+        auth: false,
+        body: { phone: phone },
+      });
+    },
+    verifyOtp: function (phone, code, requestId) {
+      var body = { phone: phone, code: code };
+      if (requestId) body.request_id = requestId;
+      return request("/auth/otp/verify", {
+        method: "POST",
+        auth: false,
+        body: body,
+      });
+    },
+    refreshAuth: function () {
+      return request("/auth/refresh", {
+        method: "POST",
+        auth: false,
+        body: { refresh_token: RoustoConfig.refreshToken },
+      });
+    },
+    logout: function () {
+      var token = RoustoConfig.refreshToken;
+      RoustoConfig.clearAuth();
+      if (!token) return Promise.resolve({ data: { logged_out: true } });
+      return request("/auth/logout", {
+        method: "POST",
+        auth: false,
+        body: { refresh_token: token },
+      });
     },
     getCategoriesTree: function () {
       return request("/categories/tree", { auth: false });

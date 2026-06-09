@@ -2,7 +2,7 @@
 
 بوابة **عميل ويب** موحّدة لمنصة روستو — RTL عربي، متصلة بـ REST API.
 
-- **المصادقة (لاحقاً):** `16_AUTH`
+- **المصادقة:** [`17_PERMISSIONS_AND_AUTH`](17_PERMISSIONS_AND_AUTH.md)
 - **المجلد:** `rousto/web/`
 
 ---
@@ -14,8 +14,8 @@
 | لوحة تحكم العميل | لوحة الإدارة (`admin/`) |
 | حجز خدمة عبر API | بوابة دفع حقيقية |
 | تتبّع التوصيل والدعم | SPA framework (React/Vue) |
-| حسابي (ملف + سيارات + طلبات) | تسجيل دخول JWT |
-| ترويسة وتذييل موحّد | i18n |
+| حسابي (ملف + سيارات + طلبات) | i18n |
+| تسجيل دخول OTP + JWT | SMS حقيقي |
 
 ---
 
@@ -24,6 +24,7 @@
 | الصفحة | الملف | API |
 |--------|-------|-----|
 | الهبوط | `index.html` | `/landing/page` |
+| تسجيل الدخول | `login.html` | `/auth/otp/*` |
 | لوحة التحكم | `dashboard.html` | `/me`, `/bookings/active` |
 | الحجز | `booking.html` | `/categories/tree`, `POST /bookings` |
 | حسابي | `account.html` | `/me`, `/me/vehicles`, `/bookings` |
@@ -43,9 +44,11 @@ web/
 │   ├── styles.css         # صفحة الهبوط
 │   ├── portal.css         # بوابة العميل
 │   └── delivery-map.css   # خرائط
+├── login.html             # OTP + JWT
 └── js/
-    ├── api.js             # عميل API + إعدادات localStorage
-    ├── portal-layout.js   # ترويسة/تذييل موحّد
+    ├── api.js             # عميل API + JWT + إعدادات localStorage
+    ├── portal-layout.js   # ترويسة/تذييل + دخول/خروج
+    ├── login.js
     ├── dashboard.js
     ├── booking.js
     ├── account.js
@@ -54,16 +57,19 @@ web/
     └── support.js
 ```
 
-### الإعدادات (مؤقتة)
+### الإعدادات
 
 ```javascript
 localStorage.rousto_web_config = {
   apiBase: "http://localhost:8000",
+  accessToken: "<jwt>",
+  refreshToken: "<refresh>",
   userId: "a0000000-0000-4000-8000-000000000001"
 }
 ```
 
-يُرسل `X-User-Id` مع طلبات العميل.
+- عند وجود `accessToken` يُرسل `Authorization: Bearer`
+- بدون توكن: يُرسل `X-User-Id` للتطوير
 
 ---
 
@@ -74,12 +80,15 @@ cd rousto/backend && docker compose up -d
 cd rousto && python3 -m http.server 8080
 ```
 
+- تسجيل الدخول: http://localhost:8080/web/login.html
 - لوحة التحكم: http://localhost:8080/web/dashboard.html
 - الحجز: http://localhost:8080/web/booking.html
 - حسابي: http://localhost:8080/web/account.html
+
+**مستخدم تجريبي:** `+966501234567` — الرمز في وضع التطوير: `123456`
 
 ---
 
 ## الخطوة التالية
 
-- `16_AUTH` — OTP + JWT + أدوار
+- [`17_PERMISSIONS_AND_AUTH`](17_PERMISSIONS_AND_AUTH.md) — OTP + JWT + أدوار ✅

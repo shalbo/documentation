@@ -24,10 +24,29 @@ export DATABASE_URL=postgresql://rousto:rousto_dev@localhost:5432/rousto
 uvicorn app.main:app --reload --port 8000
 ```
 
-## Auth (dev)
+## Auth
+
+Specification: [`../../docs/17_PERMISSIONS_AND_AUTH.md`](../../docs/17_PERMISSIONS_AND_AUTH.md)
+
+### OTP + JWT (preferred)
+
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/otp/send \
+  -H "Content-Type: application/json" \
+  -d '{"phone":"+966501234567"}'
+
+curl -X POST http://localhost:8000/api/v1/auth/otp/verify \
+  -H "Content-Type: application/json" \
+  -d '{"phone":"+966501234567","code":"123456"}'
+```
+
+Dev mode returns `meta.dev_otp` (default code: `123456`).
+
+### Legacy headers (dev)
 
 ```
 X-User-Id: a0000000-0000-4000-8000-000000000001
+X-Admin-Key: rousto_admin_dev
 ```
 
 ## Examples
@@ -37,7 +56,7 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 curl http://localhost:8000/api/v1/categories/tree
 curl http://localhost:8000/api/v1/services
 
-# Profile
+# Profile (JWT or legacy header)
 curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
   http://localhost:8000/api/v1/me
 

@@ -10,17 +10,32 @@ REST API لمنصة **روستو** مبنية على [مخطط قاعدة الب
 
 ---
 
-## المصادقة (مؤقتة)
+## المصادقة
 
-> سيتم استبدالها في `03_AUTH` بنظام OTP + JWT.
+انظر [`17_PERMISSIONS_AND_AUTH`](17_PERMISSIONS_AND_AUTH.md).
 
-في بيئة التطوير، أرسل معرف المستخدم في الهيدر:
+### JWT (مفضّل)
+
+```
+Authorization: Bearer <access_token>
+```
+
+احصل على التوكن عبر `POST /api/v1/auth/otp/verify` بعد إرسال OTP.
+
+### توافق خلفي (تطوير)
 
 ```
 X-User-Id: a0000000-0000-4000-8000-000000000001
+X-Admin-Key: rousto_admin_dev
+X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 ```
 
-المستخدم التجريبي: **سعود العتيبي** (`saud@example.com`).
+| المستخدم | الجوال | الأدوار |
+|----------|--------|---------|
+| سعود العتيبي | `+966501234567` | customer, admin |
+| أحمد فني | `+966509876543` | technician |
+
+وضع التطوير: `OTP_DEV_MODE=true` يُرجع الرمز `123456` في `meta.dev_otp`.
 
 ---
 
@@ -72,6 +87,24 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 | Method | Path | الوصف | Auth |
 |--------|------|-------|------|
 | GET | `/api/v1/health` | فحص الخدمة وقاعدة البيانات | لا |
+
+---
+
+### المصادقة والصلاحيات
+
+انظر [`17_PERMISSIONS_AND_AUTH`](17_PERMISSIONS_AND_AUTH.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| POST | `/api/v1/auth/otp/send` | إرسال رمز OTP | لا |
+| POST | `/api/v1/auth/otp/verify` | التحقق وإصدار JWT | لا |
+| POST | `/api/v1/auth/refresh` | تجديد access token | لا |
+| POST | `/api/v1/auth/logout` | إلغاء refresh token | لا |
+| GET | `/api/v1/auth/me` | المستخدم + الأدوار + الصلاحيات | JWT |
+| GET | `/api/v1/auth/permissions` | قائمة الصلاحيات | Admin |
+| GET | `/api/v1/auth/roles` | قائمة الأدوار | لا |
+| GET | `/api/v1/admin/auth/users/{id}/roles` | أدوار مستخدم | Admin |
+| PUT | `/api/v1/admin/auth/users/{id}/roles` | تعيين أدوار | Admin |
 
 ---
 
@@ -290,7 +323,7 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 انظر [`15_FRONT_END_WEB`](15_FRONT_END_WEB.md).
 
-الصفحات تستهلك نفس الـ API عبر `web/js/api.js` مع `X-User-Id` مؤقتاً.
+الصفحات تستهلك نفس الـ API عبر `web/js/api.js` — JWT من `login.html` أو `X-User-Id` للتطوير.
 
 | الصفحة | Endpoints المستخدمة |
 |--------|---------------------|
@@ -442,7 +475,9 @@ rousto/backend/api/
 │   ├── main.py          # نقطة الدخول + CORS
 │   ├── config.py        # إعدادات البيئة
 │   ├── db.py            # SQLAlchemy + الجلسة
-│   ├── deps.py          # المصادقة المؤقتة
+│   ├── deps.py          # JWT + RBAC + توافق خلفي
+│   ├── auth_services.py # OTP + JWT
+│   ├── permissions.py   # أدوار وصلاحيات
 │   ├── models.py        # نماذج ORM
 │   ├── schemas.py       # Pydantic
 │   └── routers/         # health, catalog, profile, bookings, promotions, testimonials
@@ -474,6 +509,16 @@ DATABASE_URL=postgresql://rousto:rousto_dev@localhost:5432/rousto \
 ### مثال طلب
 
 ```bash
+# OTP + JWT
+curl -X POST http://localhost:8000/api/v1/auth/otp/send \
+  -H "Content-Type: application/json" \
+  -d '{"phone":"+966501234567"}'
+
+curl -X POST http://localhost:8000/api/v1/auth/otp/verify \
+  -H "Content-Type: application/json" \
+  -d '{"phone":"+966501234567","code":"123456"}'
+
+# أو توافق خلفي
 curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
   http://localhost:8000/api/v1/bookings/active
 ```
@@ -495,4 +540,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`13_CUSTOMER_SUPPORT_AND_SECURITY`](../docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md) — دعم العملاء والأمان ✅
 - [`14_LANDING_PAGE_PRICING`](../docs/14_LANDING_PAGE_PRICING.md) — صفحة الهبوط والأسعار ✅
 - [`15_FRONT_END_WEB`](../docs/15_FRONT_END_WEB.md) — بوابة عميل الويب ✅
-- `16_AUTH` — OTP عبر الجوال + JWT
+- [`17_PERMISSIONS_AND_AUTH`](../docs/17_PERMISSIONS_AND_AUTH.md) — OTP + JWT + أدوار وصلاحيات ✅

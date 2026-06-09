@@ -2,7 +2,7 @@
 
 نظام **تذاكر الدعم**، **الأسئلة الشائعة**، وسجل **أحداث الأمان** لمنصة روستو.
 
-- **المصادقة (لاحقاً):** `16_AUTH`
+- **المصادقة (لاحقاً):** `17_PERMISSIONS_AND_AUTH`
 - **المخطط:** `support_tickets`, `support_ticket_messages`, `support_faq`, `security_audit_logs`
 
 ---
@@ -113,4 +113,4 @@ rousto/backend/api/app/routers/support.py
 
 ## الخطوة التالية
 
-- `16_AUTH` — OTP + JWT + أدوار
+- `17_PERMISSIONS_AND_AUTH` — OTP + JWT + أدوار
