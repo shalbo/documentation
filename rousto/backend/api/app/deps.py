@@ -1,12 +1,13 @@
 import uuid
 
 from fastapi import Depends, Header, HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth_services import decode_access_token
 from app.config import settings
 from app.db import get_db
-from app.models import User, Vendor
+from app.models import User, UserVendorLink, Vendor
 from app.permissions import ROLE_ADMIN, AuthPrincipal, build_principal
 
 
@@ -26,6 +27,27 @@ def _user_from_id(db: Session, user_id: str) -> User:
             detail={"code": "UNAUTHORIZED", "message": "المستخدم غير موجود أو غير نشط"},
         )
     return user
+
+
+def _verify_vendor_link(db: Session, user_id: uuid.UUID, vendor_id: uuid.UUID) -> Vendor:
+    link = db.scalar(
+        select(UserVendorLink).where(
+            UserVendorLink.user_id == user_id,
+            UserVendorLink.vendor_id == vendor_id,
+        )
+    )
+    if not link:
+        raise HTTPException(
+            status_code=403,
+            detail={"code": "FORBIDDEN", "message": "لا تملك صلاحية الوصول لهذا الفني"},
+        )
+    vendor = db.get(Vendor, vendor_id)
+    if not vendor:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "UNAUTHORIZED", "message": "الفني غير موجود"},
+        )
+    return vendor
 
 
 def get_current_principal(
@@ -49,6 +71,14 @@ def get_current_principal(
             ) from exc
 
     if x_user_id:
+        if not settings.allow_legacy_headers:
+            raise HTTPException(
+                status_code=401,
+                detail={
+                    "code": "LEGACY_AUTH_DISABLED",
+                    "message": "مطلوب Authorization Bearer في بيئة الإنتاج",
+                },
+            )
         user = _user_from_id(db, x_user_id)
         return build_principal(db, user, auth_method="legacy_header")
 
@@ -56,7 +86,7 @@ def get_current_principal(
         status_code=401,
         detail={
             "code": "UNAUTHORIZED",
-            "message": "مطلوب Authorization Bearer أو هيدر X-User-Id",
+            "message": "مطلوب Authorization Bearer",
         },
     )
 
@@ -80,7 +110,10 @@ def require_admin_key(
         try:
             payload = decode_access_token(token)
             if ROLE_ADMIN in payload.get("roles", []):
-                return
+                user = _user_from_id(db, payload["sub"])
+                principal = build_principal(db, user, auth_method="jwt")
+                if principal.has_role(ROLE_ADMIN):
+                    return
         except ValueError:
             pass
 
@@ -123,7 +156,32 @@ def get_current_vendor(
     x_vendor_id: str | None = Header(default=None, alias="X-Vendor-Id"),
     db: Session = Depends(get_db),
 ) -> Vendor:
+    if authorization and authorization.lower().startswith("bearer "):
+        token = authorization.split(" ", 1)[1].strip()
+        try:
+            payload = decode_access_token(token)
+            user = _user_from_id(db, payload["sub"])
+            vendor_claim = payload.get("vendor_id")
+            if vendor_claim:
+                return _verify_vendor_link(db, user.id, uuid.UUID(vendor_claim))
+            principal = build_principal(db, user, auth_method="jwt")
+            if principal.vendor_id:
+                return _verify_vendor_link(db, user.id, principal.vendor_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=401,
+                detail={"code": "INVALID_TOKEN", "message": str(exc)},
+            ) from exc
+
     if x_vendor_id:
+        if not settings.allow_legacy_headers:
+            raise HTTPException(
+                status_code=401,
+                detail={
+                    "code": "LEGACY_AUTH_DISABLED",
+                    "message": "مطلوب JWT فني في بيئة الإنتاج",
+                },
+            )
         try:
             vendor_uuid = uuid.UUID(x_vendor_id)
         except ValueError as exc:
@@ -140,22 +198,10 @@ def get_current_vendor(
             )
         return vendor
 
-    if authorization and authorization.lower().startswith("bearer "):
-        token = authorization.split(" ", 1)[1].strip()
-        try:
-            payload = decode_access_token(token)
-            vendor_claim = payload.get("vendor_id")
-            if vendor_claim:
-                vendor = db.get(Vendor, uuid.UUID(vendor_claim))
-                if vendor:
-                    return vendor
-        except ValueError:
-            pass
-
     raise HTTPException(
         status_code=401,
         detail={
             "code": "UNAUTHORIZED",
-            "message": "مطلوب JWT فني أو هيدر X-Vendor-Id",
+            "message": "مطلوب JWT فني",
         },
     )

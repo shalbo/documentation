@@ -8,3 +8,4 @@ python-multipart==0.0.20
 Pillow==11.1.0
 pytest==8.3.4
 PyJWT==2.10.1
+sentry-sdk[fastapi]==2.19.2

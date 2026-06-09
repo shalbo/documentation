@@ -143,6 +143,13 @@ def create_support_ticket(
     ip_address: str | None = None,
     user_agent: str | None = None,
 ) -> SupportTicket:
+    if booking_id is not None:
+        from app.models import Booking
+
+        booking = db.get(Booking, booking_id)
+        if not booking or booking.user_id != user.id:
+            raise ValueError("الحجز غير موجود أو لا يخصك")
+
     now = datetime.now(timezone.utc)
     ticket = SupportTicket(
         id=uuid.uuid4(),

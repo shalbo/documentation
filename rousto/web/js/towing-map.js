@@ -2,6 +2,10 @@ const STORAGE_KEY = "rousto_towing_map_config";
 
 const state = { apiBase: "http://localhost:8000", userId: "", pollTimer: null, data: null };
 
+window.addEventListener("beforeunload", () => {
+  if (state.pollTimer) clearInterval(state.pollTimer);
+});
+
 function $(id) { return document.getElementById(id); }
 
 function loadConfig() {

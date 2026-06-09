@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -16,6 +16,7 @@ from app.auth_services import (
 from app.config import settings
 from app.db import get_db
 from app.deps import get_current_principal, require_admin_key
+from app.rate_limit import check_rate_limit
 from app.models import Permission, Role, User, UserRole
 from app.permissions import ROLE_ADMIN, serialize_principal
 
@@ -45,12 +46,13 @@ class AssignRolesIn(BaseModel):
 
 
 @router.post("/auth/otp/send")
-def send_otp(body: OtpSendIn, db: Session = Depends(get_db)):
+def send_otp(body: OtpSendIn, request: Request, db: Session = Depends(get_db)):
+    check_rate_limit(request, suffix=f"otp-send:{body.phone}")
     try:
         otp, code = create_otp_request(db, body.phone)
         db.commit()
         meta = {"expires_in_seconds": 300}
-        if settings.otp_dev_mode:
+        if settings.otp_dev_mode and not settings.is_production:
             meta["dev_otp"] = code
         return {
             "data": {
@@ -68,7 +70,8 @@ def send_otp(body: OtpSendIn, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/otp/verify")
-def verify_otp_code(body: OtpVerifyIn, db: Session = Depends(get_db)):
+def verify_otp_code(body: OtpVerifyIn, request: Request, db: Session = Depends(get_db)):
+    check_rate_limit(request, suffix=f"otp-verify:{body.phone}")
     try:
         request_id = UUID(body.request_id) if body.request_id else None
         user = verify_otp(db, body.phone, body.code, request_id)
@@ -84,7 +87,8 @@ def verify_otp_code(body: OtpVerifyIn, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/refresh")
-def refresh_token(body: RefreshIn, db: Session = Depends(get_db)):
+def refresh_token(body: RefreshIn, request: Request, db: Session = Depends(get_db)):
+    check_rate_limit(request, suffix="auth-refresh")
     try:
         data = refresh_access_token(db, body.refresh_token)
         db.commit()

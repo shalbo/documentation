@@ -156,7 +156,6 @@
     validatePromo: function (code, servicePrice) {
       return request("/promotions/validate", {
         method: "POST",
-        auth: false,
         body: { code: code, service_price_sar: servicePrice },
       });
     },

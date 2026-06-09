@@ -28,7 +28,8 @@ rousto/
 │   ├── 14_LANDING_PAGE_PRICING.md
 │   ├── 15_FRONT_END_WEB.md
 │   ├── 17_PERMISSIONS_AND_AUTH.md
-│   └── 18_ADVERTISING_AND_MARKETING_MODULE.md
+│   ├── 18_ADVERTISING_AND_MARKETING_MODULE.md
+│   └── 19_PRODUCTION_HARDENING.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -129,6 +130,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/15_FRONT_END_WEB.md`](docs/15_FRONT_END_WEB.md)
 - [`docs/17_PERMISSIONS_AND_AUTH.md`](docs/17_PERMISSIONS_AND_AUTH.md)
 - [`docs/18_ADVERTISING_AND_MARKETING_MODULE.md`](docs/18_ADVERTISING_AND_MARKETING_MODULE.md)
+- [`docs/19_PRODUCTION_HARDENING.md`](docs/19_PRODUCTION_HARDENING.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

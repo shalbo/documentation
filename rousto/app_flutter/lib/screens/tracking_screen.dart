@@ -11,7 +11,8 @@ import '../widgets/common.dart';
 
 class TrackingScreen extends StatefulWidget {
   final String? bookingId;
-  const TrackingScreen({super.key, this.bookingId});
+  final bool active;
+  const TrackingScreen({super.key, this.bookingId, this.active = true});
 
   @override
   State<TrackingScreen> createState() => _TrackingScreenState();
@@ -33,7 +34,17 @@ class _TrackingScreenState extends State<TrackingScreen> {
   @override
   void initState() {
     super.initState();
-    _load();
+    if (widget.active) _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant TrackingScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active && !oldWidget.active) {
+      _load();
+    } else if (!widget.active && oldWidget.active) {
+      _pollTimer?.cancel();
+    }
   }
 
   @override
@@ -44,6 +55,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   void _schedulePolling(String? status, {int? refreshSeconds}) {
     _pollTimer?.cancel();
+    if (!widget.active) return;
     if (status == 'en_route' || status == 'technician_assigned') {
       final seconds = refreshSeconds ?? _refreshSeconds;
       _pollTimer = Timer.periodic(Duration(seconds: seconds), (_) => _load());

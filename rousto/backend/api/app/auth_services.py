@@ -36,7 +36,7 @@ def create_otp_request(db: Session, phone: str) -> tuple[AuthOtpRequest, str]:
         raise ValueError("رقم الجوال غير مسجّل")
 
     code = "".join(str(secrets.randbelow(10)) for _ in range(OTP_LENGTH))
-    if settings.otp_dev_mode:
+    if settings.otp_dev_mode and not settings.is_production:
         code = settings.otp_dev_code
 
     now = datetime.now(timezone.utc)

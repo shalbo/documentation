@@ -62,6 +62,10 @@ async def save_scan_images(
         content = await upload.read()
         if not content:
             raise ValueError("الصورة فارغة")
+        if len(content) > settings.max_upload_bytes:
+            raise ValueError(
+                f"حجم الصورة يتجاوز الحد ({settings.max_upload_bytes // (1024 * 1024)} ميجابايت)"
+            )
         target.write_bytes(content)
         saved.append((image_id, storage_key, mime, index))
     return saved

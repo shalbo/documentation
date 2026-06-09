@@ -19,7 +19,15 @@ class ApiClient {
         .replace(queryParameters: query);
   }
 
-  Map<String, String> get _authHeaders => {'X-User-Id': _userId};
+  Map<String, String> get _authHeaders {
+    if (AppConfig.accessToken.isNotEmpty) {
+      return {'Authorization': 'Bearer ${AppConfig.accessToken}'};
+    }
+    if (AppConfig.useLegacyUserHeader) {
+      return {'X-User-Id': _userId};
+    }
+    return {};
+  }
 
   Future<Map<String, dynamic>> _get(String path, {bool auth = false}) async {
     final headers = auth ? _authHeaders : <String, String>{};

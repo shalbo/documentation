@@ -17,12 +17,12 @@ class RootNav extends StatefulWidget {
 class _RootNavState extends State<RootNav> {
   int _index = 0;
 
-  late final List<Widget> _pages = [
-    HomeScreen(onBook: _openBooking),
-    const TrackingScreen(),
-    const OffersScreen(),
-    const ProfileScreen(),
-  ];
+  List<Widget> get _pages => [
+        HomeScreen(onBook: _openBooking),
+        TrackingScreen(active: _index == 1),
+        const OffersScreen(),
+        const ProfileScreen(),
+      ];
 
   void _openBooking() {
     Navigator.of(context).push(

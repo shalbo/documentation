@@ -177,6 +177,10 @@ def update_vendor_live_location(
     lng: float,
     booking_id: uuid.UUID | None = None,
 ) -> Technician:
+    if booking_id is not None:
+        booking = db.get(Booking, booking_id)
+        if not booking or booking.technician_id != vendor.technician_id:
+            raise ValueError("الحجز غير مرتبط بهذا الفني")
     technician = get_technician_for_vendor(db, vendor)
     update_technician_location(
         db,

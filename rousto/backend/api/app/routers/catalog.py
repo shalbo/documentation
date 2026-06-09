@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
+from app.cache import cached
+from app.config import settings
 from app.db import get_db
 from app.models import Service, ServiceCategory
 from app.schemas import (
@@ -18,8 +20,7 @@ from app.schemas import (
 router = APIRouter(tags=["catalog"])
 
 
-@router.get("/categories/tree")
-def categories_tree(db: Session = Depends(get_db)):
+def _build_categories_tree(db: Session) -> dict:
     categories = db.scalars(
         select(ServiceCategory)
         .where(ServiceCategory.is_active.is_(True))
@@ -70,6 +71,15 @@ def categories_tree(db: Session = Depends(get_db)):
         total_services=len(all_services),
     )
     return {"data": tree, "meta": meta.model_dump()}
+
+
+@router.get("/categories/tree")
+def categories_tree(db: Session = Depends(get_db)):
+    return cached(
+        settings.cache_categories_ttl,
+        "categories_tree",
+        lambda: _build_categories_tree(db),
+    )
 
 
 @router.get("/categories")

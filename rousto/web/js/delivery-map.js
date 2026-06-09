@@ -3,6 +3,10 @@
 
   var state = { pollTimer: null, mapData: null };
 
+  window.addEventListener("beforeunload", function () {
+    if (state.pollTimer) clearInterval(state.pollTimer);
+  });
+
   function $(id) {
     return document.getElementById(id);
   }

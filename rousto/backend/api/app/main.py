@@ -1,8 +1,11 @@
+import logging
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
+from app.error_reporting import capture_exception, init_error_reporting
 from app.routers import (
     admin_catalog,
     admin_marketing,
@@ -25,23 +28,27 @@ from app.routers import (
     vendors,
 )
 
+logger = logging.getLogger("rousto")
+
 app = FastAPI(
     title="Rousto API",
     description="REST API لمنصة روستو — عناية ذكية بالسيارات",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=None if settings.disable_openapi else "/docs",
+    redoc_url=None if settings.disable_openapi else "/redoc",
 )
 
-origins = (
-    [o.strip() for o in settings.cors_origins.split(",")]
-    if settings.cors_origins != "*"
-    else ["*"]
-)
+if settings.cors_origins == "*":
+    origins = ["*"]
+    allow_credentials = False
+else:
+    origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+    allow_credentials = True
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -69,6 +76,13 @@ app.include_router(marketing.router, prefix=prefix)
 app.include_router(marketing.me_router, prefix=prefix)
 
 
+@app.on_event("startup")
+def on_startup() -> None:
+    init_error_reporting()
+    for warning in settings.validate_production():
+        logger.warning("Production config: %s", warning)
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(_: Request, exc: HTTPException):
     if isinstance(exc.detail, dict) and "code" in exc.detail:
@@ -79,6 +93,28 @@ async def http_exception_handler(_: Request, exc: HTTPException):
     )
 
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    capture_exception(
+        exc,
+        context={"path": request.url.path, "method": request.method},
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "حدث خطأ داخلي، تم تسجيله",
+            }
+        },
+    )
+
+
 @app.get("/")
 def root():
-    return {"name": "Rousto API", "docs": "/docs", "health": f"{prefix}/health"}
+    return {
+        "name": "Rousto API",
+        "environment": settings.environment,
+        "health": f"{prefix}/health",
+        "docs": "/docs" if not settings.disable_openapi else None,
+    }

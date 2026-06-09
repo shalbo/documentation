@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -18,6 +18,7 @@ from app.marketing_services import (
     validate_referral_code,
 )
 from app.models import MarketingCampaign, User
+from app.rate_limit import check_rate_limit
 from app.schemas import AttributionTrackIn, NewsletterSubscribeIn
 
 router = APIRouter(prefix="/marketing", tags=["marketing"])
@@ -53,7 +54,10 @@ def marketing_campaigns(db: Session = Depends(get_db)):
 
 
 @router.post("/newsletter/subscribe")
-def newsletter_subscribe(body: NewsletterSubscribeIn, db: Session = Depends(get_db)):
+def newsletter_subscribe(
+    body: NewsletterSubscribeIn, request: Request, db: Session = Depends(get_db)
+):
+    check_rate_limit(request, suffix="newsletter")
     campaign_id = None
     if body.campaign_slug:
         campaign = db.scalar(
