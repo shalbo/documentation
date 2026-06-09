@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة الكتالوج</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — لوحة إدارة الكتالوج</h1>
+      <p>إدارة التصنيفات والخدمات</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="marketing.html" class="btn btn-ghost-light">التسويق</a>
+      <a href="notifications.html" class="btn btn-ghost-light">الإشعارات</a>
+      <a href="security.html" class="btn btn-ghost-light">الأمان</a>
+      <a href="vendors.html" class="btn btn-ghost-light">انضمام الفنيين</a>
+      <button id="connectBtn" class="btn btn-secondary">اتصال وتحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة (X-Admin-Key)</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>التصنيفات</h2>
+        <table id="categoriesTable">
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>الترتيب</th>
+              <th>الحالة</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4" class="empty">اضغط «اتصال وتحديث» لتحميل البيانات</td></tr>
+          </tbody>
+        </table>
+
+        <h2 style="margin-top:20px">تصنيف جديد</h2>
+        <form id="categoryForm">
+          <div class="form-row">
+            <div>
+              <label for="catSlug">المعرّف (slug)</label>
+              <input id="catSlug" required pattern="[a-z][a-z0-9-]*" placeholder="detailing" />
+            </div>
+            <div>
+              <label for="catName">الاسم بالعربية</label>
+              <input id="catName" required placeholder="تلميع" />
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <label for="catOrder">ترتيب العرض</label>
+            <input id="catOrder" type="number" min="0" placeholder="6" />
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-primary" type="submit">إضافة تصنيف</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2 id="serviceFormTitle">إضافة خدمة</h2>
+        <form id="serviceForm">
+          <div class="form-row">
+            <div>
+              <label for="serviceCategory">التصنيف</label>
+              <select id="serviceCategory" required></select>
+            </div>
+            <div>
+              <label for="serviceSlug">المعرّف (slug)</label>
+              <input id="serviceSlug" required pattern="[a-z][a-z0-9-]*" placeholder="oil-premium" />
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <label for="serviceName">اسم الخدمة</label>
+            <input id="serviceName" required placeholder="زيت بريميوم" />
+          </div>
+          <div style="margin-top:10px">
+            <label for="serviceSubtitle">وصف مختصر</label>
+            <textarea id="serviceSubtitle" placeholder="زيت اصطناعي كامل"></textarea>
+          </div>
+          <div class="form-row-3" style="margin-top:10px">
+            <div>
+              <label for="serviceIcon">مفتاح الأيقونة</label>
+              <input id="serviceIcon" placeholder="oil_barrel" />
+            </div>
+            <div>
+              <label for="servicePrice">السعر (دينار)</label>
+              <input id="servicePrice" type="number" min="1" step="1" required />
+            </div>
+            <div>
+              <label for="serviceDuration">المدة (دقيقة)</label>
+              <input id="serviceDuration" type="number" min="1" max="480" required />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button id="serviceSubmit" class="btn btn-primary" type="submit">إضافة</button>
+            <button id="serviceCancel" class="btn btn-ghost" type="button" style="display:none">إلغاء</button>
+          </div>
+        </form>
+
+        <h2 style="margin-top:24px">قائمة الخدمات</h2>
+        <table id="servicesTable">
+          <thead>
+            <tr>
+              <th>الخدمة</th>
+              <th>التصنيف</th>
+              <th>السعر</th>
+              <th>المدة</th>
+              <th>الحالة</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" class="empty">اضغط «اتصال وتحديث» لتحميل البيانات</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/admin.js"></script>
+</body>
+</html>
