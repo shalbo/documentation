@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="واجهات احترافية لتطبيق وموقع Rousto">
+  <title>Rousto UI - App & Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-bg"></div>
+  <header class="topbar container">
+    <a class="brand" href="#hero" aria-label="Rousto">
+      <img src="./assets/rousto-logo.png" alt="Rousto Logo" onerror="this.src='./assets/rousto-logo-placeholder.svg'">
+      <span>Rousto</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#web-ui">الويب</a>
+      <a href="#mobile-ui">التطبيق</a>
+      <a href="#features">المزايا</a>
+      <a href="#contact">تواصل</a>
+    </nav>
+    <button class="btn btn-primary">ابدأ الآن</button>
+  </header>
+
+  <main>
+    <section id="hero" class="hero container panel">
+      <div class="hero-copy">
+        <p class="eyebrow">هوية بصرية ذكية مستوحاة من الشعار</p>
+        <h1>واجهات Rousto للتطبيق والويب<br><span>احترافية وسريعة وجاهزة للنمو</span></h1>
+        <p class="lead">
+          تم تصميم هذه الواجهات باستخدام ألوان الشعار الأساسية (الأحمر والأزرق الداكن)
+          لتقديم تجربة موحدة بين تطبيق الجوال ولوحة التحكم على الويب.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary">استعراض الديمو</button>
+          <button class="btn btn-ghost">تحميل دليل الهوية</button>
+        </div>
+        <div class="stats">
+          <article>
+            <strong>+28%</strong>
+            <span>تحسن سرعة الحجز</span>
+          </article>
+          <article>
+            <strong>4.9</strong>
+            <span>تقييم تجربة العميل</span>
+          </article>
+          <article>
+            <strong>99.95%</strong>
+            <span>استقرار المنصة</span>
+          </article>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="window-head">
+          <span></span><span></span><span></span>
+        </div>
+        <h3>لوحة تشغيل الطلبات</h3>
+        <ul class="timeline" id="order-timeline">
+          <li class="done"><b>تم إنشاء الطلب</b><small>12:30</small></li>
+          <li class="done"><b>تم تأكيد السائق</b><small>12:34</small></li>
+          <li class="active"><b>الطلب في الطريق</b><small>الآن</small></li>
+          <li><b>تسليم الطلب</b><small>قادم</small></li>
+        </ul>
+        <div class="signal">
+          <span>الحمل اللحظي</span>
+          <strong>72%</strong>
+        </div>
+      </div>
+    </section>
+
+    <section id="web-ui" class="container panel web-ui">
+      <div class="section-head">
+        <p>واجهات الويب</p>
+        <h2>Dashboard احترافية لإدارة العمليات</h2>
+      </div>
+      <div class="dashboard-grid">
+        <article class="widget large">
+          <h4>توزيع الطلبات حسب المدينة</h4>
+          <div class="bars">
+            <div><span style="width: 88%"></span><label>الرياض</label></div>
+            <div><span style="width: 73%"></span><label>جدة</label></div>
+            <div><span style="width: 57%"></span><label>الدمام</label></div>
+            <div><span style="width: 42%"></span><label>المدينة</label></div>
+          </div>
+        </article>
+        <article class="widget">
+          <h4>حالة الأسطول</h4>
+          <ul>
+            <li><b>126</b> متاح</li>
+            <li><b>34</b> في مهمة</li>
+            <li><b>6</b> تحت الصيانة</li>
+          </ul>
+        </article>
+        <article class="widget">
+          <h4>الطلبات اليوم</h4>
+          <p class="big">1,284</p>
+          <small>+14.2% مقارنة بالأمس</small>
+        </article>
+        <article class="widget wide">
+          <h4>آخر الطلبات</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>رقم</th>
+                <th>العميل</th>
+                <th>الحالة</th>
+                <th>المنطقة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>#R-3912</td><td>شركة النخبة</td><td><span class="chip done">مكتمل</span></td><td>الرياض</td></tr>
+              <tr><td>#R-3913</td><td>سريع تك</td><td><span class="chip active">قيد التوصيل</span></td><td>جدة</td></tr>
+              <tr><td>#R-3914</td><td>متجر الغد</td><td><span class="chip waiting">مجدول</span></td><td>الدمام</td></tr>
+            </tbody>
+          </table>
+        </article>
+      </div>
+    </section>
+
+    <section id="mobile-ui" class="container panel mobile-ui">
+      <div class="section-head">
+        <p>واجهات التطبيق</p>
+        <h2>تجربة موبايل واضحة ومريحة للمستخدم</h2>
+      </div>
+      <div class="mobile-controls" role="tablist" aria-label="شاشات التطبيق">
+        <button class="tab-btn active" data-screen="home">الرئيسية</button>
+        <button class="tab-btn" data-screen="tracking">التتبع</button>
+        <button class="tab-btn" data-screen="wallet">المحفظة</button>
+        <button class="tab-btn" data-screen="profile">الحساب</button>
+      </div>
+      <div class="phones">
+        <article class="phone-frame active" data-screen="home">
+          <header>
+            <img src="./assets/rousto-logo.png" alt="" onerror="this.src='./assets/rousto-logo-placeholder.svg'">
+            <strong>مرحبًا، عبدالله</strong>
+          </header>
+          <div class="quick-card">
+            <span>طلبات اليوم</span>
+            <b>24 طلب</b>
+          </div>
+          <ul class="mini-list">
+            <li><span>طلب سريع</span><b>25 دقيقة</b></li>
+            <li><span>طلب مجدول</span><b>اليوم 5:00 م</b></li>
+            <li><span>أقرب سائق</span><b>2.1 كم</b></li>
+          </ul>
+          <footer><span class="dot on"></span> مباشر الآن</footer>
+        </article>
+
+        <article class="phone-frame" data-screen="tracking">
+          <header>
+            <h4>تتبع الطلب #R-3913</h4>
+          </header>
+          <div class="route">
+            <span class="point start">نقطة الانطلاق</span>
+            <span class="line"></span>
+            <span class="point end">وجهة التسليم</span>
+          </div>
+          <div class="driver-card">
+            <strong>السائق: فيصل الراشد</strong>
+            <small>Hyundai H1 - RST 4291</small>
+          </div>
+          <div class="progress"><span></span></div>
+          <footer>الوصول المتوقع: 14 دقيقة</footer>
+        </article>
+
+        <article class="phone-frame" data-screen="wallet">
+          <header>
+            <h4>محفظة Rousto</h4>
+          </header>
+          <div class="balance-card">
+            <span>الرصيد المتاح</span>
+            <strong>12,480 ر.س</strong>
+          </div>
+          <ul class="mini-list">
+            <li><span>تحويل بنكي</span><b>+4,500</b></li>
+            <li><span>خصم شحنة</span><b>-350</b></li>
+            <li><span>استرداد</span><b>+120</b></li>
+          </ul>
+          <button class="btn btn-primary full">شحن الرصيد</button>
+        </article>
+
+        <article class="phone-frame" data-screen="profile">
+          <header>
+            <h4>الحساب والإعدادات</h4>
+          </header>
+          <ul class="settings-list">
+            <li>المعلومات الشخصية</li>
+            <li>مراكز الاستلام</li>
+            <li>الإشعارات</li>
+            <li>الأمان وكلمة المرور</li>
+          </ul>
+          <button class="btn btn-ghost full">تسجيل الخروج</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="features" class="container panel features">
+      <div class="section-head">
+        <p>مزايا التجربة</p>
+        <h2>تصميم ذكي يربط الهوية بالأداء</h2>
+      </div>
+      <div class="feature-grid">
+        <article>
+          <h3>Design System موحد</h3>
+          <p>ألوان الشعار مبنية كمتغيرات قابلة للتطوير على التطبيق والويب.</p>
+        </article>
+        <article>
+          <h3>UX عملي</h3>
+          <p>رحلة المستخدم مختصرة من الحجز حتى التتبع وإغلاق الطلب.</p>
+        </article>
+        <article>
+          <h3>قابلية التوسع</h3>
+          <p>هيكل واجهات قابل لإضافة أدوار جديدة مثل مندوب/مشرف/عميل أعمال.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="container footer">
+    <div>
+      <strong>Rousto</strong>
+      <p>واجهات تطبيق وويب مبنية بعناية وبهوية احترافية.</p>
+    </div>
+    <a class="btn btn-primary" href="#">طلب نسخة الإنتاج</a>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
