@@ -44,6 +44,7 @@
         <span class="eyebrow">⚡ صيانة سيارات بثقة</span>
         <h1>عناية ذكية بسيارتك مع <span class="hl">روستو</span></h1>
         <p class="lead">احجز خدمة الصيانة في ثوانٍ، تابع حالة سيارتك مباشرةً، وادفع بأمان — كل ذلك من مكان واحد. فنيّون معتمدون وقطع غيار أصلية.</p>
+        <div id="heroMarketingBanner" class="hero-marketing-banner" style="display:none;margin-bottom:14px"></div>
         <div class="hero-cta">
           <a href="#booking" class="btn btn-primary">احجز خدمتك الآن →</a>
           <a href="#services" class="btn btn-ghost">تصفح الخدمات</a>
@@ -72,7 +73,7 @@
 
   <!-- ============ PARTNERS ============ -->
   <div class="partners">
-    <div class="container row">
+    <div class="container row" id="partnersRow">
       <span>TOYOTA</span><span>HYUNDAI</span><span>NISSAN</span><span>KIA</span><span>FORD</span><span>BMW</span><span>MERCEDES</span>
     </div>
   </div>
@@ -253,7 +254,7 @@
         <span class="eyebrow">آراء العملاء</span>
         <h2>قصص نجاح من عملائنا</h2>
       </div>
-      <div class="tcards">
+      <div class="tcards" id="testimonialsCards">
         <article class="tcard reveal">
           <div class="stars">★★★★★</div>
           <p>«تجربة سلسة من الحجز حتى التسليم. الفني وصل في الوقت المحدد والأسعار واضحة من البداية.»</p>
@@ -344,6 +345,11 @@
           <a href="pricing.html">الأسعار</a>
           <a href="#">الشروط والأحكام</a>
           <a href="#">سياسة الخصوصية</a>
+          <form id="newsletterForm" style="margin-top:12px;display:grid;gap:8px">
+            <label for="newsletterEmail" style="font-size:.85rem;color:#9a9ba3">النشرة البريدية</label>
+            <input id="newsletterEmail" type="email" placeholder="بريدك@example.com" required style="padding:8px 10px;border-radius:8px;border:1px solid #444;background:#1a1a1a;color:#fff" />
+            <button type="submit" class="btn btn-primary btn-sm">اشترك</button>
+          </form>
         </div>
       </div>
       <div class="footer-bottom">

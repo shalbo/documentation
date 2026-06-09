@@ -193,6 +193,28 @@
         body: { description: description },
       });
     },
+    getMarketingBanners: function (placement) {
+      var q = placement ? "?placement=" + encodeURIComponent(placement) : "";
+      return request("/marketing/banners" + q, { auth: false });
+    },
+    getMarketingPartners: function () {
+      return request("/marketing/partners", { auth: false });
+    },
+    subscribeNewsletter: function (email, source) {
+      return request("/marketing/newsletter/subscribe", {
+        method: "POST",
+        auth: false,
+        body: { email: email, source: source || "landing" },
+      });
+    },
+    validateReferral: function (code) {
+      return request("/marketing/referrals/validate?code=" + encodeURIComponent(code), {
+        auth: false,
+      });
+    },
+    getMyReferral: function () {
+      return request("/me/referral");
+    },
   };
 
   function showToast(message, type) {

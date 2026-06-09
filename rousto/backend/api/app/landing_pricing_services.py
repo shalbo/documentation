@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.marketing_services import get_landing_marketing
 from app.models import (
     LandingHeroStat,
     LandingPageFeature,
@@ -140,6 +141,8 @@ def get_landing_page(db: Session) -> dict:
     ).all()
     pricing = get_landing_pricing(db)
 
+    marketing = get_landing_marketing(db)
+
     return {
         "hero": {
             "stats": [
@@ -161,4 +164,5 @@ def get_landing_page(db: Session) -> dict:
             }
             for f in features
         ],
+        "marketing": marketing,
     }

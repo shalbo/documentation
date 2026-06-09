@@ -722,3 +722,110 @@ class AuthRefreshToken(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class MarketingCampaign(Base):
+    __tablename__ = "marketing_campaigns"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(120))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    channel: Mapped[str] = mapped_column(String(30), default="web")
+    utm_source: Mapped[str | None] = mapped_column(String(60))
+    utm_medium: Mapped[str | None] = mapped_column(String(60))
+    utm_campaign: Mapped[str | None] = mapped_column(String(60))
+    utm_content: Mapped[str | None] = mapped_column(String(60))
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class MarketingBanner(Base):
+    __tablename__ = "marketing_banners"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    title_ar: Mapped[str] = mapped_column(String(120))
+    subtitle_ar: Mapped[str | None] = mapped_column(String(200))
+    placement: Mapped[str] = mapped_column(String(30))
+    image_url: Mapped[str | None] = mapped_column(String(300))
+    cta_text_ar: Mapped[str | None] = mapped_column(String(60))
+    cta_url: Mapped[str | None] = mapped_column(String(200))
+    campaign_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("marketing_campaigns.id")
+    )
+    promotion_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("promotions.id"))
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class MarketingPartner(Base):
+    __tablename__ = "marketing_partners"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    logo_url: Mapped[str | None] = mapped_column(String(300))
+    website_url: Mapped[str | None] = mapped_column(String(200))
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class MarketingNewsletterSubscriber(Base):
+    __tablename__ = "marketing_newsletter_subscribers"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    phone: Mapped[str | None] = mapped_column(String(20))
+    source: Mapped[str] = mapped_column(String(40), default="landing")
+    campaign_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("marketing_campaigns.id")
+    )
+    subscribed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    unsubscribed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class MarketingReferral(Base):
+    __tablename__ = "marketing_referrals"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    referrer_user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    code: Mapped[str] = mapped_column(String(20), unique=True)
+    reward_points: Mapped[int] = mapped_column(Integer, default=100)
+    max_uses: Mapped[int | None] = mapped_column(SmallInteger)
+    uses_count: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class MarketingReferralEvent(Base):
+    __tablename__ = "marketing_referral_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    referral_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("marketing_referrals.id"))
+    referred_user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    booking_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("bookings.id"))
+    reward_granted: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class MarketingAttributionEvent(Base):
+    __tablename__ = "marketing_attribution_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    campaign_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("marketing_campaigns.id")
+    )
+    event_type: Mapped[str] = mapped_column(String(30))
+    utm_source: Mapped[str | None] = mapped_column(String(60))
+    utm_medium: Mapped[str | None] = mapped_column(String(60))
+    utm_campaign: Mapped[str | None] = mapped_column(String(60))
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    session_id: Mapped[str | None] = mapped_column(String(64))
+    metadata_json: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

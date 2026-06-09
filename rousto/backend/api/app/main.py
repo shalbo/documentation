@@ -5,12 +5,14 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.routers import (
     admin_catalog,
+    admin_marketing,
     auth,
     bookings,
     catalog,
     health,
     landing,
     logistics,
+    marketing,
     monetization,
     profile,
     promotions,
@@ -49,6 +51,7 @@ app.include_router(health.router, prefix=prefix)
 app.include_router(auth.router, prefix=prefix)
 app.include_router(catalog.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
+app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
@@ -62,6 +65,8 @@ app.include_router(vendor_map.router, prefix=prefix)
 app.include_router(towing_dispatch.router, prefix=prefix)
 app.include_router(support.router, prefix=prefix)
 app.include_router(landing.router, prefix=prefix)
+app.include_router(marketing.router, prefix=prefix)
+app.include_router(marketing.me_router, prefix=prefix)
 
 
 @app.exception_handler(HTTPException)

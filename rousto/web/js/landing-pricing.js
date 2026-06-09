@@ -116,6 +116,41 @@
     }).join("");
   }
 
+  function renderPartners(partners, selector) {
+    var el = document.querySelector(selector);
+    if (!el || !partners.length) return;
+    el.innerHTML = partners.map(function (p) {
+      return "<span>" + p.name_ar + "</span>";
+    }).join("");
+  }
+
+  function renderHeroBanner(banners, selector) {
+    var el = document.querySelector(selector);
+    if (!el || !banners.length) return;
+    var b = banners[0];
+    el.style.display = "block";
+    el.innerHTML =
+      "<strong>" + b.title_ar + "</strong>" +
+      (b.subtitle_ar ? " — " + b.subtitle_ar : "") +
+      (b.cta_text_ar ? ' <a href="' + (b.cta_url || "#booking") + '" class="text-red" style="font-weight:700">' + b.cta_text_ar + " ←</a>" : "");
+  }
+
+  function renderTestimonials(items, selector) {
+    var el = document.querySelector(selector);
+    if (!el || !items.length) return;
+    el.innerHTML = items.map(function (t) {
+      var initial = (t.author_name || "?").charAt(0);
+      var stars = "★".repeat(Math.min(5, Math.max(1, t.rating || 5)));
+      return (
+        '<article class="tcard reveal">' +
+        '<div class="stars">' + stars + '</div>' +
+        "<p>«" + t.quote_ar + "»</p>" +
+        '<div class="who"><div class="av">' + initial + '</div><div><b>' + t.author_name + '</b><span>' + t.city + '</span></div></div>' +
+        "</article>"
+      );
+    }).join("");
+  }
+
   function renderFeatures(features, selector) {
     var el = document.querySelector(selector);
     if (!el || !features.length) return;
@@ -132,7 +167,49 @@
     if (notice) notice.style.display = "block";
   }
 
+  function initNewsletter() {
+    var form = document.getElementById("newsletterForm");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("newsletterEmail").value.trim();
+      fetch(apiBase() + "/api/v1/marketing/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, source: "landing" }),
+      })
+        .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
+        .then(function (r) {
+          if (!r.ok) throw new Error((r.d.error && r.d.error.message) || "خطأ");
+          form.reset();
+          alert("تم الاشتراك بنجاح");
+        })
+        .catch(function (err) { alert(err.message); });
+    });
+  }
+
+  function trackPageView() {
+    var params = new URLSearchParams(window.location.search);
+    fetch(apiBase() + "/api/v1/marketing/attribution/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_type: "page_view",
+        utm_source: params.get("utm_source"),
+        utm_medium: params.get("utm_medium"),
+        utm_campaign: params.get("utm_campaign"),
+        session_id: sessionStorage.getItem("rousto_session") || (function () {
+          var id = "sess-" + Date.now();
+          sessionStorage.setItem("rousto_session", id);
+          return id;
+        })(),
+      }),
+    }).catch(function () {});
+  }
+
   function initIndex() {
+    trackPageView();
+    initNewsletter();
     fetchLanding("/landing/page")
       .then(function (body) {
         var data = body.data;
@@ -141,8 +218,18 @@
         renderServices(data.pricing.services, ".services-grid", "#service");
         renderMarketingPlans(data.pricing.marketing_plans, "#pricingPlans");
         renderFeatures(data.features, ".feature-list");
+        if (data.marketing) {
+          renderPartners(data.marketing.partners, "#partnersRow");
+          renderHeroBanner(data.marketing.banners, "#heroMarketingBanner");
+        }
       })
       .catch(showFallback);
+
+    fetchLanding("/testimonials")
+      .then(function (body) {
+        renderTestimonials(body.data, "#testimonialsCards");
+      })
+      .catch(function () {});
   }
 
   function initPricingPage() {

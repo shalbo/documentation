@@ -27,7 +27,8 @@ rousto/
 │   ├── 13_CUSTOMER_SUPPORT_AND_SECURITY.md
 │   ├── 14_LANDING_PAGE_PRICING.md
 │   ├── 15_FRONT_END_WEB.md
-│   └── 17_PERMISSIONS_AND_AUTH.md
+│   ├── 17_PERMISSIONS_AND_AUTH.md
+│   └── 18_ADVERTISING_AND_MARKETING_MODULE.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -43,8 +44,9 @@ rousto/
 ├── app/                   # نموذج واجهات التطبيق بصيغة HTML (5 شاشات)
 │   ├── index.html
 │   └── css/app.css
-├── admin/                 # لوحات الإدارة (كتالوج + انضمام الفنيين)
+├── admin/                 # لوحات الإدارة (كتالوج + تسويق + فنيين)
 │   ├── index.html
+│   ├── marketing.html
 │   ├── vendors.html
 │   ├── vendor-portal.html
 │   ├── vendor-map.html
@@ -126,6 +128,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/14_LANDING_PAGE_PRICING.md`](docs/14_LANDING_PAGE_PRICING.md)
 - [`docs/15_FRONT_END_WEB.md`](docs/15_FRONT_END_WEB.md)
 - [`docs/17_PERMISSIONS_AND_AUTH.md`](docs/17_PERMISSIONS_AND_AUTH.md)
+- [`docs/18_ADVERTISING_AND_MARKETING_MODULE.md`](docs/18_ADVERTISING_AND_MARKETING_MODULE.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

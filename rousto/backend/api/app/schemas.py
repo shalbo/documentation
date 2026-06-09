@@ -407,3 +407,140 @@ class SupportTicketReplyIn(BaseModel):
 
 class SecurityReportIn(BaseModel):
     description: str = Field(..., min_length=10, max_length=500)
+
+
+class NewsletterSubscribeIn(BaseModel):
+    email: str = Field(min_length=5, max_length=255)
+    phone: str | None = Field(default=None, max_length=20)
+    source: str = Field(default="landing", max_length=40)
+    campaign_slug: str | None = Field(default=None, max_length=40)
+
+
+class AttributionTrackIn(BaseModel):
+    event_type: str = Field(min_length=3, max_length=30)
+    utm_source: str | None = Field(default=None, max_length=60)
+    utm_medium: str | None = Field(default=None, max_length=60)
+    utm_campaign: str | None = Field(default=None, max_length=60)
+    campaign_slug: str | None = Field(default=None, max_length=40)
+    session_id: str | None = Field(default=None, max_length=64)
+
+
+class AdminPromotionCreate(BaseModel):
+    code: str = Field(min_length=2, max_length=30)
+    title_ar: str = Field(min_length=2, max_length=120)
+    description_ar: str | None = Field(default=None, max_length=300)
+    discount_type: str = Field(pattern=r"^(percentage|fixed_amount)$")
+    discount_value: float = Field(gt=0)
+    min_order_sar: float = Field(default=0, ge=0)
+    max_uses_per_user: int = Field(default=1, ge=1, le=100)
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool = True
+
+
+class AdminPromotionUpdate(BaseModel):
+    title_ar: str | None = Field(default=None, max_length=120)
+    description_ar: str | None = Field(default=None, max_length=300)
+    discount_type: str | None = Field(default=None, pattern=r"^(percentage|fixed_amount)$")
+    discount_value: float | None = Field(default=None, gt=0)
+    min_order_sar: float | None = Field(default=None, ge=0)
+    max_uses_per_user: int | None = Field(default=None, ge=1, le=100)
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool | None = None
+
+
+class AdminPromotionOut(BaseModel):
+    id: UUID
+    code: str
+    title_ar: str
+    description_ar: str | None
+    discount_type: str
+    discount_value: float
+    min_order_sar: float
+    max_uses_per_user: int
+    starts_at: datetime
+    ends_at: datetime | None
+    is_active: bool
+
+    model_config = {"from_attributes": True}
+
+
+class AdminCampaignCreate(BaseModel):
+    slug: str = Field(min_length=2, max_length=40, pattern=r"^[a-z][a-z0-9-]*$")
+    name_ar: str = Field(min_length=2, max_length=120)
+    description_ar: str | None = Field(default=None, max_length=300)
+    channel: str = Field(default="web", max_length=30)
+    utm_source: str | None = Field(default=None, max_length=60)
+    utm_medium: str | None = Field(default=None, max_length=60)
+    utm_campaign: str | None = Field(default=None, max_length=60)
+    utm_content: str | None = Field(default=None, max_length=60)
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool = True
+
+
+class AdminCampaignUpdate(BaseModel):
+    name_ar: str | None = Field(default=None, max_length=120)
+    description_ar: str | None = Field(default=None, max_length=300)
+    channel: str | None = Field(default=None, max_length=30)
+    utm_source: str | None = Field(default=None, max_length=60)
+    utm_medium: str | None = Field(default=None, max_length=60)
+    utm_campaign: str | None = Field(default=None, max_length=60)
+    utm_content: str | None = Field(default=None, max_length=60)
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool | None = None
+
+
+class AdminBannerCreate(BaseModel):
+    slug: str = Field(min_length=2, max_length=40, pattern=r"^[a-z][a-z0-9-]*$")
+    title_ar: str = Field(min_length=2, max_length=120)
+    subtitle_ar: str | None = Field(default=None, max_length=200)
+    placement: str = Field(min_length=2, max_length=30)
+    image_url: str | None = Field(default=None, max_length=300)
+    cta_text_ar: str | None = Field(default=None, max_length=60)
+    cta_url: str | None = Field(default=None, max_length=200)
+    campaign_id: UUID | None = None
+    promotion_id: UUID | None = None
+    sort_order: int = Field(default=0, ge=0)
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool = True
+
+
+class AdminBannerUpdate(BaseModel):
+    title_ar: str | None = Field(default=None, max_length=120)
+    subtitle_ar: str | None = Field(default=None, max_length=200)
+    placement: str | None = Field(default=None, max_length=30)
+    image_url: str | None = Field(default=None, max_length=300)
+    cta_text_ar: str | None = Field(default=None, max_length=60)
+    cta_url: str | None = Field(default=None, max_length=200)
+    campaign_id: UUID | None = None
+    promotion_id: UUID | None = None
+    sort_order: int | None = Field(default=None, ge=0)
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
+    is_active: bool | None = None
+
+
+class AdminPartnerCreate(BaseModel):
+    slug: str = Field(min_length=2, max_length=40, pattern=r"^[a-z][a-z0-9-]*$")
+    name_ar: str = Field(min_length=2, max_length=80)
+    logo_url: str | None = Field(default=None, max_length=300)
+    website_url: str | None = Field(default=None, max_length=200)
+    sort_order: int = Field(default=0, ge=0)
+    is_active: bool = True
+
+
+class AdminPartnerUpdate(BaseModel):
+    name_ar: str | None = Field(default=None, max_length=80)
+    logo_url: str | None = Field(default=None, max_length=300)
+    website_url: str | None = Field(default=None, max_length=200)
+    sort_order: int | None = Field(default=None, ge=0)
+    is_active: bool | None = None
+
+
+class AdminTestimonialUpdate(BaseModel):
+    is_published: bool | None = None
+    rating: int | None = Field(default=None, ge=1, le=5)

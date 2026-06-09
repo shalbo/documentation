@@ -340,7 +340,27 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 | Method | Path | الوصف | Auth |
 |--------|------|-------|------|
 | GET | `/api/v1/landing/pricing` | خدمات + خطط تسويقية + اشتراكات + باقات | لا |
-| GET | `/api/v1/landing/page` | بيانات صفحة الهبوط (hero + pricing + features) | لا |
+| GET | `/api/v1/landing/page` | بيانات صفحة الهبوط (hero + pricing + features + marketing) | لا |
+
+---
+
+### الإعلانات والتسويق
+
+انظر [`18_ADVERTISING_AND_MARKETING_MODULE`](18_ADVERTISING_AND_MARKETING_MODULE.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/marketing/banners` | بانرات نشطة (`?placement=`) | لا |
+| GET | `/api/v1/marketing/partners` | شركاء العلامات | لا |
+| GET | `/api/v1/marketing/campaigns` | حملات نشطة | لا |
+| POST | `/api/v1/marketing/newsletter/subscribe` | اشتراك نشرة | لا |
+| POST | `/api/v1/marketing/attribution/track` | تتبّع UTM | لا |
+| GET | `/api/v1/marketing/referrals/validate` | التحقق من كود إحالة | لا |
+| GET | `/api/v1/me/referral` | كود الإحالة الخاص بي | Customer |
+| POST | `/api/v1/me/referral` | إنشاء كود إحالة | Customer |
+| GET/POST/PATCH | `/api/v1/admin/promotions` | إدارة أكواد الخصم | Admin |
+| GET/POST/PATCH | `/api/v1/admin/marketing/*` | حملات، بانرات، شركاء | Admin |
+| GET | `/api/v1/admin/marketing/analytics` | ملخص إحصائي | Admin |
 
 ---
 
@@ -541,3 +561,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`14_LANDING_PAGE_PRICING`](../docs/14_LANDING_PAGE_PRICING.md) — صفحة الهبوط والأسعار ✅
 - [`15_FRONT_END_WEB`](../docs/15_FRONT_END_WEB.md) — بوابة عميل الويب ✅
 - [`17_PERMISSIONS_AND_AUTH`](../docs/17_PERMISSIONS_AND_AUTH.md) — OTP + JWT + أدوار وصلاحيات ✅
+- [`18_ADVERTISING_AND_MARKETING_MODULE`](../docs/18_ADVERTISING_AND_MARKETING_MODULE.md) — حملات وبانرات وإحالات ✅
