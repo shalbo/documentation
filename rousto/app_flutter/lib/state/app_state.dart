@@ -17,6 +17,10 @@ class AppState extends ChangeNotifier {
   BookingModel? activeBooking;
   List<PromotionModel> promotions = [];
   int loyaltyPoints = 0;
+  List<MembershipPlanModel> membershipPlans = [];
+  List<ServicePackageModel> servicePackages = [];
+  List<LoyaltyRewardModel> loyaltyRewards = [];
+  MonetizationSummary? monetization;
 
   List<ServiceModel> get currentServices {
     if (categories.isEmpty) return [];
@@ -43,6 +47,10 @@ class AppState extends ChangeNotifier {
       _repository.loadActiveBooking(),
       _repository.loadPromotions(),
       _repository.loadLoyaltyBalance(),
+      _repository.loadMembershipPlans(),
+      _repository.loadServicePackages(),
+      _repository.loadLoyaltyRewards(),
+      _repository.loadMonetizationSummary(),
     ]);
 
     categories = results[0] as List<CategoryModel>;
@@ -50,6 +58,10 @@ class AppState extends ChangeNotifier {
     activeBooking = results[2] as BookingModel?;
     promotions = results[3] as List<PromotionModel>;
     loyaltyPoints = results[4] as int;
+    membershipPlans = results[5] as List<MembershipPlanModel>;
+    servicePackages = results[6] as List<ServicePackageModel>;
+    loyaltyRewards = results[7] as List<LoyaltyRewardModel>;
+    monetization = results[8] as MonetizationSummary;
     usingMockData = !apiLive;
     loading = false;
     notifyListeners();
@@ -60,4 +72,20 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> subscribeToPlan(String planSlug) async {
+    final ok = await _repository.subscribePlan(planSlug);
+    if (ok) monetization = await _repository.loadMonetizationSummary();
+    notifyListeners();
+    return ok;
+  }
+
+  Future<String?> redeemReward(String rewardSlug) async {
+    final result = await _repository.redeemReward(rewardSlug);
+    if (result.ok) {
+      loyaltyPoints = result.balance;
+      notifyListeners();
+      return 'تم استبدال ${result.discount.round()} ريال خصم';
+    }
+    return null;
+  }
 }

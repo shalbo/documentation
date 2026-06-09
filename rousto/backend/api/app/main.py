@@ -3,7 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.routers import bookings, catalog, health, profile, promotions, testimonials
+from app.routers import (
+    bookings,
+    catalog,
+    health,
+    monetization,
+    profile,
+    promotions,
+    testimonials,
+)
 
 app = FastAPI(
     title="Rousto API",
@@ -33,6 +41,7 @@ app.include_router(profile.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(promotions.router, prefix=prefix)
 app.include_router(testimonials.router, prefix=prefix)
+app.include_router(monetization.router, prefix=prefix)
 
 
 @app.exception_handler(HTTPException)

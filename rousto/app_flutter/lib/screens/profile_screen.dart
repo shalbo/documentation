@@ -20,6 +20,7 @@ class ProfileScreen extends StatelessWidget {
         }
 
         final user = state.user;
+        final mon = state.monetization;
         final items = <(IconData, String, String)>[
           (
             Icons.directions_car_filled_outlined,
@@ -82,6 +83,23 @@ class ProfileScreen extends StatelessWidget {
                         user?.email ?? '',
                         style: const TextStyle(color: Color(0xFFFFD9DA)),
                       ),
+                      if (mon != null) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'عضوية ${mon.planNameAr}'
+                                '${mon.discountPercent > 0 ? ' · خصم ${mon.discountPercent}٪' : ''}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -97,6 +115,10 @@ class ProfileScreen extends StatelessWidget {
                         _Stat('${user?.servicesCount ?? 0}', 'خدمة'),
                         _Stat('${user?.vehiclesCount ?? 0}', 'سيارة'),
                         _Stat('${state.loyaltyPoints}', 'نقطة'),
+                        _Stat(
+                          '${mon?.lifetimeSavingsSar.round() ?? 0}',
+                          'توفير',
+                        ),
                       ],
                     ),
                   ),

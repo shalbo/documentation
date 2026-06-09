@@ -118,4 +118,5 @@ flutter test
 
 ## الخطوة التالية
 
-- `04_AUTH` — OTP + JWT (استبدال `X-User-Id`)
+- [`04_BUSINESS_MONETIZATION`](04_BUSINESS_MONETIZATION.md) — اشتراكات، باقات، استبدال نقاط ✅
+- `05_AUTH` — OTP + JWT (استبدال `X-User-Id`)

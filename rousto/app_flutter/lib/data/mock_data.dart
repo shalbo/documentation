@@ -166,6 +166,79 @@ class MockData {
     TrackStepModel(title: 'اكتمال الخدمة', time: 'قيد الانتظار', status: TrackStatus.todo),
   ];
 
+  static const membershipPlans = <MembershipPlanModel>[
+    MembershipPlanModel(
+      slug: 'free',
+      nameAr: 'مجاني',
+      description: 'الخطة الأساسية — احجز وادفع لكل خدمة',
+      priceSar: 0,
+      billingPeriod: 'monthly',
+      discountPercent: 0,
+    ),
+    MembershipPlanModel(
+      slug: 'gold',
+      nameAr: 'ذهبي',
+      description: 'خصم 10٪ على كل خدمة + أولوية الحجز',
+      priceSar: 29,
+      billingPeriod: 'monthly',
+      discountPercent: 10,
+      priorityBooking: true,
+    ),
+    MembershipPlanModel(
+      slug: 'platinum',
+      nameAr: 'بلاتيني',
+      description: 'خصم 20٪ + فحص مجاني سنوي + أولوية قصوى',
+      priceSar: 79,
+      billingPeriod: 'monthly',
+      discountPercent: 20,
+      priorityBooking: true,
+      freeInspection: true,
+    ),
+  ];
+
+  static const servicePackages = <ServicePackageModel>[
+    ServicePackageModel(
+      slug: 'gold-maintenance',
+      nameAr: 'باقة الصيانة الذهبية',
+      description: '4 زيارات صيانة سنوية — زيت + فحص + إطارات',
+      priceSar: 499,
+      visitsCount: 4,
+      savingsSar: 120,
+    ),
+    ServicePackageModel(
+      slug: 'basic-care',
+      nameAr: 'باقة العناية الأساسية',
+      description: 'زيت + فحص شامل — زيارتان',
+      priceSar: 199,
+      visitsCount: 2,
+      savingsSar: 40,
+    ),
+  ];
+
+  static const loyaltyRewards = <LoyaltyRewardModel>[
+    LoyaltyRewardModel(
+      slug: 'discount-10',
+      title: 'خصم 10 ريال',
+      description: 'استبدل 100 نقطة بخصم 10 ريال',
+      pointsCost: 100,
+      discountSar: 10,
+    ),
+    LoyaltyRewardModel(
+      slug: 'discount-30',
+      title: 'خصم 30 ريال',
+      description: 'استبدل 300 نقطة بخصم 30 ريال',
+      pointsCost: 300,
+      discountSar: 30,
+    ),
+  ];
+
+  static const monetization = MonetizationSummary(
+    planSlug: 'free',
+    planNameAr: 'مجاني',
+    discountPercent: 0,
+    lifetimeSavingsSar: 30,
+  );
+
   static const promotions = <PromotionModel>[
     PromotionModel(
       code: 'ROUSTO',

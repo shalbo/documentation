@@ -192,6 +192,8 @@ class Booking(Base):
     scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     service_price_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    membership_discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    points_discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
     total_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     status: Mapped[str] = mapped_column(String(30))
     notes: Mapped[str | None] = mapped_column(Text)
@@ -261,4 +263,87 @@ class Testimonial(Base):
     quote_ar: Mapped[str] = mapped_column(Text)
     rating: Mapped[int] = mapped_column(SmallInteger)
     is_published: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class MembershipPlan(Base):
+    __tablename__ = "membership_plans"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    price_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    billing_period: Mapped[str] = mapped_column(String(20))
+    discount_percent: Mapped[int] = mapped_column(SmallInteger, default=0)
+    priority_booking: Mapped[bool] = mapped_column(Boolean, default=False)
+    free_inspection: Mapped[bool] = mapped_column(Boolean, default=False)
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class UserMembership(Base):
+    __tablename__ = "user_memberships"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    plan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("membership_plans.id"))
+    status: Mapped[str] = mapped_column(String(20))
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    plan: Mapped["MembershipPlan"] = relationship()
+
+
+class ServicePackage(Base):
+    __tablename__ = "service_packages"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(120))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    price_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    visits_count: Mapped[int] = mapped_column(SmallInteger)
+    validity_days: Mapped[int] = mapped_column(SmallInteger)
+    savings_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class LoyaltyReward(Base):
+    __tablename__ = "loyalty_rewards"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    title_ar: Mapped[str] = mapped_column(String(120))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    points_cost: Mapped[int] = mapped_column(Integer)
+    discount_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class PromotionRedemption(Base):
+    __tablename__ = "promotion_redemptions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    promotion_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("promotions.id"))
+    booking_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("bookings.id"))
+    discount_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    redeemed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class BookingRevenue(Base):
+    __tablename__ = "booking_revenue"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    booking_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("bookings.id"), unique=True)
+    gross_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    membership_discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    promo_discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    points_discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    net_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    platform_fee_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    technician_payout_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    reserve_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

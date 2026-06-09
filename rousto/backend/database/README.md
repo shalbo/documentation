@@ -15,6 +15,8 @@ On first start, PostgreSQL automatically runs:
 
 1. `001_schema.sql` — tables, enums, indexes, triggers
 2. `002_seed.sql` — demo data (سعود العتيبي, active booking, services…)
+3. `003_monetization.sql` — membership plans, packages, revenue splits
+4. `004_monetization_seed.sql` — monetization demo data
 
 ## Verify
 

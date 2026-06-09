@@ -298,4 +298,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 ## الخطوة التالية
 
 - [`03_MOBILE_APP_UI`](../docs/03_MOBILE_APP_UI.md) — تطبيق Flutter المتصل بالـ API ✅
-- `04_AUTH` — OTP عبر الجوال + JWT
+- [`04_BUSINESS_MONETIZATION`](../docs/04_BUSINESS_MONETIZATION.md) — تحقيق الدخل والاشتراكات ✅
+- `05_AUTH` — OTP عبر الجوال + JWT

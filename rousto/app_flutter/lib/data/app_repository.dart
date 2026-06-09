@@ -161,6 +161,72 @@ class AppRepository {
     }
   }
 
+  Future<List<MembershipPlanModel>> loadMembershipPlans() async {
+    try {
+      final data = await _api.getMembershipPlans();
+      return data
+          .map((e) => MembershipPlanModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return MockData.membershipPlans;
+    }
+  }
+
+  Future<List<ServicePackageModel>> loadServicePackages() async {
+    try {
+      final data = await _api.getServicePackages();
+      return data
+          .map((e) => ServicePackageModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return MockData.servicePackages;
+    }
+  }
+
+  Future<List<LoyaltyRewardModel>> loadLoyaltyRewards() async {
+    try {
+      final data = await _api.getLoyaltyRewards();
+      return data
+          .map((e) => LoyaltyRewardModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return MockData.loyaltyRewards;
+    }
+  }
+
+  Future<MonetizationSummary> loadMonetizationSummary() async {
+    try {
+      final data = await _api.getMonetizationSummary();
+      return MonetizationSummary.fromJson(data);
+    } catch (_) {
+      return MockData.monetization;
+    }
+  }
+
+  Future<bool> subscribePlan(String planSlug) async {
+    try {
+      await _api.subscribeMembership(planSlug);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<({bool ok, int balance, double discount})> redeemReward(
+    String rewardSlug,
+  ) async {
+    try {
+      final data = await _api.redeemReward(rewardSlug);
+      return (
+        ok: true,
+        balance: data['balance_remaining'] as int? ?? 0,
+        discount: (data['discount_sar'] as num?)?.toDouble() ?? 0,
+      );
+    } catch (_) {
+      return (ok: false, balance: MockData.user.loyaltyPoints, discount: 0);
+    }
+  }
+
   Future<bool> createBooking({
     required String serviceId,
     required String vehicleId,

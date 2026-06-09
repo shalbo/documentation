@@ -165,6 +165,7 @@ class BookingCreateIn(BaseModel):
     address_id: UUID
     payment_method_id: UUID | None = None
     promotion_code: str | None = None
+    reward_slug: str | None = None
     scheduled_at: datetime
     notes: str | None = None
 

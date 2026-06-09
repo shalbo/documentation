@@ -96,6 +96,7 @@ def post_booking(
             address_id=body.address_id,
             payment_method_id=body.payment_method_id,
             promotion_code=body.promotion_code,
+            reward_slug=body.reward_slug,
             scheduled_at=body.scheduled_at,
             notes=body.notes,
         )

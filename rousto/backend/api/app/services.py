@@ -18,6 +18,13 @@ from app.models import (
     User,
     Vehicle,
 )
+from app.monetization import (
+    calculate_membership_discount,
+    get_membership_plan_for_user,
+    record_booking_revenue,
+    record_promo_redemption,
+    redeem_loyalty_reward,
+)
 
 ACTIVE_STATUSES = {
     "pending",
@@ -187,6 +194,7 @@ def create_booking(
     address_id: UUID,
     payment_method_id: UUID | None,
     promotion_code: str | None,
+    reward_slug: str | None,
     scheduled_at: datetime,
     notes: str | None,
 ) -> Booking:
@@ -217,15 +225,25 @@ def create_booking(
             raise ValueError("طريقة الدفع غير موجودة")
 
     service_price = to_float(service.price_sar)
-    discount_sar = 0.0
+    plan = get_membership_plan_for_user(db, user.id)
+    membership_discount = calculate_membership_discount(plan, service_price)
+    price_after_membership = service_price - membership_discount
+
+    promo_discount = 0.0
     promotion = None
     if promotion_code:
-        promotion = find_active_promotion(db, promotion_code, service_price)
+        promotion = find_active_promotion(db, promotion_code, price_after_membership)
         if not promotion:
             raise ValueError("كود الخصم غير صالح")
-        discount_sar = calculate_discount(promotion, service_price)
+        promo_discount = calculate_discount(promotion, price_after_membership)
 
-    total_sar = service_price - discount_sar
+    points_discount = 0.0
+    if reward_slug:
+        points_discount, _ = redeem_loyalty_reward(db, user, reward_slug)
+
+    total_sar = max(
+        0.0, service_price - membership_discount - promo_discount - points_discount
+    )
     technician = assign_available_technician(db)
 
     booking = Booking(
@@ -240,7 +258,9 @@ def create_booking(
         promotion_id=promotion.id if promotion else None,
         scheduled_at=scheduled_at,
         service_price_sar=service_price,
-        discount_sar=discount_sar,
+        discount_sar=promo_discount,
+        membership_discount_sar=membership_discount,
+        points_discount_sar=points_discount,
         total_sar=total_sar,
         status="confirmed" if technician else "pending",
         notes=notes,
@@ -285,6 +305,19 @@ def create_booking(
             created_at=datetime.now(timezone.utc),
         )
     )
+    record_booking_revenue(
+        db,
+        booking.id,
+        gross_sar=service_price,
+        membership_discount_sar=membership_discount,
+        promo_discount_sar=promo_discount,
+        points_discount_sar=points_discount,
+        net_sar=total_sar,
+    )
+    if promotion:
+        record_promo_redemption(
+            db, user.id, promotion.id, booking.id, promo_discount
+        )
     db.commit()
     db.refresh(booking)
     return load_booking(db, booking.id, user.id)

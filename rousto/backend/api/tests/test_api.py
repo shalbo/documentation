@@ -83,6 +83,27 @@ def test_active_booking():
 
 
 @pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with running PostgreSQL")
+def test_monetization_plans():
+    response = client.get("/api/v1/monetization/plans")
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert len(data) == 3
+    assert data[0]["slug"] == "free"
+    assert data[1]["slug"] == "gold"
+
+
+@pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with running PostgreSQL")
+def test_me_monetization():
+    response = client.get(
+        "/api/v1/me/monetization", headers={"X-User-Id": DEV_USER}
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["loyalty"]["balance"] == 320
+    assert data["membership"]["plan_slug"] == "free"
+
+
+@pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with running PostgreSQL")
 def test_promotion_validate():
     response = client.post(
         "/api/v1/promotions/validate",

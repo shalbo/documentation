@@ -130,6 +130,40 @@ class ApiClient {
     final body = await _post('/bookings', payload);
     return body['data'] as Map<String, dynamic>;
   }
+
+  Future<List<dynamic>> getMembershipPlans() async {
+    final body = await _get('/monetization/plans');
+    return body['data'] as List<dynamic>;
+  }
+
+  Future<List<dynamic>> getServicePackages() async {
+    final body = await _get('/monetization/packages');
+    return body['data'] as List<dynamic>;
+  }
+
+  Future<List<dynamic>> getLoyaltyRewards() async {
+    final body = await _get('/monetization/rewards');
+    return body['data'] as List<dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getMonetizationSummary() async {
+    final body = await _get('/me/monetization', auth: true);
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> subscribeMembership(String planSlug) async {
+    final body = await _post('/me/membership/subscribe', {
+      'plan_slug': planSlug,
+    });
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> redeemReward(String rewardSlug) async {
+    final body = await _post('/me/loyalty/redeem', {
+      'reward_slug': rewardSlug,
+    });
+    return body['data'] as Map<String, dynamic>;
+  }
 }
 
 class ApiException implements Exception {

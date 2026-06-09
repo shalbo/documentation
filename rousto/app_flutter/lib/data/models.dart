@@ -290,6 +290,121 @@ IconData iconFromKey(String? key) {
   }
 }
 
+class MembershipPlanModel {
+  final String slug;
+  final String nameAr;
+  final String description;
+  final double priceSar;
+  final String billingPeriod;
+  final int discountPercent;
+  final bool priorityBooking;
+  final bool freeInspection;
+
+  const MembershipPlanModel({
+    required this.slug,
+    required this.nameAr,
+    required this.description,
+    required this.priceSar,
+    required this.billingPeriod,
+    required this.discountPercent,
+    this.priorityBooking = false,
+    this.freeInspection = false,
+  });
+
+  factory MembershipPlanModel.fromJson(Map<String, dynamic> json) {
+    return MembershipPlanModel(
+      slug: json['slug'] as String,
+      nameAr: json['name_ar'] as String,
+      description: json['description_ar'] as String? ?? '',
+      priceSar: (json['price_sar'] as num).toDouble(),
+      billingPeriod: json['billing_period'] as String? ?? 'monthly',
+      discountPercent: json['discount_percent'] as int? ?? 0,
+      priorityBooking: json['priority_booking'] as bool? ?? false,
+      freeInspection: json['free_inspection'] as bool? ?? false,
+    );
+  }
+}
+
+class ServicePackageModel {
+  final String slug;
+  final String nameAr;
+  final String description;
+  final double priceSar;
+  final int visitsCount;
+  final double savingsSar;
+
+  const ServicePackageModel({
+    required this.slug,
+    required this.nameAr,
+    required this.description,
+    required this.priceSar,
+    required this.visitsCount,
+    required this.savingsSar,
+  });
+
+  factory ServicePackageModel.fromJson(Map<String, dynamic> json) {
+    return ServicePackageModel(
+      slug: json['slug'] as String,
+      nameAr: json['name_ar'] as String,
+      description: json['description_ar'] as String? ?? '',
+      priceSar: (json['price_sar'] as num).toDouble(),
+      visitsCount: json['visits_count'] as int? ?? 1,
+      savingsSar: (json['savings_sar'] as num?)?.toDouble() ?? 0,
+    );
+  }
+}
+
+class LoyaltyRewardModel {
+  final String slug;
+  final String title;
+  final String description;
+  final int pointsCost;
+  final double discountSar;
+
+  const LoyaltyRewardModel({
+    required this.slug,
+    required this.title,
+    required this.description,
+    required this.pointsCost,
+    required this.discountSar,
+  });
+
+  factory LoyaltyRewardModel.fromJson(Map<String, dynamic> json) {
+    return LoyaltyRewardModel(
+      slug: json['slug'] as String,
+      title: json['title_ar'] as String,
+      description: json['description_ar'] as String? ?? '',
+      pointsCost: json['points_cost'] as int,
+      discountSar: (json['discount_sar'] as num).toDouble(),
+    );
+  }
+}
+
+class MonetizationSummary {
+  final String planSlug;
+  final String planNameAr;
+  final int discountPercent;
+  final double lifetimeSavingsSar;
+
+  const MonetizationSummary({
+    required this.planSlug,
+    required this.planNameAr,
+    required this.discountPercent,
+    required this.lifetimeSavingsSar,
+  });
+
+  factory MonetizationSummary.fromJson(Map<String, dynamic> json) {
+    final membership = json['membership'] as Map<String, dynamic>? ?? {};
+    return MonetizationSummary(
+      planSlug: membership['plan_slug'] as String? ?? 'free',
+      planNameAr: membership['plan_name_ar'] as String? ?? 'مجاني',
+      discountPercent: membership['discount_percent'] as int? ?? 0,
+      lifetimeSavingsSar:
+          (json['lifetime_savings_sar'] as num?)?.toDouble() ?? 0,
+    );
+  }
+}
+
 Color trackStatusColor(TrackStatus status) {
   switch (status) {
     case TrackStatus.done:
