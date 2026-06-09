@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 
 class BookingScreen extends StatefulWidget {
-  final ServiceItem? service;
+  final ServiceModel? service;
   const BookingScreen({super.key, this.service});
 
   @override
@@ -13,14 +16,61 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  int _slot = 1;
+  final _repository = AppRepository();
   static const _slots = ['السبت', 'الأحد 9 ص', 'الاثنين', 'الثلاثاء'];
+
+  bool _loading = true;
+  int _slot = 1;
+  double _discount = 30;
+  double _total = 0;
+
+  VehicleModel? _vehicle;
+  AddressModel? _address;
+  PaymentMethodModel? _payment;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final service = widget.service;
+    final price = service?.priceSar ?? 120.0;
+    final contextData = await _repository.loadBookingContext();
+    final promo = await _repository.validatePromo('ROUSTO', price);
+    setState(() {
+      _vehicle = contextData.vehicle;
+      _address = contextData.address;
+      _payment = contextData.payment;
+      _discount = promo.discount;
+      _total = promo.total;
+      _loading = false;
+    });
+  }
+
+  ServiceModel get _service {
+    if (widget.service != null) return widget.service!;
+    final state = context.read<AppState>();
+    if (state.currentServices.isNotEmpty) return state.currentServices.first;
+    if (state.categories.isNotEmpty && state.categories.first.services.isNotEmpty) {
+      return state.categories.first.services.first;
+    }
+    throw StateError('لا توجد خدمات متاحة');
+  }
 
   @override
   Widget build(BuildContext context) {
-    final s = widget.service ?? AppData.services.first;
-    const discount = 30;
-    final total = s.price - discount;
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final s = _service;
+    final vehicle = _vehicle!;
+    final address = _address!;
+    final payment = _payment!;
 
     return Scaffold(
       appBar: AppBar(title: const Text('تأكيد الحجز')),
@@ -56,10 +106,10 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 18),
             const _Label('سيارتك'),
-            const _InfoRow(
+            _InfoRow(
               icon: Icons.directions_car_filled_outlined,
-              title: 'تويوتا كامري 2022',
-              subtitle: 'أبيض · أ ب ج 1234',
+              title: vehicle.displayTitle,
+              subtitle: vehicle.displaySubtitle,
             ),
             const SizedBox(height: 18),
             const _Label('الموعد'),
@@ -100,16 +150,16 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 18),
             const _Label('المكان'),
-            const _InfoRow(
+            _InfoRow(
               icon: Icons.location_on_outlined,
-              title: 'خدمة في موقعك',
-              subtitle: 'حي النخيل، الرياض',
+              title: address.label,
+              subtitle: address.displaySubtitle,
             ),
             const SizedBox(height: 18),
             const _Label('طريقة الدفع'),
-            const _InfoRow(
+            _InfoRow(
               icon: Icons.credit_card,
-              title: 'مدى **** 4421',
+              title: payment.labelAr,
               subtitle: 'بطاقة افتراضية',
             ),
             const SizedBox(height: 18),
@@ -118,13 +168,13 @@ class _BookingScreenState extends State<BookingScreen> {
                 children: [
                   _summaryRow('الخدمة', '${s.price} ريال'),
                   const SizedBox(height: 6),
-                  _summaryRow('خصم (ROUSTO)', '- $discount ريال',
+                  _summaryRow('خصم (ROUSTO)', '- ${_discount.round()} ريال',
                       color: AppColors.green),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(color: AppColors.line, height: 1),
                   ),
-                  _summaryRow('الإجمالي', '$total ريال',
+                  _summaryRow('الإجمالي', '${_total.round()} ريال',
                       bold: true, color: AppColors.red600),
                 ],
               ),
@@ -135,14 +185,32 @@ class _BookingScreenState extends State<BookingScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
         child: GradientButton(
-          label: 'تأكيد ودفع $total ريال',
-          onPressed: () => _confirm(context),
+          label: 'تأكيد ودفع ${_total.round()} ريال',
+          onPressed: () => _confirm(context, s, vehicle, address, payment),
         ),
       ),
     );
   }
 
-  void _confirm(BuildContext context) {
+  Future<void> _confirm(
+    BuildContext context,
+    ServiceModel service,
+    VehicleModel vehicle,
+    AddressModel address,
+    PaymentMethodModel payment,
+  ) async {
+    final ok = await _repository.createBooking(
+      serviceId: service.id,
+      vehicleId: vehicle.id,
+      addressId: address.id,
+      paymentMethodId: payment.id,
+      promotionCode: 'ROUSTO',
+    );
+
+    if (!context.mounted) return;
+
+    await context.read<AppState>().refreshActiveBooking();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -161,13 +229,18 @@ class _BookingScreenState extends State<BookingScreen> {
               child: Icon(Icons.check, color: Colors.white, size: 34),
             ),
             const SizedBox(height: 14),
-            const Text('تم تأكيد حجزك!',
-                style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+            Text(
+              ok ? 'تم تأكيد حجزك!' : 'تم حفظ الحجز محلياً',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
             const SizedBox(height: 6),
-            const Text('سيتواصل معك فريق روستو لتأكيد التفاصيل.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.ink500)),
+            Text(
+              ok
+                  ? 'سيتواصل معك فريق روستو لتأكيد التفاصيل.'
+                  : 'تعذّر الاتصال بالخادم — تم الحفظ في الوضع التجريبي.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.ink500),
+            ),
             const SizedBox(height: 18),
             GradientButton(
               label: 'تمام',

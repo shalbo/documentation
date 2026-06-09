@@ -15,7 +15,7 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.text('ابدأ الآن'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(seconds: 3));
 
     expect(find.text('الخدمات الشائعة'), findsOneWidget);
   });

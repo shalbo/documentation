@@ -1,118 +1,302 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+enum TrackStatus { done, current, todo }
 
-class ServiceItem {
+class ServiceModel {
+  final String id;
+  final String slug;
   final String name;
   final String subtitle;
-  final IconData icon;
-  final int price;
-  final String duration;
+  final String? iconKey;
+  final double priceSar;
+  final int durationMinutes;
 
-  const ServiceItem({
+  const ServiceModel({
+    required this.id,
+    required this.slug,
     required this.name,
     required this.subtitle,
-    required this.icon,
-    required this.price,
-    required this.duration,
+    this.iconKey,
+    required this.priceSar,
+    required this.durationMinutes,
   });
+
+  factory ServiceModel.fromJson(Map<String, dynamic> json) {
+    return ServiceModel(
+      id: json['id'] as String,
+      slug: json['slug'] as String,
+      name: json['name_ar'] as String,
+      subtitle: json['subtitle_ar'] as String? ?? '',
+      iconKey: json['icon_key'] as String?,
+      priceSar: (json['price_sar'] as num).toDouble(),
+      durationMinutes: json['duration_minutes'] as int,
+    );
+  }
+
+  IconData get icon => iconFromKey(iconKey);
+  int get price => priceSar.round();
+  String get duration => '$durationMinutes دقيقة';
 }
 
-class CategoryChip {
+class CategoryModel {
+  final String id;
+  final String slug;
+  final String nameAr;
+  final int sortOrder;
+  final List<ServiceModel> services;
+
+  const CategoryModel({
+    required this.id,
+    required this.slug,
+    required this.nameAr,
+    required this.sortOrder,
+    required this.services,
+  });
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    final services = (json['services'] as List<dynamic>? ?? [])
+        .map((s) => ServiceModel.fromJson(s as Map<String, dynamic>))
+        .toList();
+    return CategoryModel(
+      id: json['id'] as String,
+      slug: json['slug'] as String,
+      nameAr: json['name_ar'] as String,
+      sortOrder: json['sort_order'] as int? ?? 0,
+      services: services,
+    );
+  }
+}
+
+class UserModel {
+  final String id;
+  final String fullName;
+  final String email;
+  final String? avatarInitials;
+  final int loyaltyPoints;
+  final int servicesCount;
+  final int vehiclesCount;
+
+  const UserModel({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    this.avatarInitials,
+    required this.loyaltyPoints,
+    this.servicesCount = 0,
+    this.vehiclesCount = 0,
+  });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final stats = json['stats'] as Map<String, dynamic>? ?? {};
+    return UserModel(
+      id: json['id'] as String,
+      fullName: json['full_name'] as String,
+      email: json['email'] as String,
+      avatarInitials: json['avatar_initials'] as String?,
+      loyaltyPoints: json['loyalty_points'] as int? ?? 0,
+      servicesCount: stats['services_count'] as int? ?? 0,
+      vehiclesCount: stats['vehicles_count'] as int? ?? 0,
+    );
+  }
+}
+
+class VehicleModel {
+  final String id;
+  final String make;
+  final String model;
+  final int year;
+  final String? color;
+  final String plateNumber;
+  final bool isDefault;
+
+  const VehicleModel({
+    required this.id,
+    required this.make,
+    required this.model,
+    required this.year,
+    this.color,
+    required this.plateNumber,
+    this.isDefault = false,
+  });
+
+  factory VehicleModel.fromJson(Map<String, dynamic> json) {
+    return VehicleModel(
+      id: json['id'] as String,
+      make: json['make'] as String,
+      model: json['model'] as String,
+      year: json['year'] as int,
+      color: json['color'] as String?,
+      plateNumber: json['plate_number'] as String,
+      isDefault: json['is_default'] as bool? ?? false,
+    );
+  }
+
+  String get displayTitle => '$make $model $year';
+
+  String get displaySubtitle {
+    final parts = <String>[];
+    if (color != null && color!.isNotEmpty) parts.add(color!);
+    parts.add(plateNumber);
+    return parts.join(' · ');
+  }
+}
+
+class AddressModel {
+  final String id;
   final String label;
-  const CategoryChip(this.label);
+  final String district;
+  final String city;
+
+  const AddressModel({
+    required this.id,
+    required this.label,
+    required this.district,
+    required this.city,
+  });
+
+  factory AddressModel.fromJson(Map<String, dynamic> json) {
+    return AddressModel(
+      id: json['id'] as String,
+      label: json['label'] as String,
+      district: json['district'] as String,
+      city: json['city'] as String,
+    );
+  }
+
+  String get displaySubtitle => '$district، $city';
 }
 
-class TrackStep {
+class PaymentMethodModel {
+  final String id;
+  final String labelAr;
+
+  const PaymentMethodModel({required this.id, required this.labelAr});
+
+  factory PaymentMethodModel.fromJson(Map<String, dynamic> json) {
+    return PaymentMethodModel(
+      id: json['id'] as String,
+      labelAr: json['label_ar'] as String,
+    );
+  }
+}
+
+class BookingModel {
+  final String id;
+  final String reference;
+  final String status;
+  final String statusLabelAr;
+  final String? serviceName;
+  final String? serviceIconKey;
+
+  const BookingModel({
+    required this.id,
+    required this.reference,
+    required this.status,
+    required this.statusLabelAr,
+    this.serviceName,
+    this.serviceIconKey,
+  });
+
+  factory BookingModel.fromJson(Map<String, dynamic> json) {
+    final service = json['service'] as Map<String, dynamic>?;
+    return BookingModel(
+      id: json['id'] as String,
+      reference: json['reference'] as String,
+      status: json['status'] as String,
+      statusLabelAr: json['status_label_ar'] as String? ?? '',
+      serviceName: service?['name_ar'] as String?,
+      serviceIconKey: service?['icon_key'] as String?,
+    );
+  }
+}
+
+class TrackStepModel {
   final String title;
   final String time;
   final TrackStatus status;
-  const TrackStep(this.title, this.time, this.status);
+
+  const TrackStepModel({
+    required this.title,
+    required this.time,
+    required this.status,
+  });
 }
 
-enum TrackStatus { done, current, todo }
+class TechnicianModel {
+  final String fullName;
+  final double rating;
+  final String? avatarInitials;
+  final int? etaMinutes;
 
-class Testimonial {
-  final String name;
-  final String city;
-  final String quote;
-  const Testimonial(this.name, this.city, this.quote);
+  const TechnicianModel({
+    required this.fullName,
+    required this.rating,
+    this.avatarInitials,
+    this.etaMinutes,
+  });
+
+  factory TechnicianModel.fromJson(Map<String, dynamic> json) {
+    return TechnicianModel(
+      fullName: json['full_name'] as String,
+      rating: (json['rating'] as num).toDouble(),
+      avatarInitials: json['avatar_initials'] as String?,
+      etaMinutes: json['eta_minutes'] as int?,
+    );
+  }
+
+  String get subtitle {
+    final eta = etaMinutes;
+    if (eta != null) return '★ $rating · يصل خلال $eta دقيقة';
+    return '★ $rating';
+  }
 }
 
-/// بيانات تجريبية للتطبيق.
-class AppData {
-  AppData._();
+class PromotionModel {
+  final String code;
+  final String title;
+  final String description;
 
-  static const List<CategoryChip> categories = [
-    CategoryChip('الكل'),
-    CategoryChip('زيت'),
-    CategoryChip('إطارات'),
-    CategoryChip('فرامل'),
-    CategoryChip('تكييف'),
-    CategoryChip('كهرباء'),
-  ];
+  const PromotionModel({
+    required this.code,
+    required this.title,
+    required this.description,
+  });
 
-  static const List<ServiceItem> services = [
-    ServiceItem(
-      name: 'تغيير الزيت والفلاتر',
-      subtitle: 'زيت أصلي + فحص شامل',
-      icon: Icons.oil_barrel_outlined,
-      price: 120,
-      duration: '45 دقيقة',
-    ),
-    ServiceItem(
-      name: 'الإطارات والترصيص',
-      subtitle: 'موازنة وتبديل الإطارات',
-      icon: Icons.tire_repair_outlined,
-      price: 90,
-      duration: '30 دقيقة',
-    ),
-    ServiceItem(
-      name: 'نظام الفرامل',
-      subtitle: 'فحص واستبدال الفحمات',
-      icon: Icons.disc_full_outlined,
-      price: 180,
-      duration: '60 دقيقة',
-    ),
-    ServiceItem(
-      name: 'تكييف وتبريد',
-      subtitle: 'تعبئة فريون وصيانة',
-      icon: Icons.ac_unit,
-      price: 150,
-      duration: '50 دقيقة',
-    ),
-    ServiceItem(
-      name: 'البطارية والكهرباء',
-      subtitle: 'فحص وتركيب بطاريات',
-      icon: Icons.battery_charging_full_outlined,
-      price: 110,
-      duration: '40 دقيقة',
-    ),
-    ServiceItem(
-      name: 'فحص كمبيوتر شامل',
-      subtitle: 'تشخيص إلكتروني دقيق',
-      icon: Icons.laptop_mac_outlined,
-      price: 75,
-      duration: '35 دقيقة',
-    ),
-  ];
+  factory PromotionModel.fromJson(Map<String, dynamic> json) {
+    return PromotionModel(
+      code: json['code'] as String,
+      title: json['title_ar'] as String,
+      description: json['description_ar'] as String? ?? '',
+    );
+  }
+}
 
-  static const List<TrackStep> trackSteps = [
-    TrackStep('تم تأكيد الحجز', '9:02 ص', TrackStatus.done),
-    TrackStep('تم تعيين الفني', '9:05 ص', TrackStatus.done),
-    TrackStep('الفني في الطريق إليك', 'الآن · 12 دقيقة', TrackStatus.current),
-    TrackStep('تنفيذ الخدمة', 'قيد الانتظار', TrackStatus.todo),
-    TrackStep('اكتمال الخدمة', 'قيد الانتظار', TrackStatus.todo),
-  ];
+IconData iconFromKey(String? key) {
+  switch (key) {
+    case 'oil_barrel':
+      return Icons.oil_barrel_outlined;
+    case 'tire_repair':
+      return Icons.tire_repair_outlined;
+    case 'disc_full':
+      return Icons.disc_full_outlined;
+    case 'ac_unit':
+      return Icons.ac_unit;
+    case 'battery_charging':
+      return Icons.battery_charging_full_outlined;
+    case 'laptop_mac':
+      return Icons.laptop_mac_outlined;
+    default:
+      return Icons.build_outlined;
+  }
+}
 
-  static Color statusColor(TrackStatus s) {
-    switch (s) {
-      case TrackStatus.done:
-        return AppColors.green;
-      case TrackStatus.current:
-        return AppColors.red;
-      case TrackStatus.todo:
-        return AppColors.ink300;
-    }
+Color trackStatusColor(TrackStatus status) {
+  switch (status) {
+    case TrackStatus.done:
+      return const Color(0xFF16A34A);
+    case TrackStatus.current:
+      return const Color(0xFFE11B22);
+    case TrackStatus.todo:
+      return const Color(0xFF9CA3AF);
   }
 }

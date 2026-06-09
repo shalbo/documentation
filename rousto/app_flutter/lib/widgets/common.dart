@@ -150,6 +150,30 @@ class GradientButton extends StatelessWidget {
   }
 }
 
+/// شارة وضع تجريبي عند فشل الاتصال بالـ API.
+class DemoBadge extends StatelessWidget {
+  const DemoBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3D6),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Text(
+        'وضع تجريبي',
+        style: TextStyle(
+          color: Color(0xFFB07D00),
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
+        ),
+      ),
+    );
+  }
+}
+
 /// عنوان قسم بسيط مع زر "عرض الكل".
 class RowHeader extends StatelessWidget {
   final String title;

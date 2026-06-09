@@ -1,57 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import '../data/models.dart';
+import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import 'booking_screen.dart';
 import 'tracking_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   final VoidCallback onBook;
   const HomeScreen({super.key, required this.onBook});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _category = 0;
-
-  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 110),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _header(context),
-          Transform.translate(
-            offset: const Offset(0, -16),
-            child: _activeServiceCard(context),
+    return Consumer<AppState>(
+      builder: (context, state, _) {
+        if (state.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return RefreshIndicator(
+          onRefresh: state.load,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 110),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _header(state),
+                if (state.activeBooking != null)
+                  Transform.translate(
+                    offset: const Offset(0, -16),
+                    child: _activeServiceCard(context, state.activeBooking!),
+                  ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    18,
+                    state.activeBooking != null ? 4 : 0,
+                    18,
+                    0,
+                  ),
+                  child: _categories(state),
+                ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(18, 16, 18, 0),
+                  child: RowHeader('الخدمات الشائعة', action: 'عرض الكل'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
+                  child: _servicesGrid(context, state.currentServices),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+                  child: _promo(state),
+                ),
+              ],
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 4, 18, 0),
-            child: _categories(),
-          ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(18, 16, 18, 0),
-            child: RowHeader('الخدمات الشائعة', action: 'عرض الكل'),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
-            child: _servicesGrid(context),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
-            child: _promo(),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _header(BuildContext context) {
+  Widget _header(AppState state) {
+    final user = state.user;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 30),
       decoration: const BoxDecoration(
@@ -77,23 +91,33 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 18)),
                   ],
                 ),
-                const CircleAvatar(
-                  radius: 19,
-                  backgroundColor: Colors.white24,
-                  child: Text('س',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w800)),
+                Row(
+                  children: [
+                    if (state.usingMockData) const DemoBadge(),
+                    if (state.usingMockData) const SizedBox(width: 8),
+                    CircleAvatar(
+                      radius: 19,
+                      backgroundColor: Colors.white24,
+                      child: Text(
+                        user?.avatarInitials ?? '؟',
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
             const Text('أهلاً بعودتك 👋',
                 style: TextStyle(color: Color(0xFFFFD9DA), fontSize: 13)),
-            const Text('سعود العتيبي',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800)),
+            Text(
+              user?.fullName ?? 'ضيف',
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800),
+            ),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -116,12 +140,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _activeServiceCard(BuildContext context) {
+  Widget _activeServiceCard(BuildContext context, BookingModel booking) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: GestureDetector(
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const TrackingScreen()),
+          MaterialPageRoute(
+            builder: (_) => TrackingScreen(bookingId: booking.id),
+          ),
         ),
         child: Container(
           padding: const EdgeInsets.all(14),
@@ -129,26 +155,31 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColors.ink900,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              IconBadge(Icons.build_outlined,
-                  bg: AppColors.red, fg: Colors.white),
-              SizedBox(width: 12),
+              IconBadge(
+                iconFromKey(booking.serviceIconKey),
+                bg: AppColors.red,
+                fg: Colors.white,
+              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('خدمة جارية',
+                    const Text('خدمة جارية',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w800)),
-                    Text('تغيير الزيت · الفني في الطريق',
-                        style:
-                            TextStyle(color: Color(0xFFC7C8CF), fontSize: 12)),
+                    Text(
+                      '${booking.serviceName ?? 'خدمة'} · ${booking.statusLabelAr}',
+                      style: const TextStyle(
+                          color: Color(0xFFC7C8CF), fontSize: 12),
+                    ),
                   ],
                 ),
               ),
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 15,
                 backgroundColor: Colors.white,
                 child: Icon(Icons.arrow_back,
@@ -161,17 +192,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _categories() {
+  Widget _categories(AppState state) {
     return SizedBox(
       height: 38,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: AppData.categories.length,
+        itemCount: state.categories.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
-          final active = i == _category;
+          final active = i == state.categoryIndex;
           return GestureDetector(
-            onTap: () => setState(() => _category = i),
+            onTap: () => state.selectCategory(i),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               alignment: Alignment.center,
@@ -182,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: active ? Colors.transparent : AppColors.line),
               ),
               child: Text(
-                AppData.categories[i].label,
+                state.categories[i].nameAr,
                 style: TextStyle(
                   color: active ? AppColors.red600 : AppColors.ink700,
                   fontWeight: FontWeight.w700,
@@ -196,11 +227,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _servicesGrid(BuildContext context) {
+  Widget _servicesGrid(BuildContext context, List<ServiceModel> services) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: AppData.services.length,
+      itemCount: services.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
@@ -208,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
         childAspectRatio: 1.25,
       ),
       itemBuilder: (_, i) {
-        final s = AppData.services[i];
+        final s = services[i];
         return GestureDetector(
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => BookingScreen(service: s)),
@@ -241,31 +272,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _promo() {
+  Widget _promo(AppState state) {
+    final promo = state.promotions.isNotEmpty ? state.promotions.first : null;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: AppColors.darkGradient,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('خصم على أول حجز',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15)),
-                Text('استخدم كود ROUSTO',
-                    style:
-                        TextStyle(color: Color(0xFFC7C8CF), fontSize: 12)),
+                Text(
+                  promo?.title ?? 'خصم على أول حجز',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15),
+                ),
+                Text(
+                  promo != null
+                      ? 'استخدم كود ${promo.code}'
+                      : 'استخدم كود ROUSTO',
+                  style: const TextStyle(
+                      color: Color(0xFFC7C8CF), fontSize: 12),
+                ),
               ],
             ),
           ),
-          Text('٢٥٪',
+          const Text('٢٥٪',
               style: TextStyle(
                   color: AppColors.red,
                   fontSize: 30,

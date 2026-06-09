@@ -13,7 +13,8 @@ rousto/
 │   └── colors.md          # دليل الألوان والخطوط
 ├── docs/                  # مواصفات المشروع
 │   ├── 01_DATABASE_SCHEMA.md
-│   └── 02_BACKEND_APIS.md
+│   ├── 02_BACKEND_APIS.md
+│   └── 03_MOBILE_APP_UI.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -79,6 +80,15 @@ cd rousto/backend && docker compose up -d
 المواصفات:
 - [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md)
 - [`docs/02_BACKEND_APIS.md`](docs/02_BACKEND_APIS.md)
+- [`docs/03_MOBILE_APP_UI.md`](docs/03_MOBILE_APP_UI.md)
+
+### تطبيق Flutter (متصل بالـ API)
+
+```bash
+cd rousto/backend && docker compose up -d
+cd rousto/app_flutter && flutter pub get
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
+```
 
 ## الهوية
 انظر [`brand/colors.md`](brand/colors.md) لدليل الألوان والخطوط الكامل.

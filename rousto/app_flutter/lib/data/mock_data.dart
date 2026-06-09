@@ -1,0 +1,181 @@
+import 'models.dart';
+
+/// بيانات تجريبية تُستخدم عند عدم توفر الـ API.
+class MockData {
+  MockData._();
+
+  static const user = UserModel(
+    id: 'a0000000-0000-4000-8000-000000000001',
+    fullName: 'سعود العتيبي',
+    email: 'saud@example.com',
+    avatarInitials: 'س',
+    loyaltyPoints: 320,
+    servicesCount: 14,
+    vehiclesCount: 2,
+  );
+
+  static final categories = <CategoryModel>[
+    CategoryModel(
+      id: 'all',
+      slug: 'all',
+      nameAr: 'الكل',
+      sortOrder: 0,
+      services: services,
+    ),
+    CategoryModel(
+      id: 'oil',
+      slug: 'oil',
+      nameAr: 'زيت',
+      sortOrder: 1,
+      services: [services[0]],
+    ),
+    CategoryModel(
+      id: 'tires',
+      slug: 'tires',
+      nameAr: 'إطارات',
+      sortOrder: 2,
+      services: [services[1]],
+    ),
+    CategoryModel(
+      id: 'brakes',
+      slug: 'brakes',
+      nameAr: 'فرامل',
+      sortOrder: 3,
+      services: [services[2]],
+    ),
+    CategoryModel(
+      id: 'ac',
+      slug: 'ac',
+      nameAr: 'تكييف',
+      sortOrder: 4,
+      services: [services[3]],
+    ),
+    CategoryModel(
+      id: 'electrical',
+      slug: 'electrical',
+      nameAr: 'كهرباء',
+      sortOrder: 5,
+      services: services.sublist(4),
+    ),
+  ];
+
+  static final services = <ServiceModel>[
+    const ServiceModel(
+      id: 'f0000000-0000-4000-8000-000000000001',
+      slug: 'oil-change',
+      name: 'تغيير الزيت والفلاتر',
+      subtitle: 'زيت أصلي + فحص شامل',
+      iconKey: 'oil_barrel',
+      priceSar: 120,
+      durationMinutes: 45,
+    ),
+    const ServiceModel(
+      id: 'f0000000-0000-4000-8000-000000000002',
+      slug: 'tires',
+      name: 'الإطارات والترصيص',
+      subtitle: 'موازنة وتبديل الإطارات',
+      iconKey: 'tire_repair',
+      priceSar: 90,
+      durationMinutes: 30,
+    ),
+    const ServiceModel(
+      id: 'f0000000-0000-4000-8000-000000000003',
+      slug: 'brakes',
+      name: 'نظام الفرامل',
+      subtitle: 'فحص واستبدال الفحمات',
+      iconKey: 'disc_full',
+      priceSar: 180,
+      durationMinutes: 60,
+    ),
+    const ServiceModel(
+      id: 'f0000000-0000-4000-8000-000000000004',
+      slug: 'ac',
+      name: 'تكييف وتبريد',
+      subtitle: 'تعبئة فريون وصيانة',
+      iconKey: 'ac_unit',
+      priceSar: 150,
+      durationMinutes: 50,
+    ),
+    const ServiceModel(
+      id: 'f0000000-0000-4000-8000-000000000005',
+      slug: 'battery',
+      name: 'البطارية والكهرباء',
+      subtitle: 'فحص وتركيب بطاريات',
+      iconKey: 'battery_charging',
+      priceSar: 110,
+      durationMinutes: 40,
+    ),
+    const ServiceModel(
+      id: 'f0000000-0000-4000-8000-000000000006',
+      slug: 'diagnostics',
+      name: 'فحص كمبيوتر شامل',
+      subtitle: 'تشخيص إلكتروني دقيق',
+      iconKey: 'laptop_mac',
+      priceSar: 75,
+      durationMinutes: 35,
+    ),
+  ];
+
+  static const activeBooking = BookingModel(
+    id: 'i0000000-0000-4000-8000-000000000001',
+    reference: 'RST-2026-001',
+    status: 'en_route',
+    statusLabelAr: 'جارية',
+    serviceName: 'تغيير الزيت والفلاتر',
+    serviceIconKey: 'oil_barrel',
+  );
+
+  static const vehicle = VehicleModel(
+    id: 'b0000000-0000-4000-8000-000000000001',
+    make: 'تويوتا',
+    model: 'كامري',
+    year: 2022,
+    color: 'أبيض',
+    plateNumber: 'أ ب ج 1234',
+    isDefault: true,
+  );
+
+  static const address = AddressModel(
+    id: 'c0000000-0000-4000-8000-000000000001',
+    label: 'المنزل',
+    district: 'حي النخيل',
+    city: 'الرياض',
+  );
+
+  static const paymentMethod = PaymentMethodModel(
+    id: 'd0000000-0000-4000-8000-000000000001',
+    labelAr: 'مدى **** 4421',
+  );
+
+  static const technician = TechnicianModel(
+    fullName: 'أحمد الفني',
+    rating: 4.9,
+    avatarInitials: 'أ',
+    etaMinutes: 12,
+  );
+
+  static const trackSteps = <TrackStepModel>[
+    TrackStepModel(title: 'تم تأكيد الحجز', time: '9:02 ص', status: TrackStatus.done),
+    TrackStepModel(title: 'تم تعيين الفني', time: '9:05 ص', status: TrackStatus.done),
+    TrackStepModel(
+      title: 'الفني في الطريق إليك',
+      time: 'الآن · 12 دقيقة',
+      status: TrackStatus.current,
+    ),
+    TrackStepModel(title: 'تنفيذ الخدمة', time: 'قيد الانتظار', status: TrackStatus.todo),
+    TrackStepModel(title: 'اكتمال الخدمة', time: 'قيد الانتظار', status: TrackStatus.todo),
+  ];
+
+  static const promotions = <PromotionModel>[
+    PromotionModel(
+      code: 'ROUSTO',
+      title: 'خصم 25٪ على أول حجز',
+      description: 'استخدم كود ROUSTO عند الدفع',
+    ),
+    PromotionModel(
+      code: 'GOLD2026',
+      title: 'باقة الصيانة الذهبية',
+      description: 'وفّر حتى 120 ريال سنوياً',
+    ),
+  ];
+}

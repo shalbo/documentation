@@ -1,14 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 
-class TrackingScreen extends StatelessWidget {
-  const TrackingScreen({super.key});
+class TrackingScreen extends StatefulWidget {
+  final String? bookingId;
+  const TrackingScreen({super.key, this.bookingId});
+
+  @override
+  State<TrackingScreen> createState() => _TrackingScreenState();
+}
+
+class _TrackingScreenState extends State<TrackingScreen> {
+  bool _loading = true;
+  BookingModel? _booking;
+  TechnicianModel? _technician;
+  List<TrackStepModel> _steps = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    final state = context.read<AppState>();
+    final bookingId = widget.bookingId ?? state.activeBooking?.id;
+    if (bookingId == null) {
+      setState(() => _loading = false);
+      return;
+    }
+
+    final repo = AppRepository();
+    final result = await repo.loadTracking(bookingId);
+    setState(() {
+      _booking = result.booking;
+      _technician = result.technician;
+      _steps = result.steps;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        backgroundColor: AppColors.bg,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_booking == null) {
+      return Scaffold(
+        backgroundColor: AppColors.bg,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.receipt_long_outlined,
+                    size: 48, color: AppColors.ink300),
+                const SizedBox(height: 12),
+                const Text('لا يوجد حجز جاري',
+                    style:
+                        TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                const SizedBox(height: 16),
+                GradientButton(label: 'تحديث', onPressed: _load),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
@@ -28,20 +97,22 @@ class TrackingScreen extends StatelessWidget {
                     color: const Color(0xFFFFF3D6),
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: const Text('جارية',
-                      style: TextStyle(
-                          color: Color(0xFFB07D00),
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12)),
+                  child: Text(
+                    _booking!.statusLabelAr,
+                    style: const TextStyle(
+                        color: Color(0xFFB07D00),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 14),
             _map(),
             const SizedBox(height: 14),
-            _technician(),
+            if (_technician != null) _technicianCard(_technician!),
             const SizedBox(height: 14),
-            _steps(),
+            _stepsCard(),
             const SizedBox(height: 14),
             GradientButton(
               label: 'مراسلة الفني',
@@ -96,32 +167,34 @@ class TrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget _technician() {
-    return const SoftCard(
+  Widget _technicianCard(TechnicianModel tech) {
+    return SoftCard(
       child: Row(
         children: [
           CircleAvatar(
             radius: 24,
             backgroundColor: AppColors.red,
-            child: Text('أ',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w800)),
+            child: Text(
+              tech.avatarInitials ?? tech.fullName.substring(0, 1),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w800),
+            ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('أحمد الفني',
-                    style: TextStyle(
+                Text(tech.fullName,
+                    style: const TextStyle(
                         fontWeight: FontWeight.w800, fontSize: 14)),
-                Text('★ 4.9 · يصل خلال 12 دقيقة',
-                    style:
-                        TextStyle(color: AppColors.ink500, fontSize: 12)),
+                Text(tech.subtitle,
+                    style: const TextStyle(
+                        color: AppColors.ink500, fontSize: 12)),
               ],
             ),
           ),
-          CircleAvatar(
+          const CircleAvatar(
             radius: 20,
             backgroundColor: AppColors.green,
             child: Icon(Icons.call, color: Colors.white, size: 18),
@@ -131,16 +204,13 @@ class TrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget _steps() {
+  Widget _stepsCard() {
     return SoftCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          for (int i = 0; i < AppData.trackSteps.length; i++)
-            _StepRow(
-              step: AppData.trackSteps[i],
-              isLast: i == AppData.trackSteps.length - 1,
-            ),
+          for (int i = 0; i < _steps.length; i++)
+            _StepRow(step: _steps[i], isLast: i == _steps.length - 1),
         ],
       ),
     );
@@ -148,13 +218,13 @@ class TrackingScreen extends StatelessWidget {
 }
 
 class _StepRow extends StatelessWidget {
-  final TrackStep step;
+  final TrackStepModel step;
   final bool isLast;
   const _StepRow({required this.step, required this.isLast});
 
   @override
   Widget build(BuildContext context) {
-    final color = AppData.statusColor(step.status);
+    final color = trackStatusColor(step.status);
     final icon = step.status == TrackStatus.done
         ? Icons.check
         : step.status == TrackStatus.current
