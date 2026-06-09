@@ -27,6 +27,8 @@ services:
       - ./database/013_vendor_location_schema.sql:/docker-entrypoint-initdb.d/013_vendor_location_schema.sql:ro
       - ./database/014_vendor_location_seed.sql:/docker-entrypoint-initdb.d/014_vendor_location_seed.sql:ro
       - ./database/016_customer_delivery_seed.sql:/docker-entrypoint-initdb.d/016_customer_delivery_seed.sql:ro
+      - ./database/017_towing_dispatch_schema.sql:/docker-entrypoint-initdb.d/017_towing_dispatch_schema.sql:ro
+      - ./database/018_towing_dispatch_seed.sql:/docker-entrypoint-initdb.d/018_towing_dispatch_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

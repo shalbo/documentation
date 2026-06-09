@@ -475,3 +475,45 @@ class VendorBankAccount(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     vendor: Mapped["Vendor"] = relationship(back_populates="bank_accounts")
+
+
+class TowingDispatch(Base):
+    __tablename__ = "towing_dispatches"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    reference: Mapped[str] = mapped_column(String(12), unique=True)
+    booking_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("bookings.id"), unique=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    technician_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
+    pickup_label: Mapped[str] = mapped_column(String(120))
+    pickup_lat: Mapped[float] = mapped_column(Numeric(10, 7))
+    pickup_lng: Mapped[float] = mapped_column(Numeric(10, 7))
+    dropoff_label: Mapped[str] = mapped_column(String(120))
+    dropoff_lat: Mapped[float] = mapped_column(Numeric(10, 7))
+    dropoff_lng: Mapped[float] = mapped_column(Numeric(10, 7))
+    status: Mapped[str] = mapped_column(String(30), default="pending")
+    total_route_km: Mapped[float | None] = mapped_column(Numeric(6, 2))
+    notes: Mapped[str | None] = mapped_column(Text)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    booking: Mapped["Booking"] = relationship()
+    technician: Mapped["Technician | None"] = relationship()
+    events: Mapped[list["TowingDispatchEvent"]] = relationship(
+        back_populates="dispatch", order_by="TowingDispatchEvent.occurred_at"
+    )
+
+
+class TowingDispatchEvent(Base):
+    __tablename__ = "towing_dispatch_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    dispatch_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("towing_dispatches.id"))
+    status: Mapped[str] = mapped_column(String(30))
+    label_ar: Mapped[str] = mapped_column(String(120))
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
+
+    dispatch: Mapped["TowingDispatch"] = relationship(back_populates="events")

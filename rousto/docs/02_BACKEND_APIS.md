@@ -286,6 +286,23 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### إرسال السطحات
+
+انظر [`12_TOWING_DISPATCH_MAP`](12_TOWING_DISPATCH_MAP.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| POST | `/api/v1/towing/dispatches` | إنشاء طلب سحب | Customer |
+| GET | `/api/v1/towing/dispatches/{id}/map` | خريطة الإرسال | Customer |
+| GET | `/api/v1/towing/dispatches/active/map` | خريطة الطلب النشط | Customer |
+| GET | `/api/v1/admin/towing/dispatches` | قائمة الإرسالات | Admin |
+| GET | `/api/v1/admin/towing/dispatches/map` | خريطة كل الإرسالات | Admin |
+| POST | `/api/v1/admin/towing/dispatches/{id}/dispatch` | تعيين سائق | Admin |
+| POST | `/api/v1/admin/towing/dispatches/{id}/advance` | التقدّم للمرحلة التالية | Admin |
+| PATCH | `/api/v1/admin/towing/dispatches/{id}/location` | تحديث GPS السطحة | Admin |
+
+---
+
 ### خريطة توصيل العميل
 
 انظر [`11_CUSTOMER_DELIVERY_MAP`](11_CUSTOMER_DELIVERY_MAP.md).
@@ -430,4 +447,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`09_VENDOR_ONBOARDING_FINANCIALS`](../docs/09_VENDOR_ONBOARDING_FINANCIALS.md) — انضمام الفنيين والمالية ✅
 - [`10_VENDOR_MAP_LOCATION`](../docs/10_VENDOR_MAP_LOCATION.md) — خريطة وموقع الفني ✅
 - [`11_CUSTOMER_DELIVERY_MAP`](../docs/11_CUSTOMER_DELIVERY_MAP.md) — خريطة توصيل العميل ✅
-- `12_AUTH` — OTP عبر الجوال + JWT
+- [`12_TOWING_DISPATCH_MAP`](../docs/12_TOWING_DISPATCH_MAP.md) — خريطة إرسال السطحات ✅
+- `13_AUTH` — OTP عبر الجوال + JWT

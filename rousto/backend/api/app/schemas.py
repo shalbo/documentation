@@ -352,3 +352,23 @@ class VendorLiveLocationIn(BaseModel):
 
 class VendorAvailabilityIn(BaseModel):
     is_available: bool
+
+
+class TowingDispatchCreateIn(BaseModel):
+    booking_id: UUID
+    pickup_label: str = Field(..., min_length=2, max_length=120)
+    pickup_lat: float = Field(ge=-90, le=90)
+    pickup_lng: float = Field(ge=-180, le=180)
+    dropoff_label: str = Field(..., min_length=2, max_length=120)
+    dropoff_lat: float = Field(ge=-90, le=90)
+    dropoff_lng: float = Field(ge=-180, le=180)
+    notes: str | None = Field(default=None, max_length=500)
+
+
+class TowingDispatchAssignIn(BaseModel):
+    technician_id: UUID
+
+
+class TowingLocationUpdateIn(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
