@@ -87,7 +87,7 @@ erDiagram
 | `name_ar` | VARCHAR(120) | اسم الخدمة |
 | `subtitle_ar` | VARCHAR(200) | وصف مختصر |
 | `icon_key` | VARCHAR(40) | مفتاح الأيقونة (oil_barrel…) |
-| `price_sar` | NUMERIC(10,2) | السعر بالريال |
+| `price_sar` | NUMERIC(10,2) | السعر بالدينار |
 | `duration_minutes` | SMALLINT | المدة بالدقائق |
 | `is_active` | BOOLEAN | |
 | `created_at` | TIMESTAMPTZ | |

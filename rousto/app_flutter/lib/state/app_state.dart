@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../currency.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
 
@@ -84,7 +85,7 @@ class AppState extends ChangeNotifier {
     if (result.ok) {
       loyaltyPoints = result.balance;
       notifyListeners();
-      return 'تم استبدال ${result.discount.round()} ريال خصم';
+      return 'تم استبدال ${formatAmount(result.discount)} خصم';
     }
     return null;
   }

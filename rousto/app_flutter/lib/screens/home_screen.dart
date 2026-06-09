@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import '../currency.dart';
 import '../data/models.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
@@ -259,7 +260,7 @@ class HomeScreen extends StatelessWidget {
                     style: const TextStyle(
                         color: AppColors.ink300, fontSize: 11)),
                 const SizedBox(height: 4),
-                Text('${s.price} ريال',
+                Text(formatAmount(s.price),
                     style: const TextStyle(
                         color: AppColors.red600,
                         fontWeight: FontWeight.w800,

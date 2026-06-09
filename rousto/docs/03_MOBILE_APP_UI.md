@@ -29,6 +29,7 @@
 ```
 app_flutter/lib/
 ├── main.dart
+├── currency.dart                # تسمية العملة (دينار)
 ├── config/app_config.dart       # عنوان API + معرّف المستخدم
 ├── api/api_client.dart          # عميل HTTP
 ├── data/

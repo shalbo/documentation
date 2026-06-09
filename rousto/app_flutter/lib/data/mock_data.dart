@@ -218,15 +218,15 @@ class MockData {
   static const loyaltyRewards = <LoyaltyRewardModel>[
     LoyaltyRewardModel(
       slug: 'discount-10',
-      title: 'خصم 10 ريال',
-      description: 'استبدل 100 نقطة بخصم 10 ريال',
+      title: 'خصم 10 دينار',
+      description: 'استبدل 100 نقطة بخصم 10 دينار',
       pointsCost: 100,
       discountSar: 10,
     ),
     LoyaltyRewardModel(
       slug: 'discount-30',
-      title: 'خصم 30 ريال',
-      description: 'استبدل 300 نقطة بخصم 30 ريال',
+      title: 'خصم 30 دينار',
+      description: 'استبدل 300 نقطة بخصم 30 دينار',
       pointsCost: 300,
       discountSar: 30,
     ),
@@ -248,7 +248,7 @@ class MockData {
     PromotionModel(
       code: 'GOLD2026',
       title: 'باقة الصيانة الذهبية',
-      description: 'وفّر حتى 120 ريال سنوياً',
+      description: 'وفّر حتى 120 دينار سنوياً',
     ),
   ];
 }

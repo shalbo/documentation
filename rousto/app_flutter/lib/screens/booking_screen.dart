@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../currency.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
 import '../state/app_state.dart';
@@ -97,7 +98,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       ],
                     ),
                   ),
-                  Text('${s.price} ريال',
+                  Text(formatAmount(s.price),
                       style: const TextStyle(
                           color: AppColors.red600,
                           fontWeight: FontWeight.w800)),
@@ -166,15 +167,15 @@ class _BookingScreenState extends State<BookingScreen> {
             SoftCard(
               child: Column(
                 children: [
-                  _summaryRow('الخدمة', '${s.price} ريال'),
+                  _summaryRow('الخدمة', formatAmount(s.price)),
                   const SizedBox(height: 6),
-                  _summaryRow('خصم (ROUSTO)', '- ${_discount.round()} ريال',
+                  _summaryRow('خصم (ROUSTO)', '- ${formatAmount(_discount)}',
                       color: AppColors.green),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(color: AppColors.line, height: 1),
                   ),
-                  _summaryRow('الإجمالي', '${_total.round()} ريال',
+                  _summaryRow('الإجمالي', formatAmount(_total),
                       bold: true, color: AppColors.red600),
                 ],
               ),
@@ -185,7 +186,7 @@ class _BookingScreenState extends State<BookingScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
         child: GradientButton(
-          label: 'تأكيد ودفع ${_total.round()} ريال',
+          label: 'تأكيد ودفع ${formatAmount(_total)}',
           onPressed: () => _confirm(context, s, vehicle, address, payment),
         ),
       ),

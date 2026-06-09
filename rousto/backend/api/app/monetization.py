@@ -19,7 +19,7 @@ from app.models import (
 PLATFORM_FEE_RATE = Decimal("0.15")
 TECHNICIAN_PAYOUT_RATE = Decimal("0.75")
 RESERVE_RATE = Decimal("0.10")
-POINTS_PER_SAR = 10
+POINTS_PER_DINAR = 10
 
 
 def get_active_membership(db: Session, user_id: UUID) -> UserMembership | None:
@@ -211,8 +211,8 @@ def get_monetization_summary(db: Session, user: User) -> dict:
         },
         "loyalty": {
             "balance": user.loyalty_points,
-            "points_per_sar": POINTS_PER_SAR,
-            "redeemable_sar": round(user.loyalty_points / POINTS_PER_SAR, 1),
+            "points_per_dinar": POINTS_PER_DINAR,
+            "redeemable_dinar": round(user.loyalty_points / POINTS_PER_DINAR, 1),
         },
         "packages_owned": 0,
         "lifetime_savings_sar": float(savings),

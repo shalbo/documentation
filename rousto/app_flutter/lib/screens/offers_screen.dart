@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../currency.dart';
 import '../data/models.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
@@ -93,7 +94,7 @@ class OffersScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'تكفي لخصم ${(points / 10).round()} ريال — 100 نقطة = 10 ريال',
+            'تكفي لخصم ${formatAmount(points / 10)} — 100 نقطة = ${formatAmount(10)}',
             style: const TextStyle(color: Color(0xFFFFE1E1), fontSize: 12),
           ),
         ],
@@ -138,7 +139,7 @@ class OffersScreen extends StatelessWidget {
                 Text(
                   plan.priceSar == 0
                       ? 'مجاني'
-                      : '${plan.priceSar.round()} ريال/شهر',
+                      : formatAmountPerMonth(plan.priceSar),
                   style: const TextStyle(
                       color: AppColors.red600,
                       fontWeight: FontWeight.w800,
@@ -206,7 +207,7 @@ class OffersScreen extends StatelessWidget {
                       style: const TextStyle(
                           color: AppColors.ink500, fontSize: 12)),
                   Text(
-                    '${p.visitsCount} زيارات · وفّر ${p.savingsSar.round()} ريال',
+                    '${p.visitsCount} زيارات · وفّر ${formatAmount(p.savingsSar)}',
                     style: const TextStyle(
                         color: AppColors.red600,
                         fontSize: 11,
@@ -215,7 +216,7 @@ class OffersScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Text('${p.priceSar.round()} ريال',
+            Text(formatAmount(p.priceSar),
                 style: const TextStyle(
                     fontWeight: FontWeight.w800, color: AppColors.ink900)),
           ],
