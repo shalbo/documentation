@@ -11,6 +11,11 @@ rousto/
 │   ├── logo.svg           # الرمز (البادج)
 │   ├── logo-wordmark.svg  # الشعار + الاسم
 │   └── colors.md          # دليل الألوان والخطوط
+├── docs/                  # مواصفات المشروع
+│   └── 01_DATABASE_SCHEMA.md
+├── backend/               # قاعدة البيانات (PostgreSQL)
+│   ├── docker-compose.yml
+│   └── database/          # 001_schema.sql, 002_seed.sql
 ├── web/                   # موقع الويب (متجاوب، RTL)
 │   ├── index.html
 │   ├── css/theme.css      # نظام التصميم (المتغيرات)
@@ -59,6 +64,16 @@ python3 -m http.server 8080
 3. تأكيد الحجز والدفع
 4. التتبّع المباشر للفني
 5. الملف الشخصي
+
+## قاعدة البيانات
+
+مخطط PostgreSQL كامل مع بيانات تجريبية:
+
+```bash
+cd rousto/backend && docker compose up -d
+```
+
+انظر [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md) للمواصفات الكاملة.
 
 ## الهوية
 انظر [`brand/colors.md`](brand/colors.md) لدليل الألوان والخطوط الكامل.

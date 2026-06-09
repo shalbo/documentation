@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: rousto-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rousto
+      POSTGRES_PASSWORD: rousto_dev
+      POSTGRES_DB: rousto
+      TZ: Asia/Riyadh
+    ports:
+      - "5432:5432"
+    volumes:
+      - rousto_pgdata:/var/lib/postgresql/data
+      - ./database/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./database/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  rousto_pgdata:
