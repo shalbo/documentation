@@ -587,3 +587,45 @@ class UserSecurityProfile(Base):
     )
     last_security_review_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class LandingHeroStat(Base):
+    __tablename__ = "landing_hero_stats"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    value_ar: Mapped[str] = mapped_column(String(40))
+    label_ar: Mapped[str] = mapped_column(String(80))
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class LandingPricingPlan(Base):
+    __tablename__ = "landing_pricing_plans"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    price_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    price_label_ar: Mapped[str] = mapped_column(String(60), default="شهرياً")
+    billing_period: Mapped[str] = mapped_column(String(20), default="monthly")
+    features: Mapped[list] = mapped_column(JSONB, default=list)
+    cta_text_ar: Mapped[str] = mapped_column(String(60), default="ابدأ الآن")
+    cta_url: Mapped[str | None] = mapped_column(String(200))
+    badge_ar: Mapped[str | None] = mapped_column(String(40))
+    is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class LandingPageFeature(Base):
+    __tablename__ = "landing_page_features"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    title_ar: Mapped[str] = mapped_column(String(120))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    icon_key: Mapped[str | None] = mapped_column(String(40))
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)

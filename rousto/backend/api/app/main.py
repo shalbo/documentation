@@ -8,6 +8,7 @@ from app.routers import (
     bookings,
     catalog,
     health,
+    landing,
     logistics,
     monetization,
     profile,
@@ -58,6 +59,7 @@ app.include_router(vendors.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)
 app.include_router(towing_dispatch.router, prefix=prefix)
 app.include_router(support.router, prefix=prefix)
+app.include_router(landing.router, prefix=prefix)
 
 
 @app.exception_handler(HTTPException)

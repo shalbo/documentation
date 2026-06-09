@@ -375,6 +375,8 @@ rousto/backend/database/
 ├── 018_towing_dispatch_seed.sql
 ├── 019_support_security_schema.sql
 ├── 020_support_security_seed.sql
+├── 021_landing_pricing_schema.sql
+├── 022_landing_pricing_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 

@@ -286,6 +286,17 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### صفحة الهبوط والأسعار
+
+انظر [`14_LANDING_PAGE_PRICING`](14_LANDING_PAGE_PRICING.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/landing/pricing` | خدمات + خطط تسويقية + اشتراكات + باقات | لا |
+| GET | `/api/v1/landing/page` | بيانات صفحة الهبوط (hero + pricing + features) | لا |
+
+---
+
 ### دعم العملاء والأمان
 
 انظر [`13_CUSTOMER_SUPPORT_AND_SECURITY`](13_CUSTOMER_SUPPORT_AND_SECURITY.md).
@@ -468,4 +479,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`11_CUSTOMER_DELIVERY_MAP`](../docs/11_CUSTOMER_DELIVERY_MAP.md) — خريطة توصيل العميل ✅
 - [`12_TOWING_DISPATCH_MAP`](../docs/12_TOWING_DISPATCH_MAP.md) — خريطة إرسال السطحات ✅
 - [`13_CUSTOMER_SUPPORT_AND_SECURITY`](../docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md) — دعم العملاء والأمان ✅
-- `14_AUTH` — OTP عبر الجوال + JWT
+- [`14_LANDING_PAGE_PRICING`](../docs/14_LANDING_PAGE_PRICING.md) — صفحة الهبوط والأسعار ✅
+- `15_AUTH` — OTP عبر الجوال + JWT

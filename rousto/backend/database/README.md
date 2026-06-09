@@ -17,7 +17,7 @@ On first start, PostgreSQL automatically runs:
 2. `002_seed.sql` — demo data (سعود العتيبي, active booking, services…)
 3. `003_monetization.sql` — membership plans, packages, revenue splits
 4. `004_monetization_seed.sql` — monetization demo data
-5. `005`–`016` — AI scans, logistics, split payments, vendors, customer delivery map
+5. `005`–`022` — AI scans, logistics, payments, vendors, delivery, towing, support, landing pricing
 
 ## Verify
 
