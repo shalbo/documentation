@@ -4,16 +4,23 @@ import 'package:http/http.dart' as http;
 
 import '../config/app_config.dart';
 import '../services/auth_storage.dart';
+import '../state/locale_state.dart';
 
 class ApiClient {
-  ApiClient({http.Client? client, String? baseUrl, String? userId})
-      : _client = client ?? http.Client(),
+  ApiClient({
+    http.Client? client,
+    String? baseUrl,
+    String? userId,
+    String? languageCode,
+  })  : _client = client ?? http.Client(),
         _baseUrl = baseUrl ?? AppConfig.apiBaseUrl,
-        _userId = userId ?? AppConfig.defaultUserId;
+        _userId = userId ?? AppConfig.defaultUserId,
+        _languageCode = languageCode ?? LocaleState.languageCode;
 
   final http.Client _client;
   final String _baseUrl;
   final String _userId;
+  final String _languageCode;
 
   Uri _uri(String path, [Map<String, String>? query]) {
     return Uri.parse('$_baseUrl${AppConfig.apiPrefix}$path')
@@ -31,8 +38,16 @@ class ApiClient {
     return {};
   }
 
+  Map<String, String> _headers({bool auth = false, bool json = false}) {
+    return {
+      'Accept-Language': _languageCode,
+      if (json) 'Content-Type': 'application/json',
+      if (auth) ..._authHeaders,
+    };
+  }
+
   Future<Map<String, dynamic>> _get(String path, {bool auth = false}) async {
-    final headers = auth ? _authHeaders : <String, String>{};
+    final headers = _headers(auth: auth);
     final response = await _client.get(_uri(path), headers: headers);
     _ensureSuccess(response);
     return jsonDecode(response.body) as Map<String, dynamic>;
@@ -43,13 +58,9 @@ class ApiClient {
     Map<String, dynamic> body, {
     bool auth = true,
   }) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      if (auth) ..._authHeaders,
-    };
     final response = await _client.post(
       _uri(path),
-      headers: headers,
+      headers: _headers(auth: auth, json: true),
       body: jsonEncode(body),
     );
     _ensureSuccess(response);
@@ -62,11 +73,11 @@ class ApiClient {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       final error = body['error'] as Map<String, dynamic>?;
       throw ApiException(
-        error?['message'] as String? ?? 'خطأ في الاتصال',
+        error?['message'] as String? ?? 'Connection error',
         statusCode: response.statusCode,
       );
     } catch (_) {
-      throw ApiException('خطأ في الاتصال (${response.statusCode})',
+      throw ApiException('Connection error (${response.statusCode})',
           statusCode: response.statusCode);
     }
   }
@@ -192,7 +203,7 @@ class ApiClient {
     required String filename,
   }) async {
     final request = http.MultipartRequest('POST', _uri('/scans'));
-    request.headers.addAll(_authHeaders);
+    request.headers.addAll(_headers(auth: true));
     request.fields['vehicle_id'] = vehicleId;
     request.fields['scan_type'] = scanType;
     request.files.add(
@@ -251,7 +262,7 @@ class ApiClient {
     if (category != null) query['category'] = category;
     final response = await _client.get(
       _uri('/me/notifications', query.isEmpty ? null : query),
-      headers: _authHeaders,
+      headers: _headers(auth: true),
     );
     _ensureSuccess(response);
     final parsed = jsonDecode(response.body) as Map<String, dynamic>;
@@ -292,13 +303,9 @@ class ApiClient {
     Map<String, dynamic> body, {
     bool auth = true,
   }) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      if (auth) ..._authHeaders,
-    };
     final response = await _client.put(
       _uri(path),
-      headers: headers,
+      headers: _headers(auth: auth, json: true),
       body: jsonEncode(body),
     );
     _ensureSuccess(response);
@@ -310,13 +317,9 @@ class ApiClient {
     Map<String, dynamic>? body,
     bool auth = true,
   }) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      if (auth) ..._authHeaders,
-    };
     final response = await _client.patch(
       _uri(path),
-      headers: headers,
+      headers: _headers(auth: auth, json: true),
       body: body != null ? jsonEncode(body) : null,
     );
     _ensureSuccess(response);

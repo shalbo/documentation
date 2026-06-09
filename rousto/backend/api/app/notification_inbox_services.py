@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models import Notification, NotificationTemplate, UserNotificationPreference
+from app.i18n import NOTIFICATION_CATEGORY_LABELS, label_from_map
+from app.models import Notification, NotificationTemplate, User, UserNotificationPreference
 
 NOTIFICATION_CATEGORIES = (
     "booking",
@@ -18,14 +19,8 @@ NOTIFICATION_CATEGORIES = (
     "system",
 )
 
-CATEGORY_LABELS_AR = {
-    "booking": "الحجوزات",
-    "support": "الدعم",
-    "towing": "السطحات",
-    "promo": "العروض",
-    "security": "الأمان",
-    "system": "النظام",
-}
+def category_label(category: str, locale: str = "ar") -> str:
+    return label_from_map(NOTIFICATION_CATEGORY_LABELS, category, locale)
 
 _TEMPLATE_RE = re.compile(r"\{\{(\w+)\}\}")
 
@@ -56,7 +51,9 @@ def get_category_prefs(
     return True, True
 
 
-def list_user_preferences(db: Session, user_id: uuid.UUID) -> list[dict]:
+def list_user_preferences(
+    db: Session, user_id: uuid.UUID, locale: str = "ar"
+) -> list[dict]:
     rows = db.scalars(
         select(UserNotificationPreference).where(
             UserNotificationPreference.user_id == user_id
@@ -69,7 +66,8 @@ def list_user_preferences(db: Session, user_id: uuid.UUID) -> list[dict]:
         data.append(
             {
                 "category": cat,
-                "category_label_ar": CATEGORY_LABELS_AR.get(cat, cat),
+                "category_label_ar": category_label(cat, "ar"),
+                "category_label": category_label(cat, locale),
                 "push_enabled": row.push_enabled if row else True,
                 "in_app_enabled": row.in_app_enabled if row else True,
             }
@@ -81,6 +79,7 @@ def update_user_preferences(
     db: Session,
     user_id: uuid.UUID,
     items: list[dict],
+    locale: str = "ar",
 ) -> list[dict]:
     now = _now()
     for item in items:
@@ -110,14 +109,15 @@ def update_user_preferences(
                 )
             )
     db.flush()
-    return list_user_preferences(db, user_id)
+    return list_user_preferences(db, user_id, locale)
 
 
-def notification_out(row: Notification) -> dict:
+def notification_out(row: Notification, locale: str = "ar") -> dict:
     return {
         "id": row.id,
         "category": row.category,
-        "category_label_ar": CATEGORY_LABELS_AR.get(row.category, row.category),
+        "category_label_ar": category_label(row.category, "ar"),
+        "category_label": category_label(row.category, locale),
         "template_slug": row.template_slug,
         "title": row.title,
         "body": row.body,
@@ -138,6 +138,7 @@ def list_notifications(
     category: str | None = None,
     limit: int = 50,
     offset: int = 0,
+    locale: str = "ar",
 ) -> tuple[list[dict], int]:
     query = select(Notification).where(Notification.user_id == user_id)
     count_query = select(func.count()).select_from(Notification).where(
@@ -155,7 +156,7 @@ def list_notifications(
     rows = db.scalars(
         query.order_by(Notification.created_at.desc()).limit(limit).offset(offset)
     ).all()
-    return [notification_out(r) for r in rows], total
+    return [notification_out(r, locale) for r in rows], total
 
 
 def unread_count(db: Session, user_id: uuid.UUID) -> int:
@@ -276,8 +277,16 @@ def notify_from_template(
     if not template:
         raise ValueError(f"قالب غير موجود: {template_slug}")
 
-    title = render_template(template.title_template, context)
-    body = render_template(template.body_template, context)
+    user = db.get(User, user_id)
+    locale = user.locale if user and user.locale in {"ar", "en"} else "ar"
+    if locale == "en" and template.title_template_en:
+        title = render_template(template.title_template_en, context)
+        body = render_template(
+            template.body_template_en or template.body_template, context
+        )
+    else:
+        title = render_template(template.title_template, context)
+        body = render_template(template.body_template, context)
     action_url = None
     if template.action_url_template:
         action_url = render_template(template.action_url_template, context)

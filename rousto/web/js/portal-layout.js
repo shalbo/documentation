@@ -2,15 +2,25 @@
   "use strict";
 
   var PAGES = [
-    { id: "home", href: "index.html", label: "الرئيسية" },
-    { id: "dashboard", href: "dashboard.html", label: "لوحتي" },
-    { id: "booking", href: "booking.html", label: "احجز" },
-    { id: "tracking", href: "delivery-map.html", label: "تتبّع" },
-    { id: "pricing", href: "pricing.html", label: "الأسعار" },
-    { id: "support", href: "support.html", label: "الدعم" },
-    { id: "notifications", href: "notifications.html", label: "الإشعارات" },
-    { id: "account", href: "account.html", label: "حسابي" },
+    { id: "home", href: "index.html", key: "nav.home" },
+    { id: "dashboard", href: "dashboard.html", key: "nav.dashboard" },
+    { id: "booking", href: "booking.html", key: "nav.booking" },
+    { id: "tracking", href: "delivery-map.html", key: "nav.tracking" },
+    { id: "pricing", href: "pricing.html", key: "nav.pricing" },
+    { id: "support", href: "support.html", key: "nav.support" },
+    { id: "notifications", href: "notifications.html", key: "nav.notifications" },
+    { id: "account", href: "account.html", key: "nav.account" },
   ];
+
+  function t(key, fallback) {
+    if (typeof RoustoI18n !== "undefined") return RoustoI18n.t(key) || fallback;
+    return fallback;
+  }
+
+  function langQuery() {
+    if (typeof RoustoI18n === "undefined") return "";
+    return "?lang=" + RoustoI18n.locale;
+  }
 
   function mountHeader(active) {
     var mount = document.getElementById("portalHeader");
@@ -18,36 +28,76 @@
 
     var links = PAGES.map(function (p) {
       var cls = p.id === active ? " active" : "";
-      return '<a class="portal-nav-link' + cls + '" href="' + p.href + '">' + p.label + "</a>";
+      var label = t(p.key, p.key);
+      return (
+        '<a class="portal-nav-link' +
+        cls +
+        '" href="' +
+        p.href +
+        langQuery() +
+        '">' +
+        label +
+        "</a>"
+      );
     }).join("");
 
     var authAction =
       typeof RoustoConfig !== "undefined" && RoustoConfig.isLoggedIn
-        ? '<button type="button" class="btn btn-ghost btn-sm" id="portalLogoutBtn">خروج</button>'
-        : '<a href="login.html" class="btn btn-ghost btn-sm">دخول</a>';
+        ? '<button type="button" class="btn btn-ghost btn-sm" id="portalLogoutBtn">' +
+          t("nav.logout", "Logout") +
+          "</button>"
+        : '<a href="login.html' +
+          langQuery() +
+          '" class="btn btn-ghost btn-sm">' +
+          t("nav.login", "Login") +
+          "</a>";
+
+    var nextLang = typeof RoustoI18n !== "undefined" && RoustoI18n.locale === "ar" ? "en" : "ar";
 
     mount.innerHTML =
       '<header class="portal-header">' +
       '<div class="portal-header-inner">' +
-      '<a href="index.html" class="portal-brand">' +
-      '<img src="../brand/logo.svg" alt="روستو" />' +
-      "<span>روستو</span></a>" +
-      '<nav class="portal-nav" id="portalNav">' + links + "</nav>" +
+      '<a href="index.html' +
+      langQuery() +
+      '" class="portal-brand">' +
+      '<img src="../brand/logo.svg" alt="' +
+      t("brand", "Rousto") +
+      '" />' +
+      "<span>" +
+      t("brand", "Rousto") +
+      "</span></a>" +
+      '<nav class="portal-nav" id="portalNav">' +
+      links +
+      "</nav>" +
       '<div class="portal-header-actions">' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="langSwitchBtn">' +
+      t("lang.switch", "English") +
+      "</button>" +
       authAction +
-      '<a href="booking.html" class="btn btn-primary btn-sm">احجز الآن</a>' +
-      '<button class="portal-nav-toggle" id="portalNavToggle" aria-label="القائمة">' +
+      '<a href="booking.html' +
+      langQuery() +
+      '" class="btn btn-primary btn-sm">' +
+      t("nav.bookNow", "Book now") +
+      "</a>" +
+      '<button class="portal-nav-toggle" id="portalNavToggle" aria-label="Menu">' +
       "<span></span><span></span><span></span></button>" +
       "</div></div></header>";
+
+    var langBtn = document.getElementById("langSwitchBtn");
+    if (langBtn && typeof RoustoI18n !== "undefined") {
+      langBtn.addEventListener("click", function () {
+        RoustoI18n.switchLocale(nextLang);
+      });
+    }
 
     var logoutBtn = document.getElementById("portalLogoutBtn");
     if (logoutBtn && typeof RoustoAPI !== "undefined") {
       logoutBtn.addEventListener("click", function () {
         RoustoAPI.logout().finally(function () {
           if (typeof RoustoToast === "function") {
-            RoustoToast("تم تسجيل الخروج");
+            RoustoToast(t("nav.logout", "Logged out"));
           }
-          window.location.href = "login.html";
+          window.location.href = "login.html" + langQuery();
         });
       });
     }
@@ -72,14 +122,16 @@
 
     mount.innerHTML =
       '<details class="portal-config">' +
-      "<summary>إعدادات الاتصال (تطوير)</summary>" +
+      "<summary>API settings (dev)</summary>" +
       '<div class="portal-config-grid">' +
-      '<div><label for="cfgApiBase">عنوان API</label>' +
+      '<div><label for="cfgApiBase">API URL</label>' +
       '<input id="cfgApiBase" type="url" /></div>' +
-      '<div><label for="cfgUserId">معرّف العميل</label>' +
+      '<div><label for="cfgUserId">Customer ID</label>' +
       '<input id="cfgUserId" type="text" /></div>' +
       "</div>" +
-      '<button type="button" class="btn btn-ghost btn-sm" id="cfgSaveBtn">حفظ</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="cfgSaveBtn">' +
+      t("common.save", "Save") +
+      "</button>" +
       "</details>";
 
     var apiInput = document.getElementById("cfgApiBase");
@@ -93,7 +145,7 @@
         RoustoConfig.apiBase = apiInput.value;
         RoustoConfig.userId = userInput.value;
         if (typeof RoustoToast === "function") {
-          RoustoToast("تم حفظ الإعدادات");
+          RoustoToast(t("common.save", "Saved"));
         }
         if (typeof window.onRoustoConfigSaved === "function") {
           window.onRoustoConfigSaved();
@@ -105,19 +157,48 @@
   function mountFooter() {
     var mount = document.getElementById("portalFooter");
     if (!mount) return;
+    var q = langQuery();
     mount.innerHTML =
       '<footer class="portal-footer">' +
       '<div class="portal-footer-inner">' +
-      "<span>© 2026 روستو — عناية ذكية بسيارتك</span>" +
-      '<a href="index.html">الموقع الرئيسي</a>' +
+      "<span>© 2026 " +
+      t("brand", "Rousto") +
+      "</span>" +
+      '<a href="privacy.html' +
+      q +
+      '">' +
+      t("footer.privacy", "Privacy") +
+      "</a>" +
+      '<a href="terms.html' +
+      q +
+      '">' +
+      t("footer.terms", "Terms") +
+      "</a>" +
+      '<a href="warranty.html' +
+      q +
+      '">' +
+      t("footer.warranty", "Warranty") +
+      "</a>" +
+      '<a href="index.html' +
+      q +
+      '">' +
+      t("nav.home", "Home") +
+      "</a>" +
       "</div></footer>";
   }
 
   function init() {
     var active = document.body.getAttribute("data-portal-page") || "";
-    mountHeader(active);
-    mountConfigPanel();
-    mountFooter();
+    var boot = function () {
+      mountHeader(active);
+      mountConfigPanel();
+      mountFooter();
+    };
+    if (typeof RoustoI18n !== "undefined") {
+      RoustoI18n.init().then(boot).catch(boot);
+    } else {
+      boot();
+    }
   }
 
   if (document.readyState === "loading") {

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../currency.dart';
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -32,11 +33,12 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _header(state),
+                _header(context, state),
                 if (state.activeBooking != null)
                   Transform.translate(
                     offset: const Offset(0, -16),
-                    child: _activeServiceCard(context, state.activeBooking!),
+                    child: _activeServiceCard(
+                        context, state.activeBooking!, state),
                   ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -47,9 +49,12 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: _categories(state),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(18, 16, 18, 0),
-                  child: RowHeader('الخدمات الشائعة', action: 'عرض الكل'),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+                  child: RowHeader(
+                    AppLocalizations.of(context)!.popularServices,
+                    action: AppLocalizations.of(context)!.viewAll,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
@@ -65,7 +70,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
-                  child: _promo(state),
+                  child: _promo(context, state),
                 ),
               ],
             ),
@@ -75,7 +80,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _header(AppState state) {
+  Widget _header(BuildContext context, AppState state) {
+    final l10n = AppLocalizations.of(context)!;
     final user = state.user;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 30),
@@ -95,8 +101,8 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     SvgPicture.asset('assets/logo.svg', height: 28),
                     const SizedBox(width: 8),
-                    const Text('روستو',
-                        style: TextStyle(
+                    Text(l10n.appTitle,
+                        style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             fontSize: 18)),
@@ -110,7 +116,7 @@ class HomeScreen extends StatelessWidget {
                       radius: 19,
                       backgroundColor: Colors.white24,
                       child: Text(
-                        user?.avatarInitials ?? '؟',
+                        user?.avatarInitials ?? l10n.unknownInitial,
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.w800),
                       ),
@@ -120,10 +126,10 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            const Text('أهلاً بعودتك 👋',
-                style: TextStyle(color: Color(0xFFE8C4C6), fontSize: 13)),
+            Text(l10n.welcomeBack,
+                style: const TextStyle(color: Color(0xFFE8C4C6), fontSize: 13)),
             Text(
-              user?.fullName ?? 'ضيف',
+              user?.fullName ?? l10n.guest,
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -136,12 +142,12 @@ class HomeScreen extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.search, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
-                  Text('ابحث عن خدمة…',
-                      style: TextStyle(color: Color(0xFFE8D0D2))),
+                  const Icon(Icons.search, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  Text(l10n.searchService,
+                      style: const TextStyle(color: Color(0xFFE8D0D2))),
                 ],
               ),
             ),
@@ -151,7 +157,10 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _activeServiceCard(BuildContext context, BookingModel booking) {
+  Widget _activeServiceCard(
+      BuildContext context, BookingModel booking, AppState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: GestureDetector(
@@ -186,12 +195,15 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('خدمة جارية',
-                        style: TextStyle(
+                    Text(l10n.activeService,
+                        style: const TextStyle(
                             color: AppColors.ink900,
                             fontWeight: FontWeight.w800)),
                     Text(
-                      '${booking.serviceName ?? 'خدمة'} · ${booking.statusLabelAr}',
+                      l10n.bookingStatusLine(
+                        booking.serviceName ?? l10n.service,
+                        booking.statusLabelAr,
+                      ),
                       style: const TextStyle(
                           color: AppColors.ink500, fontSize: 12),
                     ),
@@ -292,6 +304,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _pricingTeaser(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const PricingScreen()),
@@ -308,17 +321,18 @@ class HomeScreen extends StatelessWidget {
             const IconBadge(Icons.sell_outlined,
                 bg: AppColors.red050, fg: AppColors.red, size: 48),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('الأسعار والخطط',
-                      style: TextStyle(
+                  Text(l10n.pricingPlans,
+                      style: const TextStyle(
                           color: AppColors.ink900,
                           fontWeight: FontWeight.w800,
                           fontSize: 15)),
-                  Text('فردي · عائلي · أعمال — بالدينار',
-                      style: TextStyle(color: AppColors.ink500, fontSize: 12)),
+                  Text(l10n.pricingPlansSubtitle,
+                      style: const TextStyle(
+                          color: AppColors.ink500, fontSize: 12)),
                 ],
               ),
             ),
@@ -330,6 +344,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _aiScanCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const AiScanScreen()),
@@ -352,15 +367,15 @@ class HomeScreen extends StatelessWidget {
           children: [
             const IconBadge(Icons.document_scanner_outlined, size: 48),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('فحص بالصورة',
-                      style: TextStyle(
+                  Text(l10n.photoScan,
+                      style: const TextStyle(
                           fontWeight: FontWeight.w800, fontSize: 15)),
-                  Text('تشخيص مبدئي بالذكاء الاصطناعي',
-                      style: TextStyle(
+                  Text(l10n.photoScanSubtitle,
+                      style: const TextStyle(
                           color: AppColors.ink500, fontSize: 12)),
                 ],
               ),
@@ -372,7 +387,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _promo(AppState state) {
+  Widget _promo(BuildContext context, AppState state) {
+    final l10n = AppLocalizations.of(context)!;
     final promo = state.promotions.isNotEmpty ? state.promotions.first : null;
     return Container(
       padding: const EdgeInsets.all(16),
@@ -387,7 +403,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  promo?.title ?? 'خصم على أول حجز',
+                  promo?.title ?? l10n.firstBookingDiscount,
                   style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -395,16 +411,16 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Text(
                   promo != null
-                      ? 'استخدم كود ${promo.code}'
-                      : 'استخدم كود ROUSTO',
+                      ? l10n.useCode(promo.code)
+                      : l10n.useCode('ROUSTO'),
                   style: const TextStyle(
                       color: Color(0xFFC7C8CF), fontSize: 12),
                 ),
               ],
             ),
           ),
-          const Text('٢٥٪',
-              style: TextStyle(
+          Text(l10n.promoPercent,
+              style: const TextStyle(
                   color: AppColors.red,
                   fontSize: 30,
                   fontWeight: FontWeight.w800)),

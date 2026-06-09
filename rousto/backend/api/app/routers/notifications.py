@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.i18n import resolve_locale
 from app.deps import get_current_user, require_admin_key
 from app.models import User
 from app.notification_inbox_services import (
@@ -50,6 +51,7 @@ def get_my_notifications(
     category: str | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
+    locale: str = Depends(resolve_locale),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -65,8 +67,12 @@ def get_my_notifications(
         category=category,
         limit=limit,
         offset=offset,
+        locale=locale,
     )
-    return {"data": data, "meta": {"total": total, "unread": unread_count(db, user.id)}}
+    return {
+        "data": data,
+        "meta": {"total": total, "unread": unread_count(db, user.id), "locale": locale},
+    }
 
 
 @router.get("/me/notifications/unread-count")
@@ -105,16 +111,18 @@ def post_read_all(
 
 @router.get("/me/notification-preferences")
 def get_preferences(
+    locale: str = Depends(resolve_locale),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    data = list_user_preferences(db, user.id)
+    data = list_user_preferences(db, user.id, locale)
     return {"data": data, "meta": {"total": len(data)}}
 
 
 @router.put("/me/notification-preferences")
 def put_preferences(
     body: PreferencesUpdateIn,
+    locale: str = Depends(resolve_locale),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -123,6 +131,7 @@ def put_preferences(
             db,
             user.id,
             [p.model_dump() for p in body.preferences],
+            locale=locale,
         )
         db.commit()
     except ValueError as exc:

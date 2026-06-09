@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -97,8 +98,19 @@ class _TrackingScreenState extends State<TrackingScreen> {
     );
   }
 
+  String _distanceText(AppLocalizations l10n) {
+    if (_distanceKm == null) return '';
+    final distance = _distanceKm!.toStringAsFixed(1);
+    if (_technician?.etaMinutes != null) {
+      return l10n.distanceWithEta(distance, _technician!.etaMinutes!);
+    }
+    return l10n.distanceKm(distance);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_loading) {
       return const Scaffold(
         backgroundColor: AppColors.bg,
@@ -117,11 +129,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 const Icon(Icons.receipt_long_outlined,
                     size: 48, color: AppColors.ink300),
                 const SizedBox(height: 12),
-                const Text('لا يوجد حجز جاري',
-                    style:
-                        TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                Text(l10n.noActiveBooking,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800, fontSize: 16)),
                 const SizedBox(height: 16),
-                GradientButton(label: 'تحديث', onPressed: _load),
+                GradientButton(label: l10n.refresh, onPressed: _load),
               ],
             ),
           ),
@@ -141,8 +153,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('تتبّع الخدمة',
-                      style: TextStyle(
+                  Text(l10n.trackService,
+                      style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.w800)),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -191,8 +203,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
               if (_distanceKm != null) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'المسافة ${_distanceKm!.toStringAsFixed(1)} كم'
-                  '${_technician?.etaMinutes != null ? ' · يصل خلال ${_technician!.etaMinutes} دقيقة' : ''}',
+                  _distanceText(l10n),
                   style: const TextStyle(color: AppColors.ink500, fontSize: 12),
                 ),
               ],
@@ -204,7 +215,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
               _stepsCard(),
               const SizedBox(height: 14),
               GradientButton(
-                label: 'مراسلة الفني',
+                label: l10n.messageTechnician,
                 icon: Icons.chat_bubble_outline,
                 gradient: const LinearGradient(
                     colors: [AppColors.ink900, AppColors.ink700]),

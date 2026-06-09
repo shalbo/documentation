@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
@@ -39,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إرسال الرمز')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.codeSent)),
         );
       }
     } catch (e) {
@@ -78,9 +79,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
-      appBar: AppBar(title: const Text('تسجيل الدخول')),
+      appBar: AppBar(title: Text(l10n.login)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -89,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               controller: _phoneCtrl,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'رقم الجوال'),
+              decoration: InputDecoration(labelText: l10n.phoneNumber),
             ),
             const SizedBox(height: 16),
             if (_otpSent) ...[
@@ -97,8 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _codeCtrl,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'رمز التحقق',
-                  helperText: _devOtp != null ? 'وضع التطوير: $_devOtp' : null,
+                  labelText: l10n.verificationCode,
+                  helperText: _devOtp != null
+                      ? l10n.devOtpHelper(_devOtp!)
+                      : null,
                 ),
               ),
               const SizedBox(height: 16),
@@ -111,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_otpSent ? 'تأكيد الدخول' : 'إرسال الرمز'),
+                  : Text(_otpSent ? l10n.confirmLogin : l10n.sendCode),
             ),
           ],
         ),

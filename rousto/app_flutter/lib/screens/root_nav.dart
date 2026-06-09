@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import 'booking_screen.dart';
 import 'home_screen.dart';
@@ -32,6 +33,8 @@ class _RootNavState extends State<RootNav> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       extendBody: true,
       body: IndexedStack(index: _index, children: _pages),
@@ -65,11 +68,11 @@ class _RootNavState extends State<RootNav> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _tab(0, Icons.home_filled, 'الرئيسية'),
-            _tab(1, Icons.receipt_long_outlined, 'طلباتي'),
+            _tab(0, Icons.home_filled, l10n.navHome),
+            _tab(1, Icons.receipt_long_outlined, l10n.navOrders),
             const SizedBox(width: 48),
-            _tab(2, Icons.card_giftcard_outlined, 'عروض'),
-            _tab(3, Icons.person_outline, 'حسابي'),
+            _tab(2, Icons.card_giftcard_outlined, l10n.navOffers),
+            _tab(3, Icons.person_outline, l10n.navAccount),
           ],
         ),
       ),

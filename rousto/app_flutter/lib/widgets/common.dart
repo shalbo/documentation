@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 
 /// شارة صغيرة (eyebrow) بخلفية حمراء فاتحة.
@@ -170,15 +171,16 @@ class DemoBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF3D6),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: const Text(
-        'وضع تجريبي',
-        style: TextStyle(
+      child: Text(
+        l10n.demoMode,
+        style: const TextStyle(
           color: Color(0xFFB07D00),
           fontWeight: FontWeight.w700,
           fontSize: 11,

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import 'scan_results_screen.dart';
@@ -79,10 +80,12 @@ class _AiScanScreenState extends State<AiScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: const Text('فحص بالصورة'),
+        title: Text(l10n.aiScan),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink900,
         elevation: 0,
@@ -92,15 +95,16 @@ class _AiScanScreenState extends State<AiScanScreen> {
           : ListView(
               padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
               children: [
-                const Eyebrow('ذكاء اصطناعي'),
+                Eyebrow(l10n.artificialIntelligence),
                 const SizedBox(height: 8),
-                const Text(
-                  'التقط صورة للمشكلة واحصل على تشخيص مبدئي وخدمة مقترحة',
-                  style: TextStyle(color: AppColors.ink500, fontSize: 14),
+                Text(
+                  l10n.aiScanDescription,
+                  style: const TextStyle(color: AppColors.ink500, fontSize: 14),
                 ),
                 const SizedBox(height: 18),
-                const Text('نوع الفحص',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                Text(l10n.scanType,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800, fontSize: 14)),
                 const SizedBox(height: 10),
                 ...List.generate(_types.length, (i) {
                   final t = _types[i];
@@ -164,14 +168,15 @@ class _AiScanScreenState extends State<AiScanScreen> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: AppColors.line),
                           ),
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_a_photo_outlined,
+                              const Icon(Icons.add_a_photo_outlined,
                                   color: AppColors.ink300, size: 36),
-                              SizedBox(height: 8),
-                              Text('لم تُختَر صورة بعد',
-                                  style: TextStyle(color: AppColors.ink500)),
+                              const SizedBox(height: 8),
+                              Text(l10n.noImageSelected,
+                                  style: const TextStyle(
+                                      color: AppColors.ink500)),
                             ],
                           ),
                         ),
@@ -182,7 +187,7 @@ class _AiScanScreenState extends State<AiScanScreen> {
                             child: OutlinedButton.icon(
                               onPressed: _pickImage,
                               icon: const Icon(Icons.photo_library_outlined),
-                              label: const Text('اختيار صورة'),
+                              label: Text(l10n.chooseImage),
                             ),
                           ),
                         ],
@@ -192,7 +197,7 @@ class _AiScanScreenState extends State<AiScanScreen> {
                 ),
                 const SizedBox(height: 16),
                 GradientButton(
-                  label: _submitting ? 'جاري التحليل...' : 'تحليل الصورة',
+                  label: _submitting ? l10n.analyzing : l10n.analyzeImage,
                   onPressed:
                       (_imageBytes == null || _submitting) ? null : _submit,
                 ),

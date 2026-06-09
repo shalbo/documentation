@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../api/api_client.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 
@@ -64,24 +65,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await _api.updateNotificationPreferences(_prefs);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم حفظ التفضيلات')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.preferencesSaved)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text('الإشعارات',
-            style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(l10n.notifications,
+            style: const TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           if (_unread > 0)
             TextButton(
               onPressed: _markAllRead,
-              child: const Text('قراءة الكل'),
+              child: Text(l10n.markAllRead),
             ),
           IconButton(onPressed: _load, icon: const Icon(Icons.refresh)),
         ],
@@ -97,23 +100,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Chip(
-                          label: Text('$_unread غير مقروء'),
+                          label: Text(l10n.unreadCount(_unread)),
                           backgroundColor: AppColors.red050,
                         ),
                       ),
                     if (_items.isEmpty)
-                      const SoftCard(
+                      SoftCard(
                         child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text('لا توجد إشعارات',
+                          padding: const EdgeInsets.all(16),
+                          child: Text(l10n.noNotifications,
                               textAlign: TextAlign.center),
                         ),
                       )
                     else
                       ..._items.map(_notifCard),
                     const SizedBox(height: 20),
-                    const Text('تفضيلات الإشعارات',
-                        style: TextStyle(
+                    Text(l10n.notificationPreferences,
+                        style: const TextStyle(
                             fontWeight: FontWeight.w800, fontSize: 16)),
                     const SizedBox(height: 10),
                     SoftCard(
@@ -121,7 +124,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         children: [
                           for (var i = 0; i < _prefs.length; i++) ...[
                             if (i > 0) const Divider(height: 1),
-                            _prefRow(i),
+                            _prefRow(i, l10n),
                           ],
                         ],
                       ),
@@ -135,7 +138,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           backgroundColor: AppColors.red,
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text('حفظ التفضيلات'),
+                        child: Text(l10n.savePreferences),
                       ),
                     ),
                   ],
@@ -199,7 +202,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _prefRow(int index) {
+  Widget _prefRow(int index, AppLocalizations l10n) {
     final p = _prefs[index];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -213,17 +216,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Expanded(
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('داخل التطبيق', style: TextStyle(fontSize: 13)),
+                  title: Text(l10n.inApp,
+                      style: const TextStyle(fontSize: 13)),
                   value: p['in_app_enabled'] == true,
-                  onChanged: (v) => setState(() => _prefs[index]['in_app_enabled'] = v),
+                  onChanged: (v) =>
+                      setState(() => _prefs[index]['in_app_enabled'] = v),
                 ),
               ),
               Expanded(
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Push', style: TextStyle(fontSize: 13)),
+                  title: Text(l10n.push,
+                      style: const TextStyle(fontSize: 13)),
                   value: p['push_enabled'] == true,
-                  onChanged: (v) => setState(() => _prefs[index]['push_enabled'] = v),
+                  onChanged: (v) =>
+                      setState(() => _prefs[index]['push_enabled'] = v),
                 ),
               ),
             ],

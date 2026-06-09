@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,7 @@ from app.config import settings
 from app.db import get_db
 from app.deps import get_current_user
 from app.models import User
+from app.rate_limit import check_rate_limit
 from app.scan_services import (
     create_scan_with_analysis,
     ensure_storage_dir,
@@ -30,12 +31,14 @@ def list_scan_types():
 
 @router.post("", status_code=201)
 async def create_scan(
+    request: Request,
     vehicle_id: UUID = Form(...),
     scan_type: str = Form(...),
     images: list[UploadFile] = File(...),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    check_rate_limit(request, suffix="scan_upload", limit=10)
     if not is_valid_scan_type(scan_type):
         raise HTTPException(
             status_code=400,

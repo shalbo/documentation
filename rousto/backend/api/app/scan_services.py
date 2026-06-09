@@ -50,15 +50,7 @@ async def save_scan_images(
         if mime not in ALLOWED_MIME:
             raise ValueError("نوع الصورة غير مدعوم — استخدم JPEG أو PNG أو WebP")
 
-        ext = {
-            "image/jpeg": ".jpg",
-            "image/png": ".png",
-            "image/webp": ".webp",
-        }[mime]
         image_id = uuid4()
-        filename = f"{index:02d}_{image_id.hex}{ext}"
-        storage_key = f"{scan_id}/{filename}"
-        target = storage_root / storage_key
         content = await upload.read()
         if not content:
             raise ValueError("الصورة فارغة")
@@ -66,8 +58,33 @@ async def save_scan_images(
             raise ValueError(
                 f"حجم الصورة يتجاوز الحد ({settings.max_upload_bytes // (1024 * 1024)} ميجابايت)"
             )
+
+        output_mime = "image/webp"
+        output_ext = ".webp"
+        try:
+            from io import BytesIO
+
+            from PIL import Image
+
+            img = Image.open(BytesIO(content))
+            if img.mode not in ("RGB", "RGBA"):
+                img = img.convert("RGB")
+            buf = BytesIO()
+            img.save(buf, format="WEBP", quality=82, method=4)
+            content = buf.getvalue()
+        except Exception:
+            output_mime = mime
+            output_ext = {
+                "image/jpeg": ".jpg",
+                "image/png": ".png",
+                "image/webp": ".webp",
+            }[mime]
+
+        filename = f"{index:02d}_{image_id.hex}{output_ext}"
+        storage_key = f"{scan_id}/{filename}"
+        target = storage_root / storage_key
         target.write_bytes(content)
-        saved.append((image_id, storage_key, mime, index))
+        saved.append((image_id, storage_key, output_mime, index))
     return saved
 
 

@@ -68,6 +68,18 @@ def post_towing_dispatch(
             detail={"code": "DISPATCH_ERROR", "message": str(exc)},
         ) from exc
 
+    try:
+        from app.notifications import notify_nearby_drivers_towing
+
+        notify_nearby_drivers_towing(
+            db,
+            dispatch=dispatch,
+            pickup_lat=body.pickup_lat,
+            pickup_lng=body.pickup_lng,
+        )
+    except Exception:
+        pass
+
     return {"data": build_towing_dispatch_map(db, dispatch)}
 
 

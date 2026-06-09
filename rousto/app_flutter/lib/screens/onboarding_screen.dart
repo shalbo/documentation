@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import 'root_nav.dart';
@@ -16,6 +17,8 @@ class OnboardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: Stack(
@@ -52,54 +55,54 @@ class OnboardingScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 18),
-                        const Text(
-                          'عناية ذكية بسيارتك',
-                          style: TextStyle(
+                        Text(
+                          l10n.onboardingTitle,
+                          style: const TextStyle(
                             color: AppColors.ink900,
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'احجز خدمة الصيانة في ثوانٍ وتابعها مباشرةً من هاتفك مع فنيّين معتمدين.',
-                          style: TextStyle(
+                        Text(
+                          l10n.onboardingSubtitle,
+                          style: const TextStyle(
                               color: AppColors.ink500, height: 1.6),
                         ),
-                          const SizedBox(height: 24),
-                          GradientButton(
-                            label: 'ابدأ الآن',
-                            icon: Icons.arrow_back,
-                            onPressed: () => _start(context),
-                          ),
-                          const SizedBox(height: 14),
-                          Center(
-                            child: GestureDetector(
-                              onTap: () => _start(context),
-                              child: const Text.rich(
-                                TextSpan(
-                                  text: 'لديك حساب؟ ',
-                                  style: TextStyle(color: AppColors.ink500),
-                                  children: [
-                                    TextSpan(
-                                      text: 'تسجيل الدخول',
-                                      style: TextStyle(
-                                        color: AppColors.red,
-                                        fontWeight: FontWeight.w800,
-                                      ),
+                        const SizedBox(height: 24),
+                        GradientButton(
+                          label: l10n.getStarted,
+                          icon: Icons.arrow_back,
+                          onPressed: () => _start(context),
+                        ),
+                        const SizedBox(height: 14),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () => _start(context),
+                            child: Text.rich(
+                              TextSpan(
+                                text: l10n.haveAccount,
+                                style: const TextStyle(color: AppColors.ink500),
+                                children: [
+                                  TextSpan(
+                                    text: l10n.login,
+                                    style: const TextStyle(
+                                      color: AppColors.red,
+                                      fontWeight: FontWeight.w800,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );

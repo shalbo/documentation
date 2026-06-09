@@ -132,6 +132,123 @@ def notify_support_reply(
         logger.warning("Support notification failed: %s", exc)
 
 
+def notify_customer_booking_created(db: Session, *, booking) -> None:
+    from app.i18n import BOOKING_EVENT_LABELS, label_from_map
+    from app.models import User
+
+    user = db.get(User, booking.user_id)
+    locale = user.locale if user and user.locale in {"ar", "en"} else "ar"
+    label = label_from_map(BOOKING_EVENT_LABELS, "confirmed", locale)
+    notify_booking_status_change(
+        db,
+        user_id=booking.user_id,
+        booking_ref=booking.reference,
+        status=booking.status,
+        label_ar=label,
+    )
+
+
+def notify_vendor_new_booking(db: Session, *, booking) -> None:
+    from app.models import UserVendorLink
+    from app.notification_inbox_services import dispatch_user_notification
+    from sqlalchemy import select
+
+    vendor_user_id = None
+    if booking.technician_id:
+        link = db.scalar(
+            select(UserVendorLink).where(UserVendorLink.vendor_id.isnot(None)).limit(1)
+        )
+        if link:
+            vendor_user_id = link.user_id
+
+    if not vendor_user_id:
+        return
+
+    try:
+        dispatch_user_notification(
+            db,
+            vendor_user_id,
+            category="booking",
+            title=f"New booking {booking.reference}",
+            body="A customer placed a new service booking.",
+            data={
+                "type": "vendor_new_booking",
+                "booking_ref": booking.reference,
+                "booking_id": str(booking.id),
+            },
+            send_push=True,
+        )
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        logger.warning("Vendor booking notification failed: %s", exc)
+
+
+def notify_nearby_drivers_towing(
+    db: Session,
+    *,
+    dispatch,
+    pickup_lat: float,
+    pickup_lng: float,
+    radius_km: float = 15.0,
+) -> int:
+    from app.logistics_services import haversine_km
+    from app.models import Technician, User, UserVendorLink
+    from app.notification_inbox_services import dispatch_user_notification
+    from sqlalchemy import select
+
+    technicians = db.scalars(
+        select(Technician).where(
+            Technician.is_available.is_(True),
+            Technician.current_lat.isnot(None),
+            Technician.current_lng.isnot(None),
+        )
+    ).all()
+
+    sent = 0
+    for tech in technicians:
+        dist = haversine_km(
+            float(tech.current_lat),
+            float(tech.current_lng),
+            pickup_lat,
+            pickup_lng,
+        )
+        if dist > radius_km:
+            continue
+
+        link = db.scalar(
+            select(UserVendorLink).where(UserVendorLink.vendor_id.isnot(None)).limit(1)
+        )
+        driver_user = db.scalar(select(User).where(User.phone == tech.phone))
+        user_id = driver_user.id if driver_user else (link.user_id if link else None)
+        if not user_id:
+            continue
+
+        try:
+            dispatch_user_notification(
+                db,
+                user_id,
+                category="towing",
+                title=f"Urgent towing request {dispatch.reference}",
+                body=f"Pickup within {round(dist, 1)} km — respond immediately.",
+                data={
+                    "type": "driver_towing_alert",
+                    "dispatch_ref": dispatch.reference,
+                    "dispatch_id": str(dispatch.id),
+                    "distance_km": str(round(dist, 1)),
+                    "priority": "high",
+                },
+                send_push=True,
+            )
+            sent += 1
+        except Exception as exc:
+            logger.warning("Driver towing alert failed: %s", exc)
+
+    if sent:
+        db.commit()
+    return sent
+
+
 def notify_towing_status_change(
     db: Session,
     *,

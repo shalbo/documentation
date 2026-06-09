@@ -21,3 +21,10 @@ def cached(ttl_seconds: int, key: str, loader: Callable[[], Any]) -> Any:
 def invalidate(key: str) -> None:
     with _lock:
         _store.pop(key, None)
+
+
+def invalidate_prefix(prefix: str) -> None:
+    with _lock:
+        for k in list(_store.keys()):
+            if k.startswith(prefix):
+                _store.pop(k, None)

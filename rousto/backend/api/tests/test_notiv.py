@@ -4,7 +4,7 @@ import pytest
 
 from app.notification_inbox_services import (
     NOTIFICATION_CATEGORIES,
-    CATEGORY_LABELS_AR,
+    category_label,
     get_category_prefs,
     render_template,
     update_user_preferences,
@@ -51,7 +51,8 @@ def test_render_template_missing_key_unit():
 
 def test_categories_defined_unit():
     assert "booking" in NOTIFICATION_CATEGORIES
-    assert CATEGORY_LABELS_AR["support"] == "الدعم"
+    assert category_label("support", "ar") == "الدعم"
+    assert category_label("support", "en") == "Support"
 
 
 def test_default_prefs_when_missing_unit():

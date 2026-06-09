@@ -65,6 +65,9 @@
         headers["X-User-Id"] = RoustoConfig.userId;
       }
     }
+    if (typeof RoustoI18n !== "undefined" && RoustoI18n.locale) {
+      headers["Accept-Language"] = RoustoI18n.locale;
+    }
     var res = await fetch(RoustoConfig.apiBase + "/api/v1" + path, {
       method: options.method || "GET",
       headers: headers,

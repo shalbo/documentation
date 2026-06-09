@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../currency.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -39,6 +40,8 @@ class _PricingScreenState extends State<PricingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: _loading
@@ -49,29 +52,29 @@ class _PricingScreenState extends State<PricingScreen> {
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 32),
                 children: [
-                  _hero(_data!),
+                  _hero(l10n, _data!),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(18, 20, 18, 0),
-                    child: const RowHeader('خطط الاشتراك'),
+                    child: RowHeader(l10n.subscriptionPlans),
                   ),
                   const SizedBox(height: 12),
                   _plans(_data!.marketingPlans),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
-                    child: const RowHeader('باقات الصيانة'),
+                    child: RowHeader(l10n.maintenancePackages),
                   ),
                   const SizedBox(height: 10),
-                  ..._data!.packages.map(_packageTile),
+                  ..._data!.packages.map((p) => _packageTile(context, p)),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
-                    child: const RowHeader('أسعار الخدمات'),
+                    child: RowHeader(l10n.servicePrices),
                   ),
                   const SizedBox(height: 10),
                   _servicesGrid(_data!.services),
                   if (_data!.features.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
-                      child: const RowHeader('لماذا روستو'),
+                      child: RowHeader(l10n.whyRousto),
                     ),
                     const SizedBox(height: 10),
                     _features(_data!.features),
@@ -82,7 +85,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  Widget _hero(LandingPricingModel data) {
+  Widget _hero(AppLocalizations l10n, LandingPricingModel data) {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
       decoration: const BoxDecoration(
@@ -102,22 +105,22 @@ class _PricingScreenState extends State<PricingScreen> {
                 ),
                 SvgPicture.asset('assets/logo.svg', height: 28),
                 const SizedBox(width: 8),
-                const Text('الأسعار',
-                    style: TextStyle(
+                Text(l10n.pricing,
+                    style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
                         fontSize: 18)),
               ],
             ),
             const SizedBox(height: 8),
-            const Text('خطط تناسب كل احتياج',
-                style: TextStyle(
+            Text(l10n.plansForEveryNeed,
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.w800)),
             const SizedBox(height: 6),
-            const Text('أسعار شفافة بالدينار — تُحدَّث من الخادم',
-                style: TextStyle(color: Color(0xFFFFE1E1), fontSize: 13)),
+            Text(l10n.transparentPricing,
+                style: const TextStyle(color: Color(0xFFFFE1E1), fontSize: 13)),
             const SizedBox(height: 18),
             Wrap(
               spacing: 20,
@@ -232,6 +235,7 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 
   void _onPlanTap(MarketingPlanModel plan) {
+    final l10n = AppLocalizations.of(context)!;
     if (plan.slug == 'individual') {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const BookingScreen()),
@@ -245,14 +249,15 @@ class _PricingScreenState extends State<PricingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(ok
-              ? 'تم الاشتراك في خطة ${plan.nameAr}'
-              : 'تعذّر الاشتراك — وضع تجريبي'),
+              ? l10n.subscribedToPlan(plan.nameAr)
+              : l10n.subscribeFailed),
         ),
       );
     });
   }
 
-  Widget _packageTile(ServicePackageModel p) {
+  Widget _packageTile(BuildContext context, ServicePackageModel p) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
       child: SoftCard(
@@ -272,7 +277,7 @@ class _PricingScreenState extends State<PricingScreen> {
                       style: const TextStyle(
                           color: AppColors.ink500, fontSize: 12)),
                   Text(
-                    '${p.visitsCount} زيارات · وفّر ${formatAmount(p.savingsSar)}',
+                    l10n.visitsSave(p.visitsCount, formatAmount(p.savingsSar)),
                     style: const TextStyle(
                         color: AppColors.red,
                         fontSize: 11,

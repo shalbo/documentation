@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import 'booking_screen.dart';
@@ -20,26 +21,27 @@ class ScanResultsScreen extends StatelessWidget {
     }
   }
 
-  String _severityLabel(String severity) {
+  String _severityLabel(AppLocalizations l10n, String severity) {
     switch (severity) {
       case 'high':
-        return 'عالي';
+        return l10n.severityHigh;
       case 'low':
-        return 'منخفض';
+        return l10n.severityLow;
       default:
-        return 'متوسط';
+        return l10n.severityMedium;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final finding = scan.primaryFinding;
     final service = finding?.suggestedService;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: const Text('نتائج الفحص'),
+        title: Text(l10n.scanResults),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink900,
         elevation: 0,
@@ -56,11 +58,13 @@ class ScanResultsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('تم التحليل',
-                          style: TextStyle(
+                      Text(l10n.analysisComplete,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w800, fontSize: 16)),
                       Text(
-                        'دقة تقديرية ${((finding?.confidence ?? 0) * 100).round()}٪',
+                        l10n.estimatedAccuracy(
+                          ((finding?.confidence ?? 0) * 100).round(),
+                        ),
                         style: const TextStyle(
                             color: AppColors.ink500, fontSize: 12),
                       ),
@@ -82,11 +86,12 @@ class ScanResultsScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _severityColor(f.severity).withValues(alpha: 0.12),
+                          color: _severityColor(f.severity)
+                              .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          'خطورة ${_severityLabel(f.severity)}',
+                          l10n.severity(_severityLabel(l10n, f.severity)),
                           style: TextStyle(
                             color: _severityColor(f.severity),
                             fontWeight: FontWeight.w800,
@@ -112,8 +117,8 @@ class ScanResultsScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('الخدمة المقترحة',
-                                  style: TextStyle(
+                              Text(l10n.suggestedService,
+                                  style: const TextStyle(
                                       color: AppColors.ink500, fontSize: 11)),
                               Text(f.suggestedService!.name,
                                   style: const TextStyle(
@@ -132,7 +137,7 @@ class ScanResultsScreen extends StatelessWidget {
           ],
           if (service != null)
             GradientButton(
-              label: 'احجز ${service.name}',
+              label: l10n.bookService(service.name),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(

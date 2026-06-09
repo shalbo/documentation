@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../currency.dart';
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -13,6 +14,8 @@ class OffersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         if (state.loading) {
@@ -31,8 +34,8 @@ class OffersScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('العروض والاشتراكات',
-                        style: TextStyle(
+                    Text(l10n.offersAndSubscriptions,
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w800)),
                     if (state.usingMockData) const DemoBadge(),
                   ],
@@ -49,48 +52,48 @@ class OffersScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.line),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.payments_outlined,
+                        const Icon(Icons.payments_outlined,
                             color: AppColors.red, size: 28),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('صفحة الأسعار الكاملة',
-                                  style: TextStyle(
+                              Text(l10n.fullPricingPage,
+                                  style: const TextStyle(
                                       color: AppColors.ink900,
                                       fontWeight: FontWeight.w800)),
-                              Text('خطط · باقات · أسعار الخدمات',
-                                  style: TextStyle(
+                              Text(l10n.fullPricingSubtitle,
+                                  style: const TextStyle(
                                       color: AppColors.ink500,
                                       fontSize: 12)),
                             ],
                           ),
                         ),
-                        Icon(Icons.chevron_left, color: AppColors.ink300),
+                        const Icon(Icons.chevron_left, color: AppColors.ink300),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 14),
-                _pointsCard(state.loyaltyPoints),
+                _pointsCard(context, state.loyaltyPoints),
                 const SizedBox(height: 18),
-                const RowHeader('خطط العضوية'),
+                RowHeader(l10n.membershipPlans),
                 const SizedBox(height: 10),
                 _membershipPlans(context, state),
                 const SizedBox(height: 18),
-                const RowHeader('باقات الصيانة'),
+                RowHeader(l10n.maintenancePackages),
                 const SizedBox(height: 10),
-                for (final p in state.servicePackages) _packageCard(p),
+                for (final p in state.servicePackages) _packageCard(context, p),
                 const SizedBox(height: 18),
-                const RowHeader('استبدال النقاط'),
+                RowHeader(l10n.redeemPoints),
                 const SizedBox(height: 10),
                 for (final r in state.loyaltyRewards)
                   _rewardCard(context, state, r),
                 const SizedBox(height: 18),
-                const RowHeader('عروض حصرية'),
+                RowHeader(l10n.exclusiveOffers),
                 const SizedBox(height: 10),
                 for (final o in state.promotions) _promoCard(o),
               ],
@@ -101,7 +104,8 @@ class OffersScreen extends StatelessWidget {
     );
   }
 
-  Widget _pointsCard(int points) {
+  Widget _pointsCard(BuildContext context, int points) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -111,8 +115,8 @@ class OffersScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('رصيد نقاطك',
-              style: TextStyle(color: Color(0xFFFFE1E1))),
+          Text(l10n.yourPointsBalance,
+              style: const TextStyle(color: Color(0xFFFFE1E1))),
           const SizedBox(height: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -123,16 +127,19 @@ class OffersScreen extends StatelessWidget {
                       fontSize: 40,
                       fontWeight: FontWeight.w800)),
               const SizedBox(width: 6),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child:
-                    Text('نقطة', style: TextStyle(color: Colors.white)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(l10n.points,
+                    style: const TextStyle(color: Colors.white)),
               ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
-            'تكفي لخصم ${formatAmount(points / 10)} — 100 نقطة = ${formatAmount(10)}',
+            l10n.pointsDiscountInfo(
+              formatAmount(points / 10),
+              formatAmount(10),
+            ),
             style: const TextStyle(color: Color(0xFFFFE1E1), fontSize: 12),
           ),
         ],
@@ -141,6 +148,7 @@ class OffersScreen extends StatelessWidget {
   }
 
   Widget _membershipPlans(BuildContext context, AppState state) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 170,
       child: ListView.separated(
@@ -176,7 +184,7 @@ class OffersScreen extends StatelessWidget {
                 const Spacer(),
                 Text(
                   plan.priceSar == 0
-                      ? 'مجاني'
+                      ? l10n.free
                       : formatAmountPerMonth(plan.priceSar),
                   style: const TextStyle(
                       color: AppColors.red600,
@@ -187,16 +195,16 @@ class OffersScreen extends StatelessWidget {
                   const SizedBox(height: 6),
                   GestureDetector(
                     onTap: () => _subscribe(context, state, plan),
-                    child: const Text('اشترك الآن',
-                        style: TextStyle(
+                    child: Text(l10n.subscribeNow,
+                        style: const TextStyle(
                             color: AppColors.red600,
                             fontWeight: FontWeight.w700,
                             fontSize: 12)),
                   ),
                 ],
                 if (isCurrent)
-                  const Text('خطتك الحالية',
-                      style: TextStyle(
+                  Text(l10n.yourCurrentPlan,
+                      style: const TextStyle(
                           color: AppColors.green,
                           fontWeight: FontWeight.w700,
                           fontSize: 11)),
@@ -213,20 +221,22 @@ class OffersScreen extends StatelessWidget {
     AppState state,
     MembershipPlanModel plan,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await state.subscribeToPlan(plan.slug);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           ok
-              ? 'تم الاشتراك في خطة ${plan.nameAr}'
-              : 'تعذّر الاشتراك — وضع تجريبي',
+              ? l10n.subscribedToPlan(plan.nameAr)
+              : l10n.subscribeFailed,
         ),
       ),
     );
   }
 
-  Widget _packageCard(ServicePackageModel p) {
+  Widget _packageCard(BuildContext context, ServicePackageModel p) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: SoftCard(
@@ -245,7 +255,7 @@ class OffersScreen extends StatelessWidget {
                       style: const TextStyle(
                           color: AppColors.ink500, fontSize: 12)),
                   Text(
-                    '${p.visitsCount} زيارات · وفّر ${formatAmount(p.savingsSar)}',
+                    l10n.visitsSave(p.visitsCount, formatAmount(p.savingsSar)),
                     style: const TextStyle(
                         color: AppColors.red600,
                         fontSize: 11,
@@ -268,13 +278,14 @@ class OffersScreen extends StatelessWidget {
     AppState state,
     LoyaltyRewardModel r,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final canRedeem = state.loyaltyPoints >= r.pointsCost;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: SoftCard(
         child: Row(
           children: [
-            IconBadge(Icons.card_giftcard_outlined, size: 44),
+            const IconBadge(Icons.card_giftcard_outlined, size: 44),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -286,7 +297,7 @@ class OffersScreen extends StatelessWidget {
                   Text(r.description,
                       style: const TextStyle(
                           color: AppColors.ink500, fontSize: 12)),
-                  Text('${r.pointsCost} نقطة',
+                  Text(l10n.pointsCost(r.pointsCost),
                       style: TextStyle(
                           color: canRedeem
                               ? AppColors.red600
@@ -306,8 +317,8 @@ class OffersScreen extends StatelessWidget {
                     color: AppColors.red050,
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: const Text('استبدال',
-                      style: TextStyle(
+                  child: Text(l10n.redeem,
+                      style: const TextStyle(
                           color: AppColors.red600,
                           fontWeight: FontWeight.w800,
                           fontSize: 12)),
@@ -324,11 +335,12 @@ class OffersScreen extends StatelessWidget {
     AppState state,
     LoyaltyRewardModel r,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final msg = await state.redeemReward(r.slug);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(msg ?? 'تعذّر الاستبدال'),
+        content: Text(msg ?? l10n.redeemFailed),
       ),
     );
   }
@@ -339,7 +351,7 @@ class OffersScreen extends StatelessWidget {
       child: SoftCard(
         child: Row(
           children: [
-            IconBadge(Icons.percent, size: 44),
+            const IconBadge(Icons.percent, size: 44),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

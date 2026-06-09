@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -21,6 +22,10 @@ from app.services import get_user_stats, vehicle_display_name
 router = APIRouter(tags=["profile"])
 
 
+class LocaleUpdateIn(BaseModel):
+    locale: str = Field(pattern="^(ar|en)$")
+
+
 @router.get("/me")
 def get_me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     stats = UserStats(**get_user_stats(db, user.id))
@@ -33,7 +38,18 @@ def get_me(user: User = Depends(get_current_user), db: Session = Depends(get_db)
         loyalty_points=user.loyalty_points,
         stats=stats,
     )
-    return {"data": payload.model_dump()}
+    return {"data": {**payload.model_dump(), "locale": user.locale}}
+
+
+@router.put("/me/locale")
+def update_locale(
+    body: LocaleUpdateIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user.locale = body.locale
+    db.commit()
+    return {"data": {"locale": user.locale}}
 
 
 @router.get("/me/vehicles")

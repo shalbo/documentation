@@ -5,6 +5,7 @@ from threading import Lock
 from fastapi import HTTPException, Request
 
 from app.config import settings
+from app.i18n import error_message, resolve_locale
 
 _lock = Lock()
 _buckets: dict[str, list[float]] = defaultdict(list)
@@ -16,11 +17,18 @@ def _client_key(request: Request, suffix: str = "") -> str:
     return f"{ip}:{suffix}" if suffix else ip
 
 
-def check_rate_limit(request: Request, *, suffix: str = "", limit: int | None = None) -> None:
+def check_rate_limit(
+    request: Request,
+    *,
+    suffix: str = "",
+    limit: int | None = None,
+    locale: str | None = None,
+) -> None:
     max_requests = limit or settings.rate_limit_per_minute
     window_sec = 60
     key = _client_key(request, suffix)
     now = time.time()
+    lang = locale or resolve_locale(request.headers.get("Accept-Language"))
 
     with _lock:
         hits = [t for t in _buckets[key] if now - t < window_sec]
@@ -29,7 +37,7 @@ def check_rate_limit(request: Request, *, suffix: str = "", limit: int | None = 
                 status_code=429,
                 detail={
                     "code": "RATE_LIMITED",
-                    "message": "تجاوزت الحد المسموح من المحاولات، حاول لاحقاً",
+                    "message": error_message("RATE_LIMITED", lang),
                 },
             )
         hits.append(now)

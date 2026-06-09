@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
-import 'notifications_screen.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<AppState>(
       builder: (context, state, _) {
         if (state.loading) {
@@ -22,29 +25,47 @@ class ProfileScreen extends StatelessWidget {
 
         final user = state.user;
         final mon = state.monetization;
-        final items = <(IconData, String, String)>[
-          (
+        final serviceCount = user?.servicesCount ?? 0;
+        final vehicleCount = user?.vehiclesCount ?? 0;
+
+        final items = <_ProfileItem>[
+          _ProfileItem(
             Icons.directions_car_filled_outlined,
-            'سياراتي',
-            '${user?.vehiclesCount ?? 0} مركبة'
+            l10n.myVehicles,
+            l10n.vehicleCount(vehicleCount),
           ),
-          (
+          _ProfileItem(
             Icons.receipt_long_outlined,
-            'سجل الطلبات',
-            '${user?.servicesCount ?? 0} خدمة سابقة'
+            l10n.orderHistory,
+            l10n.previousServicesCount(serviceCount),
           ),
-          (Icons.credit_card, 'طرق الدفع', 'مدى، آبل باي'),
-          (Icons.location_on_outlined, 'العناوين', 'المنزل، العمل'),
-          (
+          _ProfileItem(
+            Icons.credit_card,
+            l10n.paymentMethods,
+            l10n.paymentMethodsSubtitle,
+          ),
+          _ProfileItem(
+            Icons.location_on_outlined,
+            l10n.addresses,
+            l10n.addressesSubtitle,
+          ),
+          _ProfileItem(
             Icons.card_giftcard_outlined,
-            'المكافآت',
-            '${state.loyaltyPoints} نقطة متاحة'
+            l10n.rewards,
+            l10n.loyaltyPointsAvailable(state.loyaltyPoints),
           ),
-          (Icons.settings_outlined, 'الإعدادات', 'الإشعارات واللغة'),
-          (
+          _ProfileItem(
+            Icons.settings_outlined,
+            l10n.settings,
+            l10n.settingsSubtitle,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
+          ),
+          _ProfileItem(
             Icons.support_agent_outlined,
-            'الدعم والأمان',
-            'تذاكر الدعم والأسئلة الشائعة'
+            l10n.supportAndSafety,
+            l10n.supportSubtitle,
           ),
         ];
 
@@ -70,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
                         radius: 36,
                         backgroundColor: Colors.white,
                         child: Text(
-                          user?.avatarInitials ?? '؟',
+                          user?.avatarInitials ?? l10n.unknownInitial,
                           style: const TextStyle(
                               color: AppColors.red600,
                               fontSize: 26,
@@ -79,7 +100,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        user?.fullName ?? 'ضيف',
+                        user?.fullName ?? l10n.guest,
                         style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -99,8 +120,11 @@ class ProfileScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
-                            'عضوية ${mon.planNameAr}'
-                                '${mon.discountPercent > 0 ? ' · خصم ${mon.discountPercent}٪' : ''}',
+                            l10n.membership(mon.planNameAr) +
+                                (mon.discountPercent > 0
+                                    ? l10n.membershipDiscount(
+                                        mon.discountPercent)
+                                    : ''),
                             style: const TextStyle(
                                 color: Colors.white, fontSize: 12),
                           ),
@@ -118,12 +142,22 @@ class ProfileScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Row(
                       children: [
-                        _Stat('${user?.servicesCount ?? 0}', 'خدمة'),
-                        _Stat('${user?.vehiclesCount ?? 0}', 'سيارة'),
-                        _Stat('${state.loyaltyPoints}', 'نقطة'),
+                        _Stat(
+                          '${user?.servicesCount ?? 0}',
+                          serviceCount == 1
+                              ? l10n.serviceStat
+                              : l10n.servicesStat,
+                        ),
+                        _Stat(
+                          '${user?.vehiclesCount ?? 0}',
+                          vehicleCount == 1
+                              ? l10n.vehicleStat
+                              : l10n.vehiclesStat,
+                        ),
+                        _Stat('${state.loyaltyPoints}', l10n.pointsStat),
                         _Stat(
                           '${mon?.lifetimeSavingsSar.round() ?? 0}',
-                          'توفير',
+                          l10n.savingsStat,
                         ),
                       ],
                     ),
@@ -137,28 +171,21 @@ class ProfileScreen extends StatelessWidget {
                     for (final it in items) ...[
                       SoftCard(
                         child: InkWell(
-                          onTap: it.$2 == 'الإعدادات'
-                              ? () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          const NotificationsScreen(),
-                                    ),
-                                  )
-                              : null,
+                          onTap: it.onTap,
                           borderRadius: BorderRadius.circular(16),
                           child: Row(
                             children: [
-                              IconBadge(it.$1, size: 40),
+                              IconBadge(it.icon, size: 40),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(it.$2,
+                                    Text(it.title,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.w800,
                                             fontSize: 14)),
-                                    Text(it.$3,
+                                    Text(it.subtitle,
                                         style: const TextStyle(
                                             color: AppColors.ink500,
                                             fontSize: 12)),
@@ -182,6 +209,15 @@ class ProfileScreen extends StatelessWidget {
       },
     );
   }
+}
+
+class _ProfileItem {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  const _ProfileItem(this.icon, this.title, this.subtitle, {this.onTap});
 }
 
 class _Stat extends StatelessWidget {

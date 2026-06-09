@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
+from app.cache import invalidate_prefix
 from app.db import get_db
 from app.deps import require_admin_key
 from app.models import Service, ServiceCategory
@@ -22,6 +23,10 @@ from app.schemas import (
 router = APIRouter(prefix="/admin", tags=["admin-catalog"])
 
 PROTECTED_CATEGORY_SLUG = "all"
+
+
+def _bust_catalog_cache() -> None:
+    invalidate_prefix("categories_tree")
 
 
 def _category_out(category: ServiceCategory) -> dict:
@@ -140,6 +145,7 @@ def admin_create_category(
     db.add(category)
     try:
         db.commit()
+        _bust_catalog_cache()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(
@@ -176,6 +182,7 @@ def admin_update_category(
         setattr(category, field, value)
 
     db.commit()
+    _bust_catalog_cache()
     db.refresh(category)
     return {"data": _category_out(category)}
 
@@ -190,6 +197,7 @@ def admin_reorder_categories(
         category = _get_category_or_404(db, item.id)
         category.sort_order = item.sort_order
     db.commit()
+    _bust_catalog_cache()
     categories = db.scalars(
         select(ServiceCategory).order_by(ServiceCategory.sort_order)
     ).all()
@@ -242,6 +250,7 @@ def admin_create_service(
     db.add(service)
     try:
         db.commit()
+        _bust_catalog_cache()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(
@@ -279,5 +288,6 @@ def admin_update_service(
         setattr(service, field, value)
 
     db.commit()
+    _bust_catalog_cache()
     service = _get_service_or_404(db, service_id)
     return {"data": _service_out(service)}

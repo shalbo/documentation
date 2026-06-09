@@ -346,6 +346,15 @@ def create_booking(
         )
     db.commit()
     db.refresh(booking)
+
+    try:
+        from app.notifications import notify_customer_booking_created, notify_vendor_new_booking
+
+        notify_customer_booking_created(db, booking=booking)
+        notify_vendor_new_booking(db, booking=booking)
+    except Exception:
+        pass
+
     return load_booking(db, booking.id, user.id)
 
 

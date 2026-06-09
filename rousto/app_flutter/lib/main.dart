@@ -6,12 +6,14 @@ import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'config/app_config.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/login_screen.dart';
 import 'screens/root_nav.dart';
 import 'services/auth_storage.dart';
 import 'services/error_reporter.dart';
-import 'services/push_notifications.dart';
+import 'services/push_notifications.dart' show PushNotifications, appNavigatorKey;
 import 'state/app_state.dart';
+import 'state/locale_state.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -43,30 +45,38 @@ class RoustoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AppState()..load(),
-      child: MaterialApp(
-        title: 'روستو',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        builder: (context, child) {
-          final locale = Localizations.localeOf(context);
-          final isRtl = locale.languageCode == 'ar';
-          return Directionality(
-            textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-            child: child!,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()..load()),
+        ChangeNotifierProvider(create: (_) => LocaleState()..load()),
+      ],
+      child: Consumer<LocaleState>(
+        builder: (context, localeState, _) {
+          return MaterialApp(
+            navigatorKey: appNavigatorKey,
+            title: 'Rousto',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            locale: localeState.locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            builder: (context, child) {
+              final isRtl = localeState.isRtl;
+              return Directionality(
+                textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+                child: child!,
+              );
+            },
+            home: AuthStorage.instance.isLoggedIn
+                ? const RootNav()
+                : const LoginScreen(),
           );
         },
-        home: AuthStorage.instance.isLoggedIn
-            ? const RootNav()
-            : const LoginScreen(),
       ),
     );
   }

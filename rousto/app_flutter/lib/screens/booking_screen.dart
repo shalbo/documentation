@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../currency.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -19,7 +20,6 @@ class BookingScreen extends StatefulWidget {
 
 class _BookingScreenState extends State<BookingScreen> {
   final _repository = AppRepository();
-  static const _slots = ['السبت', 'الأحد 9 ص', 'الاثنين', 'الثلاثاء'];
 
   bool _loading = true;
   int _slot = 1;
@@ -30,6 +30,13 @@ class _BookingScreenState extends State<BookingScreen> {
   VehicleModel? _vehicle;
   AddressModel? _address;
   PaymentMethodModel? _payment;
+
+  List<String> _slots(AppLocalizations l10n) => [
+        l10n.slotSaturday,
+        l10n.slotSunday9am,
+        l10n.slotMonday,
+        l10n.slotTuesday,
+      ];
 
   @override
   void initState() {
@@ -61,11 +68,13 @@ class _BookingScreenState extends State<BookingScreen> {
     if (state.categories.isNotEmpty && state.categories.first.services.isNotEmpty) {
       return state.categories.first.services.first;
     }
-    throw StateError('لا توجد خدمات متاحة');
+    throw StateError(AppLocalizations.of(context)!.noServicesAvailable);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -76,9 +85,10 @@ class _BookingScreenState extends State<BookingScreen> {
     final vehicle = _vehicle!;
     final address = _address!;
     final payment = _payment!;
+    final slots = _slots(l10n);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('تأكيد الحجز')),
+      appBar: AppBar(title: Text(l10n.confirmBooking)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 6, 18, 100),
@@ -110,19 +120,19 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
             ),
             const SizedBox(height: 18),
-            const _Label('سيارتك'),
+            _Label(l10n.yourVehicle),
             _InfoRow(
               icon: Icons.directions_car_filled_outlined,
               title: vehicle.displayTitle,
               subtitle: vehicle.displaySubtitle,
             ),
             const SizedBox(height: 18),
-            const _Label('الموعد'),
+            _Label(l10n.appointment),
             SizedBox(
               height: 38,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: _slots.length,
+                itemCount: slots.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, i) {
                   final active = i == _slot;
@@ -140,7 +150,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                 ? Colors.transparent
                                 : AppColors.line),
                       ),
-                      child: Text(_slots[i],
+                      child: Text(slots[i],
                           style: TextStyle(
                             color: active
                                 ? AppColors.red600
@@ -154,32 +164,32 @@ class _BookingScreenState extends State<BookingScreen> {
               ),
             ),
             const SizedBox(height: 18),
-            const _Label('المكان'),
+            _Label(l10n.location),
             _InfoRow(
               icon: Icons.location_on_outlined,
               title: address.label,
               subtitle: address.displaySubtitle,
             ),
             const SizedBox(height: 18),
-            const _Label('طريقة الدفع'),
+            _Label(l10n.paymentMethod),
             _InfoRow(
               icon: Icons.credit_card,
               title: payment.labelAr,
-              subtitle: 'بطاقة افتراضية',
+              subtitle: l10n.virtualCard,
             ),
             const SizedBox(height: 18),
             SoftCard(
               child: Column(
                 children: [
-                  _summaryRow('الخدمة', formatAmount(s.price)),
+                  _summaryRow(l10n.serviceSummary, formatAmount(s.price)),
                   const SizedBox(height: 6),
-                  _summaryRow('خصم (ROUSTO)', '- ${formatAmount(_discount)}',
+                  _summaryRow(l10n.discountLabel, '- ${formatAmount(_discount)}',
                       color: AppColors.green),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Divider(color: AppColors.line, height: 1),
                   ),
-                  _summaryRow('الإجمالي', formatAmount(_total),
+                  _summaryRow(l10n.total, formatAmount(_total),
                       bold: true, color: AppColors.red600),
                 ],
               ),
@@ -190,8 +200,8 @@ class _BookingScreenState extends State<BookingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('توزيع الدفع',
-                        style: TextStyle(
+                    Text(l10n.paymentSplit,
+                        style: const TextStyle(
                             fontWeight: FontWeight.w800, fontSize: 13)),
                     const SizedBox(height: 8),
                     for (final leg in _splitPreview!.legs)
@@ -220,7 +230,7 @@ class _BookingScreenState extends State<BookingScreen> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
         child: GradientButton(
-          label: 'تأكيد ودفع ${formatAmount(_total)}',
+          label: l10n.confirmAndPay(formatAmount(_total)),
           onPressed: () => _confirm(context, s, vehicle, address, payment),
         ),
       ),
@@ -234,6 +244,7 @@ class _BookingScreenState extends State<BookingScreen> {
     AddressModel address,
     PaymentMethodModel payment,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await _repository.createBooking(
       serviceId: service.id,
       vehicleId: vehicle.id,
@@ -266,20 +277,18 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             const SizedBox(height: 14),
             Text(
-              ok ? 'تم تأكيد حجزك!' : 'تم حفظ الحجز محلياً',
+              ok ? l10n.bookingConfirmed : l10n.bookingSavedLocally,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             Text(
-              ok
-                  ? 'سيتواصل معك فريق روستو لتأكيد التفاصيل.'
-                  : 'تعذّر الاتصال بالخادم — تم الحفظ في الوضع التجريبي.',
+              ok ? l10n.bookingConfirmedDetail : l10n.bookingSavedDetail,
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.ink500),
             ),
             const SizedBox(height: 18),
             GradientButton(
-              label: 'تمام',
+              label: l10n.ok,
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();

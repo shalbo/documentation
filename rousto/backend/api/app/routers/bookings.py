@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
@@ -16,6 +16,7 @@ from app.services import (
     load_booking,
     serialize_booking,
 )
+from app.rate_limit import check_rate_limit
 from app.split_payments import get_booking_split
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
@@ -140,9 +141,11 @@ def get_booking_delivery_map(
 @router.post("", status_code=201)
 def post_booking(
     body: BookingCreateIn,
+    request: Request,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    check_rate_limit(request, suffix="booking_create", limit=20)
     try:
         booking = create_booking(
             db,
