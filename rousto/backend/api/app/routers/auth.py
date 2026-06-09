@@ -17,6 +17,7 @@ from app.config import settings
 from app.db import get_db
 from app.deps import get_current_principal, require_admin_key
 from app.rate_limit import check_rate_limit
+from app.security_audit import audit_security_event
 from app.models import Permission, Role, User, UserRole
 from app.permissions import ROLE_ADMIN, serialize_principal
 
@@ -80,6 +81,13 @@ def verify_otp_code(body: OtpVerifyIn, request: Request, db: Session = Depends(g
         return {"data": tokens}
     except ValueError as exc:
         db.rollback()
+        audit_security_event(
+            db,
+            request,
+            event_type="auth.otp_verify_failed",
+            severity="warn",
+            metadata={"phone": body.phone[-4:]},
+        )
         raise HTTPException(
             status_code=400,
             detail={"code": "OTP_VERIFY_FAILED", "message": str(exc)},

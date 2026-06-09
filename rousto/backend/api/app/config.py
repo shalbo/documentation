@@ -21,7 +21,13 @@ class Settings(BaseSettings):
     allow_legacy_headers: bool = True
     disable_openapi: bool = False
     rate_limit_per_minute: int = 5
+    admin_rate_limit_per_minute: int = 30
     max_upload_bytes: int = 5 * 1024 * 1024
+    max_request_body_bytes: int = 2 * 1024 * 1024
+    security_headers_enabled: bool = True
+    hsts_max_age: int = 31536000
+    trusted_hosts: str = ""
+    production_strict: bool = False
 
     # Caching (seconds)
     cache_categories_ttl: int = 300
@@ -54,7 +60,15 @@ class Settings(BaseSettings):
             warnings.append("ADMIN_API_KEY must be changed in production")
         if self.cors_origins == "*":
             warnings.append("CORS_ORIGINS should list explicit domains in production")
+        if not self.trusted_hosts.strip():
+            warnings.append("TRUSTED_HOSTS should be set in production")
+        if self.disable_openapi is False:
+            warnings.append("DISABLE_OPENAPI should be true in production")
         return warnings
+
+    @property
+    def trusted_host_list(self) -> list[str]:
+        return [h.strip() for h in self.trusted_hosts.split(",") if h.strip()]
 
 
 settings = Settings()

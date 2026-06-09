@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import get_db
 from app.deps import get_current_user, require_admin_key
 from app.models import SecurityAuditLog, SupportFaq, SupportTicket, User
@@ -281,6 +282,33 @@ def admin_reply_ticket(
 
     ticket = load_ticket(db, ticket_id)
     return {"data": ticket_detail(ticket)}
+
+
+@router.get("/admin/security/status")
+def admin_security_status(
+    _: None = Depends(require_admin_key),
+):
+    warnings = settings.validate_production() if settings.is_production else []
+    return {
+        "data": {
+            "environment": settings.environment,
+            "is_production": settings.is_production,
+            "security_headers_enabled": settings.security_headers_enabled,
+            "allow_legacy_headers": settings.allow_legacy_headers,
+            "otp_dev_mode": settings.otp_dev_mode,
+            "disable_openapi": settings.disable_openapi,
+            "trusted_hosts": settings.trusted_host_list,
+            "rate_limit_per_minute": settings.rate_limit_per_minute,
+            "admin_rate_limit_per_minute": settings.admin_rate_limit_per_minute,
+            "max_upload_bytes": settings.max_upload_bytes,
+            "max_request_body_bytes": settings.max_request_body_bytes,
+            "production_strict": settings.production_strict,
+            "sentry_enabled": bool(settings.sentry_dsn),
+            "fcm_enabled": settings.fcm_enabled,
+            "production_warnings": warnings,
+            "production_ready": len(warnings) == 0,
+        }
+    }
 
 
 @router.get("/admin/security/events")

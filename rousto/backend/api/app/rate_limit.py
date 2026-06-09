@@ -5,7 +5,7 @@ from threading import Lock
 from fastapi import HTTPException, Request
 
 from app.config import settings
-from app.i18n import error_message, resolve_locale
+from app.i18n import error_message, parse_locale
 
 _lock = Lock()
 _buckets: dict[str, list[float]] = defaultdict(list)
@@ -28,7 +28,7 @@ def check_rate_limit(
     window_sec = 60
     key = _client_key(request, suffix)
     now = time.time()
-    lang = locale or resolve_locale(request.headers.get("Accept-Language"))
+    lang = locale or parse_locale(request.headers.get("Accept-Language"))
 
     with _lock:
         hits = [t for t in _buckets[key] if now - t < window_sec]

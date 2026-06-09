@@ -1,11 +1,14 @@
 import logging
+import sys
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.config import settings
 from app.error_reporting import capture_exception, init_error_reporting
+from app.security_middleware import SecurityHeadersMiddleware
 from app.routers import (
     admin_catalog,
     admin_marketing,
@@ -56,6 +59,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+if settings.trusted_host_list:
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.trusted_host_list)
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 prefix = settings.api_prefix
 app.include_router(health.router, prefix=prefix)
 app.include_router(auth.router, prefix=prefix)
@@ -85,8 +93,12 @@ app.include_router(marketing.me_router, prefix=prefix)
 @app.on_event("startup")
 def on_startup() -> None:
     init_error_reporting()
-    for warning in settings.validate_production():
+    warnings = settings.validate_production()
+    for warning in warnings:
         logger.warning("Production config: %s", warning)
+    if settings.is_production and settings.production_strict and warnings:
+        logger.error("Production strict mode: refusing to start with %d config issues", len(warnings))
+        sys.exit(1)
 
 
 @app.exception_handler(HTTPException)

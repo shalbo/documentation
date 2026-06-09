@@ -28,6 +28,12 @@
     </section>
 
     <section class="card">
+      <h2>حالة التصلّب</h2>
+      <div id="statusGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:12px"></div>
+      <ul id="warningsList" style="color:#b45309;font-size:.9rem"></ul>
+    </section>
+
+    <section class="card">
       <h2>
         الأحداث
         <select id="severityFilter">
@@ -59,15 +65,37 @@
       setTimeout(() => el.classList.remove("show"), 2400);
     }
 
+    function renderStatus(status) {
+      const items = [
+        ["البيئة", status.environment],
+        ["رؤوس أمنية", status.security_headers_enabled ? "✓" : "—"],
+        ["Legacy headers", status.allow_legacy_headers ? "مفعّل" : "معطّل"],
+        ["OpenAPI", status.disable_openapi ? "معطّل" : "مفعّل"],
+        ["Rate limit إدارة", status.admin_rate_limit_per_minute + "/د"],
+        ["جاهز للإنتاج", status.production_ready ? "✓" : "—"],
+      ];
+      $("statusGrid").innerHTML = items.map(([l, v]) =>
+        `<div><b>${v}</b><div style="color:#888;font-size:.85rem">${l}</div></div>`
+      ).join("");
+      const warnings = status.production_warnings || [];
+      $("warningsList").innerHTML = warnings.length
+        ? warnings.map((w) => `<li>${w}</li>`).join("")
+        : "<li style='color:#666'>لا تحذيرات إنتاج</li>";
+    }
+
     async function refresh() {
       const apiBase = $("apiBase").value.replace(/\/$/, "");
       const adminKey = $("adminKey").value.trim();
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ apiBase, adminKey }));
+      const headers = { "X-Admin-Key": adminKey };
+
+      const statusRes = await fetch(`${apiBase}/api/v1/admin/security/status`, { headers });
+      const statusBody = await statusRes.json();
+      if (statusRes.ok) renderStatus(statusBody.data);
+
       const sev = $("severityFilter").value;
       const q = sev ? `?severity=${sev}` : "";
-      const res = await fetch(`${apiBase}/api/v1/admin/security/events${q}`, {
-        headers: { "X-Admin-Key": adminKey },
-      });
+      const res = await fetch(`${apiBase}/api/v1/admin/security/events${q}`, { headers });
       const body = await res.json();
       if (!res.ok) throw new Error(body?.error?.message || "خطأ");
       const tbody = $("eventsTable").querySelector("tbody");

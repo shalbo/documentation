@@ -6,6 +6,8 @@
 
 ---
 
+> **توسّع:** [`23_SECURITY_HARDENING`](23_SECURITY_HARDENING.md) — رؤوس HTTP، Trusted Hosts، تدقيق الدخول، rate limit إدارة.
+
 ## 1. الأمان والمصادقة
 
 | إجراء | التطبيق |

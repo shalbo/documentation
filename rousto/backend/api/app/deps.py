@@ -1,12 +1,14 @@
 import uuid
 
-from fastapi import Depends, Header, HTTPException
+from fastapi import Depends, Header, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth_services import decode_access_token
 from app.config import settings
 from app.db import get_db
+from app.rate_limit import check_rate_limit
+from app.security_audit import audit_security_event
 from app.models import User, UserVendorLink, Vendor
 from app.permissions import ROLE_ADMIN, AuthPrincipal, build_principal
 
@@ -51,6 +53,7 @@ def _verify_vendor_link(db: Session, user_id: uuid.UUID, vendor_id: uuid.UUID) -
 
 
 def get_current_principal(
+    request: Request,
     authorization: str | None = Header(default=None),
     x_user_id: str | None = Header(default=None, alias="X-User-Id"),
     db: Session = Depends(get_db),
@@ -65,6 +68,13 @@ def get_current_principal(
                 principal.vendor_id = uuid.UUID(payload["vendor_id"])
             return principal
         except ValueError as exc:
+            audit_security_event(
+                db,
+                request,
+                event_type="auth.invalid_token",
+                severity="warn",
+                metadata={"reason": str(exc)},
+            )
             raise HTTPException(
                 status_code=401,
                 detail={"code": "INVALID_TOKEN", "message": str(exc)},
@@ -72,6 +82,13 @@ def get_current_principal(
 
     if x_user_id:
         if not settings.allow_legacy_headers:
+            audit_security_event(
+                db,
+                request,
+                event_type="auth.legacy_disabled",
+                severity="warn",
+                metadata={"header": "X-User-Id"},
+            )
             raise HTTPException(
                 status_code=401,
                 detail={
@@ -98,10 +115,17 @@ def get_current_user(
 
 
 def require_admin_key(
+    request: Request,
     authorization: str | None = Header(default=None),
     x_admin_key: str | None = Header(default=None, alias="X-Admin-Key"),
     db: Session = Depends(get_db),
 ) -> None:
+    check_rate_limit(
+        request,
+        suffix="admin-api",
+        limit=settings.admin_rate_limit_per_minute,
+    )
+
     if x_admin_key and x_admin_key == settings.admin_api_key:
         return
 
@@ -117,6 +141,12 @@ def require_admin_key(
         except ValueError:
             pass
 
+    audit_security_event(
+        db,
+        request,
+        event_type="auth.admin_key_failed",
+        severity="critical",
+    )
     raise HTTPException(
         status_code=401,
         detail={"code": "UNAUTHORIZED", "message": "مفتاح الإدارة أو JWT مدير غير صالح"},
@@ -152,6 +182,7 @@ def require_permission(permission: str):
 
 
 def get_current_vendor(
+    request: Request,
     authorization: str | None = Header(default=None),
     x_vendor_id: str | None = Header(default=None, alias="X-Vendor-Id"),
     db: Session = Depends(get_db),
@@ -175,6 +206,13 @@ def get_current_vendor(
 
     if x_vendor_id:
         if not settings.allow_legacy_headers:
+            audit_security_event(
+                db,
+                request,
+                event_type="auth.legacy_disabled",
+                severity="warn",
+                metadata={"header": "X-Vendor-Id"},
+            )
             raise HTTPException(
                 status_code=401,
                 detail={

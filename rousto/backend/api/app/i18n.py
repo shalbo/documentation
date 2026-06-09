@@ -6,9 +6,9 @@ SUPPORTED_LOCALES = frozenset({"ar", "en"})
 DEFAULT_LOCALE = "ar"
 
 
-def resolve_locale(
-    accept_language: str | None = Header(default=None, alias="Accept-Language"),
-    lang: str | None = Query(default=None, alias="lang"),
+def parse_locale(
+    accept_language: str | None = None,
+    lang: str | None = None,
 ) -> str:
     if lang and lang.lower() in SUPPORTED_LOCALES:
         return lang.lower()
@@ -17,6 +17,13 @@ def resolve_locale(
         if primary in SUPPORTED_LOCALES:
             return primary
     return DEFAULT_LOCALE
+
+
+def resolve_locale(
+    accept_language: str | None = Header(default=None, alias="Accept-Language"),
+    lang: str | None = Query(default=None, alias="lang"),
+) -> str:
+    return parse_locale(accept_language, lang)
 
 
 def pick_localized(obj, field_base: str, locale: str, *, fallback: str = "") -> str:

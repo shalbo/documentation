@@ -405,6 +405,7 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 | POST | `/api/v1/me/security/report` | إبلاغ نشاط مشبوه | Customer |
 | GET | `/api/v1/admin/support/tickets` | كل التذاكر | Admin |
 | POST | `/api/v1/admin/support/tickets/{id}/reply` | رد الإدارة | Admin |
+| GET | `/api/v1/admin/security/status` | حالة التصلّب والإعدادات | Admin |
 | GET | `/api/v1/admin/security/events` | سجل الأحداث | Admin |
 
 ---
@@ -590,3 +591,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`18_ADVERTISING_AND_MARKETING_MODULE`](../docs/18_ADVERTISING_AND_MARKETING_MODULE.md) — حملات وبانرات وإحالات ✅
 - [`20_NOTIV`](../docs/20_NOTIV.md) — صندوق إشعارات in-app + FCM push ✅
 - [`22_CENTRALIZED_NOTIFICATION_ENGINE`](../docs/22_CENTRALIZED_NOTIFICATION_ENGINE.md) — محرك إشعارات مركزي + لوحة إدارة ✅
+- [`23_SECURITY_HARDENING`](../docs/23_SECURITY_HARDENING.md) — تصلّب أمني: رؤوس HTTP، تدقيق، rate limit إدارة ✅
