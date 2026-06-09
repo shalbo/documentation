@@ -320,6 +320,25 @@ erDiagram
 
 **أعمدة الموقع (013):** `base_lat`, `base_lng`, `service_radius_km` — انظر [`10_VENDOR_MAP_LOCATION`](10_VENDOR_MAP_LOCATION.md).
 
+### 22. `towing_dispatches` — إرسال السطحات
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `reference` | VARCHAR(12) | مرجع الإرسال (TOW-…) |
+| `pickup_lat/lng` | NUMERIC | موقع العطل |
+| `dropoff_lat/lng` | NUMERIC | موقع الورشة |
+| `status` | VARCHAR(30) | مراحل الإرسال |
+
+### 23. `towing_dispatch_events` — أحداث الإرسال
+
+انظر [`12_TOWING_DISPATCH_MAP`](12_TOWING_DISPATCH_MAP.md).
+
+### 24. `support_tickets` / `support_ticket_messages` — دعم العملاء
+
+### 25. `support_faq` · `security_audit_logs` · `user_security_profiles`
+
+انظر [`13_CUSTOMER_SUPPORT_AND_SECURITY`](13_CUSTOMER_SUPPORT_AND_SECURITY.md).
+
 ---
 
 ## الفهارس (Indexes)
@@ -354,6 +373,8 @@ rousto/backend/database/
 ├── 016_customer_delivery_seed.sql
 ├── 017_towing_dispatch_schema.sql
 ├── 018_towing_dispatch_seed.sql
+├── 019_support_security_schema.sql
+├── 020_support_security_seed.sql
 └── README.md         # تعليمات التشغيل
 ```
 

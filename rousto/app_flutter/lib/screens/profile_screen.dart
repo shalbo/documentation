@@ -40,6 +40,11 @@ class ProfileScreen extends StatelessWidget {
             '${state.loyaltyPoints} نقطة متاحة'
           ),
           (Icons.settings_outlined, 'الإعدادات', 'الإشعارات واللغة'),
+          (
+            Icons.support_agent_outlined,
+            'الدعم والأمان',
+            'تذاكر الدعم والأسئلة الشائعة'
+          ),
         ];
 
         return Scaffold(

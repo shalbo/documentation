@@ -372,3 +372,38 @@ class TowingDispatchAssignIn(BaseModel):
 class TowingLocationUpdateIn(BaseModel):
     lat: float = Field(ge=-90, le=90)
     lng: float = Field(ge=-180, le=180)
+
+
+class SupportTicketCreateIn(BaseModel):
+    category: str = Field(pattern=r"^(booking|payment|account|technical|other)$")
+    subject: str = Field(..., min_length=3, max_length=200)
+    message: str = Field(..., min_length=5, max_length=2000)
+    priority: str = Field(default="normal", pattern=r"^(low|normal|high|urgent)$")
+    booking_id: UUID | None = None
+
+
+class SupportTicketMessageIn(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000)
+
+
+class SupportTicketUpdateIn(BaseModel):
+    status: str | None = Field(
+        default=None,
+        pattern=r"^(open|in_progress|waiting_customer|resolved|closed)$",
+    )
+    priority: str | None = Field(
+        default=None,
+        pattern=r"^(low|normal|high|urgent)$",
+    )
+
+
+class SupportTicketReplyIn(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000)
+    status: str | None = Field(
+        default=None,
+        pattern=r"^(in_progress|waiting_customer|resolved|closed)$",
+    )
+
+
+class SecurityReportIn(BaseModel):
+    description: str = Field(..., min_length=10, max_length=500)

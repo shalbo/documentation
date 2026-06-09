@@ -23,7 +23,8 @@ rousto/
 │   ├── 09_VENDOR_ONBOARDING_FINANCIALS.md
 │   ├── 10_VENDOR_MAP_LOCATION.md
 │   ├── 11_CUSTOMER_DELIVERY_MAP.md
-│   └── 12_TOWING_DISPATCH_MAP.md
+│   ├── 12_TOWING_DISPATCH_MAP.md
+│   └── 13_CUSTOMER_SUPPORT_AND_SECURITY.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -66,6 +67,7 @@ python3 -m http.server 8080
 - موقع الويب: <http://localhost:8080/web/index.html>
 - خريطة التوصيل: <http://localhost:8080/web/delivery-map.html>
 - تتبّع السطحة: <http://localhost:8080/web/towing-map.html>
+- الدعم والأمان: <http://localhost:8080/web/support.html>
 - نموذج التطبيق: <http://localhost:8080/app/index.html>
 
 أو افتح ملفات `index.html` مباشرةً في المتصفح.
@@ -109,6 +111,7 @@ cd rousto/backend && docker compose up -d
 - [`docs/10_VENDOR_MAP_LOCATION.md`](docs/10_VENDOR_MAP_LOCATION.md)
 - [`docs/11_CUSTOMER_DELIVERY_MAP.md`](docs/11_CUSTOMER_DELIVERY_MAP.md)
 - [`docs/12_TOWING_DISPATCH_MAP.md`](docs/12_TOWING_DISPATCH_MAP.md)
+- [`docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md`](docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

@@ -286,6 +286,25 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### دعم العملاء والأمان
+
+انظر [`13_CUSTOMER_SUPPORT_AND_SECURITY`](13_CUSTOMER_SUPPORT_AND_SECURITY.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/support/faq` | الأسئلة الشائعة | لا |
+| POST | `/api/v1/support/tickets` | فتح تذكرة | Customer |
+| GET | `/api/v1/support/tickets` | تذاكري | Customer |
+| GET | `/api/v1/support/tickets/{id}` | تفاصيل التذكرة | Customer |
+| POST | `/api/v1/support/tickets/{id}/messages` | رد العميل | Customer |
+| GET | `/api/v1/me/security` | ملخص الأمان | Customer |
+| POST | `/api/v1/me/security/report` | إبلاغ نشاط مشبوه | Customer |
+| GET | `/api/v1/admin/support/tickets` | كل التذاكر | Admin |
+| POST | `/api/v1/admin/support/tickets/{id}/reply` | رد الإدارة | Admin |
+| GET | `/api/v1/admin/security/events` | سجل الأحداث | Admin |
+
+---
+
 ### إرسال السطحات
 
 انظر [`12_TOWING_DISPATCH_MAP`](12_TOWING_DISPATCH_MAP.md).
@@ -448,4 +467,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`10_VENDOR_MAP_LOCATION`](../docs/10_VENDOR_MAP_LOCATION.md) — خريطة وموقع الفني ✅
 - [`11_CUSTOMER_DELIVERY_MAP`](../docs/11_CUSTOMER_DELIVERY_MAP.md) — خريطة توصيل العميل ✅
 - [`12_TOWING_DISPATCH_MAP`](../docs/12_TOWING_DISPATCH_MAP.md) — خريطة إرسال السطحات ✅
-- `13_AUTH` — OTP عبر الجوال + JWT
+- [`13_CUSTOMER_SUPPORT_AND_SECURITY`](../docs/13_CUSTOMER_SUPPORT_AND_SECURITY.md) — دعم العملاء والأمان ✅
+- `14_AUTH` — OTP عبر الجوال + JWT

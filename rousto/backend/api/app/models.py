@@ -517,3 +517,73 @@ class TowingDispatchEvent(Base):
     metadata_: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
 
     dispatch: Mapped["TowingDispatch"] = relationship(back_populates="events")
+
+
+class SupportFaq(Base):
+    __tablename__ = "support_faq"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(60), unique=True)
+    category: Mapped[str] = mapped_column(String(40))
+    question_ar: Mapped[str] = mapped_column(String(300))
+    answer_ar: Mapped[str] = mapped_column(Text)
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class SupportTicket(Base):
+    __tablename__ = "support_tickets"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    reference: Mapped[str] = mapped_column(String(12), unique=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    booking_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("bookings.id"))
+    category: Mapped[str] = mapped_column(String(40))
+    priority: Mapped[str] = mapped_column(String(20), default="normal")
+    status: Mapped[str] = mapped_column(String(30), default="open")
+    subject: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    messages: Mapped[list["SupportTicketMessage"]] = relationship(
+        back_populates="ticket", order_by="SupportTicketMessage.created_at"
+    )
+
+
+class SupportTicketMessage(Base):
+    __tablename__ = "support_ticket_messages"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    ticket_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("support_tickets.id"))
+    author_type: Mapped[str] = mapped_column(String(20))
+    author_label: Mapped[str] = mapped_column(String(80))
+    message: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    ticket: Mapped["SupportTicket"] = relationship(back_populates="messages")
+
+
+class SecurityAuditLog(Base):
+    __tablename__ = "security_audit_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    event_type: Mapped[str] = mapped_column(String(60))
+    severity: Mapped[str] = mapped_column(String(20), default="info")
+    ip_address: Mapped[str | None] = mapped_column(String(45))
+    user_agent: Mapped[str | None] = mapped_column(String(300))
+    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class UserSecurityProfile(Base):
+    __tablename__ = "user_security_profiles"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    login_alerts_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    suspicious_activity_reported_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
+    last_security_review_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — سجل الأمان</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — سجل الأمان</h1>
+      <p>أحداث التدقيق والتنبيهات</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="support.html" class="btn btn-ghost-light">الدعم</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="adminKey">مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>
+        الأحداث
+        <select id="severityFilter">
+          <option value="">الكل</option>
+          <option value="info">معلومات</option>
+          <option value="warn">تحذير</option>
+          <option value="critical">حرج</option>
+        </select>
+      </h2>
+      <table id="eventsTable">
+        <thead>
+          <tr><th>النوع</th><th>الخطورة</th><th>المستخدم</th><th>IP</th><th>الوقت</th></tr>
+        </thead>
+        <tbody><tr><td colspan="5" class="empty">تحديث</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script>
+    const STORAGE_KEY = "rousto_admin_config";
+    const state = { apiBase: "http://localhost:8000", adminKey: "rousto_admin_dev" };
+    const $ = (id) => document.getElementById(id);
+
+    function toast(msg) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.className = "toast show";
+      setTimeout(() => el.classList.remove("show"), 2400);
+    }
+
+    async function refresh() {
+      const apiBase = $("apiBase").value.replace(/\/$/, "");
+      const adminKey = $("adminKey").value.trim();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ apiBase, adminKey }));
+      const sev = $("severityFilter").value;
+      const q = sev ? `?severity=${sev}` : "";
+      const res = await fetch(`${apiBase}/api/v1/admin/security/events${q}`, {
+        headers: { "X-Admin-Key": adminKey },
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error?.message || "خطأ");
+      const tbody = $("eventsTable").querySelector("tbody");
+      const events = body.data || [];
+      tbody.innerHTML = events.length ? events.map((e) => `
+        <tr>
+          <td><b>${e.event_type}</b></td>
+          <td><span class="badge ${e.severity === "warn" ? "badge-warn" : e.severity === "critical" ? "badge-off" : "badge-on"}">${e.severity}</span></td>
+          <td><small>${e.user_id ? e.user_id.slice(0, 8) + "…" : "—"}</small></td>
+          <td>${e.ip_address || "—"}</td>
+          <td><small>${new Date(e.created_at).toLocaleString("ar-SA")}</small></td>
+        </tr>`).join("") : '<tr><td colspan="5" class="empty">لا توجد أحداث</td></tr>';
+      toast(`تم تحميل ${events.length} حدث`);
+    }
+
+    $("refreshBtn").addEventListener("click", () => refresh().catch((e) => toast(e.message)));
+    $("severityFilter").addEventListener("change", () => refresh().catch((e) => toast(e.message)));
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      if (saved.apiBase) $("apiBase").value = saved.apiBase;
+      if (saved.adminKey) $("adminKey").value = saved.adminKey;
+    } catch (_) {}
+    refresh().catch(() => {});
+  </script>
+</body>
+</html>

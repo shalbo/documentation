@@ -14,6 +14,7 @@ from app.routers import (
     promotions,
     scans,
     split_payments,
+    support,
     testimonials,
     towing_dispatch,
     vendor_map,
@@ -56,6 +57,7 @@ app.include_router(split_payments.router, prefix=prefix)
 app.include_router(vendors.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)
 app.include_router(towing_dispatch.router, prefix=prefix)
+app.include_router(support.router, prefix=prefix)
 
 
 @app.exception_handler(HTTPException)

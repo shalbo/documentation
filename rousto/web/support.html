@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — الدعم والأمان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/delivery-map.css" />
+  <style>
+    .faq-item { padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .faq-item h3 { margin: 0 0 6px; font-size: .95rem; }
+    .faq-item p { margin: 0; color: var(--ink-500); font-size: .85rem; line-height: 1.6; }
+    .ticket-card { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
+    .ticket-card:hover { background: #faf9f7; }
+    .messages { max-height: 240px; overflow: auto; margin-top: 12px; }
+    .msg { padding: 8px 10px; border-radius: 10px; margin-bottom: 8px; font-size: .85rem; }
+    .msg.customer { background: #FDECEC; }
+    .msg.admin { background: #e8f7f0; }
+    textarea { width: 100%; min-height: 80px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: inherit; }
+    select, input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: inherit; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="delivery-header">
+    <div>
+      <h1>الدعم والأمان</h1>
+      <p>تذاكر الدعم والأسئلة الشائعة</p>
+    </div>
+    <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+  </header>
+
+  <main class="delivery-layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="userId">معرّف العميل</label><input id="userId" value="a0000000-0000-4000-8000-000000000001" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>الأسئلة الشائعة</h2>
+      <div id="faqList"></div>
+    </section>
+
+    <section class="card">
+      <h2>فتح تذكرة جديدة</h2>
+      <form id="ticketForm">
+        <div class="grid-2">
+          <div>
+            <label for="category">التصنيف</label>
+            <select id="category">
+              <option value="booking">الحجوزات</option>
+              <option value="payment">المدفوعات</option>
+              <option value="account">الحساب</option>
+              <option value="technical">تقني</option>
+              <option value="other">أخرى</option>
+            </select>
+          </div>
+          <div>
+            <label for="priority">الأولوية</label>
+            <select id="priority">
+              <option value="normal">عادية</option>
+              <option value="high">عالية</option>
+              <option value="urgent">عاجلة</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <label for="subject">الموضوع</label>
+          <input id="subject" required placeholder="وصف مختصر للمشكلة" />
+        </div>
+        <div style="margin-top:10px">
+          <label for="message">التفاصيل</label>
+          <textarea id="message" required placeholder="اشرح المشكلة بالتفصيل"></textarea>
+        </div>
+        <button type="submit" class="btn btn-secondary" style="margin-top:10px">إرسال التذكرة</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>تذاكري</h2>
+      <div id="ticketList"></div>
+      <div id="ticketDetail" style="display:none">
+        <h3 id="detailSubject"></h3>
+        <div id="messages" class="messages"></div>
+        <form id="replyForm" style="margin-top:10px">
+          <textarea id="replyMessage" placeholder="أضف رداً"></textarea>
+          <button type="submit" class="btn btn-secondary" style="margin-top:8px">إرسال</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>الأمان</h2>
+      <p id="securitySummary" class="map-caption">—</p>
+      <form id="reportForm">
+        <textarea id="reportDesc" placeholder="صف النشاط المشبوه"></textarea>
+        <button type="submit" class="btn btn-secondary" style="margin-top:8px">إبلاغ</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/support.js"></script>
+</body>
+</html>
