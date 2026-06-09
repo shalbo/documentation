@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     api_prefix: str = "/api/v1"
     cors_origins: str = "*"
     dev_user_id: str = "a0000000-0000-4000-8000-000000000001"
+    admin_api_key: str = "rousto_admin_dev"
 
 
 settings = Settings()

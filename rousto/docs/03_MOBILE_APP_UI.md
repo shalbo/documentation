@@ -120,4 +120,5 @@ flutter test
 ## الخطوة التالية
 
 - [`04_BUSINESS_MONETIZATION`](04_BUSINESS_MONETIZATION.md) — اشتراكات، باقات، استبدال نقاط ✅
-- `05_AUTH` — OTP + JWT (استبدال `X-User-Id`)
+- [`05_ADMIN_CATALOG_MANAGEMENT`](05_ADMIN_CATALOG_MANAGEMENT.md) — لوحة إدارة الكتالوج ✅
+- `06_AUTH` — OTP + JWT (استبدال `X-User-Id`)

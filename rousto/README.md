@@ -15,7 +15,8 @@ rousto/
 │   ├── 01_DATABASE_SCHEMA.md
 │   ├── 02_BACKEND_APIS.md
 │   ├── 03_MOBILE_APP_UI.md
-│   └── 04_BUSINESS_MONETIZATION.md
+│   ├── 04_BUSINESS_MONETIZATION.md
+│   └── 05_ADMIN_CATALOG_MANAGEMENT.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -28,6 +29,10 @@ rousto/
 ├── app/                   # نموذج واجهات التطبيق بصيغة HTML (5 شاشات)
 │   ├── index.html
 │   └── css/app.css
+├── admin/                 # لوحة إدارة الكتالوج (تصنيفات + خدمات)
+│   ├── index.html
+│   ├── css/admin.css
+│   └── js/admin.js
 └── app_flutter/           # تطبيق Flutter كامل (الإصدار الرسمي للتطبيق)
     ├── lib/               # الكود المصدري (شاشات، ثيم، مكوّنات)
     ├── web/               # غلاف الويب
@@ -77,12 +82,14 @@ cd rousto/backend && docker compose up -d
 
 - قاعدة البيانات: PostgreSQL على المنفذ `5432`
 - REST API: http://localhost:8000/docs
+- لوحة الإدارة: http://localhost:8080/admin/index.html (بعد تشغيل `python3 -m http.server`)
 
 المواصفات:
 - [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md)
 - [`docs/02_BACKEND_APIS.md`](docs/02_BACKEND_APIS.md)
 - [`docs/03_MOBILE_APP_UI.md`](docs/03_MOBILE_APP_UI.md)
 - [`docs/04_BUSINESS_MONETIZATION.md`](docs/04_BUSINESS_MONETIZATION.md)
+- [`docs/05_ADMIN_CATALOG_MANAGEMENT.md`](docs/05_ADMIN_CATALOG_MANAGEMENT.md)
 
 ### تطبيق Flutter (متصل بالـ API)
 

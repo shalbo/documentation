@@ -231,3 +231,71 @@ class TestimonialOut(BaseModel):
 class HealthOut(BaseModel):
     status: str
     database: str
+
+
+class AdminCategoryOut(BaseModel):
+    id: UUID
+    slug: str
+    name_ar: str
+    sort_order: int
+    is_active: bool
+
+    model_config = {"from_attributes": True}
+
+
+class AdminCategoryCreate(BaseModel):
+    slug: str = Field(..., min_length=2, max_length=40, pattern=r"^[a-z][a-z0-9-]*$")
+    name_ar: str = Field(..., min_length=1, max_length=80)
+    sort_order: int = 0
+    is_active: bool = True
+
+
+class AdminCategoryUpdate(BaseModel):
+    name_ar: str | None = Field(default=None, min_length=1, max_length=80)
+    sort_order: int | None = None
+    is_active: bool | None = None
+
+
+class AdminCategoryReorderItem(BaseModel):
+    id: UUID
+    sort_order: int
+
+
+class AdminCategoryReorderIn(BaseModel):
+    items: list[AdminCategoryReorderItem] = Field(..., min_length=1)
+
+
+class AdminServiceOut(BaseModel):
+    id: UUID
+    slug: str
+    name_ar: str
+    subtitle_ar: str | None
+    icon_key: str | None
+    price_sar: float
+    duration_minutes: int
+    category_id: UUID
+    category_slug: str
+    category_name_ar: str
+    is_active: bool
+    created_at: datetime | None = None
+
+
+class AdminServiceCreate(BaseModel):
+    category_id: UUID
+    slug: str = Field(..., min_length=2, max_length=60, pattern=r"^[a-z][a-z0-9-]*$")
+    name_ar: str = Field(..., min_length=1, max_length=120)
+    subtitle_ar: str | None = Field(default=None, max_length=200)
+    icon_key: str | None = Field(default=None, max_length=40)
+    price_sar: float = Field(gt=0)
+    duration_minutes: int = Field(gt=0, le=480)
+    is_active: bool = True
+
+
+class AdminServiceUpdate(BaseModel):
+    category_id: UUID | None = None
+    name_ar: str | None = Field(default=None, min_length=1, max_length=120)
+    subtitle_ar: str | None = Field(default=None, max_length=200)
+    icon_key: str | None = Field(default=None, max_length=40)
+    price_sar: float | None = Field(default=None, gt=0)
+    duration_minutes: int | None = Field(default=None, gt=0, le=480)
+    is_active: bool | None = None

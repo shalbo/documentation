@@ -3,6 +3,7 @@ import uuid
 from fastapi import Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import get_db
 from app.models import User
 
@@ -31,3 +32,13 @@ def get_current_user(
             detail={"code": "UNAUTHORIZED", "message": "المستخدم غير موجود أو غير نشط"},
         )
     return user
+
+
+def require_admin_key(
+    x_admin_key: str | None = Header(default=None, alias="X-Admin-Key"),
+) -> None:
+    if not x_admin_key or x_admin_key != settings.admin_api_key:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "UNAUTHORIZED", "message": "مفتاح الإدارة غير صالح"},
+        )

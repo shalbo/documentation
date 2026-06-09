@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.routers import (
+    admin_catalog,
     bookings,
     catalog,
     health,
@@ -37,6 +38,7 @@ app.add_middleware(
 prefix = settings.api_prefix
 app.include_router(health.router, prefix=prefix)
 app.include_router(catalog.router, prefix=prefix)
+app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(promotions.router, prefix=prefix)

@@ -84,6 +84,22 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 | GET | `/api/v1/services` | قائمة الخدمات (`?category=oil`) | لا |
 | GET | `/api/v1/services/{id}` | تفاصيل خدمة | لا |
 
+---
+
+### الكتالوج (إدارة)
+
+> يتطلب هيدر `X-Admin-Key` — انظر [`05_ADMIN_CATALOG_MANAGEMENT`](05_ADMIN_CATALOG_MANAGEMENT.md).
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/admin/categories` | كل التصنيفات | Admin |
+| POST | `/api/v1/admin/categories` | إنشاء تصنيف | Admin |
+| PATCH | `/api/v1/admin/categories/{id}` | تعديل تصنيف | Admin |
+| POST | `/api/v1/admin/categories/reorder` | إعادة ترتيب | Admin |
+| GET | `/api/v1/admin/services` | كل الخدمات | Admin |
+| POST | `/api/v1/admin/services` | إنشاء خدمة | Admin |
+| PATCH | `/api/v1/admin/services/{id}` | تعديل خدمة | Admin |
+
 **مثال — `GET /api/v1/categories/tree`**
 
 ```json
@@ -314,4 +330,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 
 - [`03_MOBILE_APP_UI`](../docs/03_MOBILE_APP_UI.md) — تطبيق Flutter المتصل بالـ API ✅
 - [`04_BUSINESS_MONETIZATION`](../docs/04_BUSINESS_MONETIZATION.md) — تحقيق الدخل والاشتراكات ✅
-- `05_AUTH` — OTP عبر الجوال + JWT
+- [`05_ADMIN_CATALOG_MANAGEMENT`](../docs/05_ADMIN_CATALOG_MANAGEMENT.md) — إدارة الكتالوج + لوحة الويب ✅
+- `06_AUTH` — OTP عبر الجوال + JWT
