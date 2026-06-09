@@ -249,6 +249,21 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### تحقيق الدخل
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/monetization/plans` | خطط الاشتراك | لا |
+| GET | `/api/v1/monetization/packages` | باقات الصيانة | لا |
+| GET | `/api/v1/monetization/rewards` | مكافآت النقاط | لا |
+| GET | `/api/v1/me/monetization` | ملخص المحفظة | نعم |
+| POST | `/api/v1/me/membership/subscribe` | الاشتراك في خطة | نعم |
+| POST | `/api/v1/me/loyalty/redeem` | استبدال نقاط | نعم |
+
+انظر [`04_BUSINESS_MONETIZATION.md`](04_BUSINESS_MONETIZATION.md).
+
+---
+
 ## هيكل المشروع
 
 ```
