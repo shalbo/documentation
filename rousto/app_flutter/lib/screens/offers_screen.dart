@@ -45,7 +45,7 @@ class OffersScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: AppColors.navyGradient,
+                      color: AppColors.cream,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.line),
                     ),

@@ -6,19 +6,19 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get dark {
-    final base = ThemeData.dark(useMaterial3: true);
+  static ThemeData get light {
+    final base = ThemeData.light(useMaterial3: true);
     final textTheme = GoogleFonts.tajawalTextTheme(base.textTheme).apply(
       bodyColor: AppColors.ink900,
       displayColor: AppColors.ink900,
     );
 
     return base.copyWith(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.bg,
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.red,
-        secondary: AppColors.navyLight,
+        secondary: AppColors.navy,
         surface: AppColors.surface,
         onSurface: AppColors.ink900,
         error: AppColors.red700,
@@ -40,7 +40,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
-          side: const BorderSide(color: AppColors.line, width: 0.6),
+          side: const BorderSide(color: AppColors.line, width: 0.8),
         ),
       ),
       dividerColor: AppColors.line,
@@ -78,19 +78,17 @@ class AppTheme {
         ),
       ),
       bottomAppBarTheme: const BottomAppBarTheme(
-        color: AppColors.navy,
+        color: AppColors.surface,
         elevation: 8,
+        shadowColor: Color(0x1A15161A),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.navyLight,
-        contentTextStyle: GoogleFonts.tajawal(color: AppColors.ink900),
+        backgroundColor: AppColors.navy,
+        contentTextStyle: GoogleFonts.tajawal(color: Colors.white),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.red,
       ),
     );
   }
-
-  /// Alias للتوافق مع الكود الحالي.
-  static ThemeData get light => dark;
 }

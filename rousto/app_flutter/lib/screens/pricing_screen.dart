@@ -86,7 +86,7 @@ class _PricingScreenState extends State<PricingScreen> {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
       decoration: const BoxDecoration(
-        gradient: AppColors.darkGradient,
+        gradient: AppColors.redGradient,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
       child: SafeArea(
@@ -98,13 +98,13 @@ class _PricingScreenState extends State<PricingScreen> {
               children: [
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_forward, color: AppColors.ink700),
+                  icon: const Icon(Icons.arrow_forward, color: Colors.white),
                 ),
                 SvgPicture.asset('assets/logo.svg', height: 28),
                 const SizedBox(width: 8),
                 const Text('الأسعار',
                     style: TextStyle(
-                        color: AppColors.ink900,
+                        color: Colors.white,
                         fontWeight: FontWeight.w800,
                         fontSize: 18)),
               ],
@@ -112,12 +112,12 @@ class _PricingScreenState extends State<PricingScreen> {
             const SizedBox(height: 8),
             const Text('خطط تناسب كل احتياج',
                 style: TextStyle(
-                    color: AppColors.ink900,
+                    color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.w800)),
             const SizedBox(height: 6),
             const Text('أسعار شفافة بالدينار — تُحدَّث من الخادم',
-                style: TextStyle(color: AppColors.ink500, fontSize: 13)),
+                style: TextStyle(color: Color(0xFFFFE1E1), fontSize: 13)),
             const SizedBox(height: 18),
             Wrap(
               spacing: 20,
@@ -128,12 +128,12 @@ class _PricingScreenState extends State<PricingScreen> {
                         children: [
                           Text(s.valueAr,
                               style: const TextStyle(
-                                  color: AppColors.red,
+                                  color: Colors.white,
                                   fontSize: 22,
                                   fontWeight: FontWeight.w800)),
                           Text(s.labelAr,
                               style: const TextStyle(
-                                  color: AppColors.ink500, fontSize: 12)),
+                                  color: Color(0xFFFFE1E1), fontSize: 12)),
                         ],
                       ))
                   .toList(),

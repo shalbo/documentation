@@ -163,16 +163,23 @@ class HomeScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            gradient: AppColors.navyGradient,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.line),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0F15161A),
+                blurRadius: 14,
+                offset: Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             children: [
               IconBadge(
                 iconFromKey(booking.serviceIconKey),
-                bg: AppColors.red,
-                fg: Colors.white,
+                bg: AppColors.red050,
+                fg: AppColors.red,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -181,21 +188,21 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const Text('خدمة جارية',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.ink900,
                             fontWeight: FontWeight.w800)),
                     Text(
                       '${booking.serviceName ?? 'خدمة'} · ${booking.statusLabelAr}',
                       style: const TextStyle(
-                          color: Color(0xFFC7C8CF), fontSize: 12),
+                          color: AppColors.ink500, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               const CircleAvatar(
                 radius: 15,
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.red050,
                 child: Icon(Icons.arrow_back,
-                    size: 16, color: AppColors.ink900),
+                    size: 16, color: AppColors.red600),
               ),
             ],
           ),
@@ -292,7 +299,7 @@ class HomeScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: AppColors.navyGradient,
+          color: AppColors.cream,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.line),
         ),
@@ -333,6 +340,13 @@ class HomeScreen extends StatelessWidget {
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.line),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F15161A),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [

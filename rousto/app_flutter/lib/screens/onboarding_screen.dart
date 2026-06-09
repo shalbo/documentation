@@ -18,63 +18,54 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF000000), Color(0xFF0B2C44), Color(0xFF000000)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Stack(
-          children: [
-            // وهج أحمر زخرفي
-            Positioned(
-              top: -120,
-              right: -100,
-              child: Container(
-                width: 340,
-                height: 340,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: AppColors.redGradient,
-                ),
+      body: Stack(
+        children: [
+          Positioned(
+            top: -80,
+            right: -60,
+            child: Container(
+              width: 280,
+              height: 280,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.red050.withValues(alpha: 0.9),
               ),
             ),
-            Positioned.fill(
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    const Spacer(),
-                    SvgPicture.asset('assets/logo.svg', height: 150),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              _dot(true),
-                              _dot(false),
-                              _dot(false),
-                            ],
+          ),
+          Positioned.fill(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const Spacer(),
+                  SvgPicture.asset('assets/logo.svg', height: 150),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            _dot(true),
+                            _dot(false),
+                            _dot(false),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        const Text(
+                          'عناية ذكية بسيارتك',
+                          style: TextStyle(
+                            color: AppColors.ink900,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
                           ),
-                          const SizedBox(height: 18),
-                          const Text(
-                            'عناية ذكية بسيارتك',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'احجز خدمة الصيانة في ثوانٍ وتابعها مباشرةً من هاتفك مع فنيّين معتمدين.',
-                            style: TextStyle(
-                                color: Color(0xFFC7C8CF), height: 1.6),
-                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'احجز خدمة الصيانة في ثوانٍ وتابعها مباشرةً من هاتفك مع فنيّين معتمدين.',
+                          style: TextStyle(
+                              color: AppColors.ink500, height: 1.6),
+                        ),
                           const SizedBox(height: 24),
                           GradientButton(
                             label: 'ابدأ الآن',
@@ -88,7 +79,7 @@ class OnboardingScreen extends StatelessWidget {
                               child: const Text.rich(
                                 TextSpan(
                                   text: 'لديك حساب؟ ',
-                                  style: TextStyle(color: Color(0xFFC7C8CF)),
+                                  style: TextStyle(color: AppColors.ink500),
                                   children: [
                                     TextSpan(
                                       text: 'تسجيل الدخول',
@@ -109,8 +100,7 @@ class OnboardingScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -121,7 +111,7 @@ class OnboardingScreen extends StatelessWidget {
         width: active ? 22 : 8,
         height: 8,
         decoration: BoxDecoration(
-          color: active ? AppColors.red : Colors.white24,
+          color: active ? AppColors.red : AppColors.line,
           borderRadius: BorderRadius.circular(999),
         ),
       );
