@@ -1,1 +1,0 @@
- /workspace/rousto/app_flutter/lib/l10n/app_localizations_ar.dart /workspace/rousto/app_flutter/lib/l10n/app_localizations_en.dart /workspace/rousto/app_flutter/lib/l10n/app_localizations.dart:  /workspace/rousto/app_flutter/l10n.yaml /workspace/rousto/app_flutter/lib/l10n/app_ar.arb /workspace/rousto/app_flutter/lib/l10n/app_en.arb
