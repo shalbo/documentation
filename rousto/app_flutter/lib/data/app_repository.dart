@@ -6,6 +6,7 @@ class AppRepository {
   AppRepository({ApiClient? api}) : _api = api ?? ApiClient();
 
   final ApiClient _api;
+  ApiClient get api => _api;
 
   Future<bool> isApiAvailable() => _api.ping();
 

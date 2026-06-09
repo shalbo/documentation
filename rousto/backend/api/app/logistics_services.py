@@ -198,6 +198,20 @@ def transition_booking_status(
         release_technician_splits(db, booking.id)
 
     db.commit()
+
+    try:
+        from app.notifications import notify_booking_status_change
+
+        notify_booking_status_change(
+            db,
+            user_id=booking.user_id,
+            booking_ref=booking.reference,
+            status=new_status,
+            label_ar=STATUS_EVENT_LABELS[new_status],
+        )
+    except Exception:
+        pass
+
     return booking
 
 

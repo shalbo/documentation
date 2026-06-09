@@ -814,6 +814,18 @@ class MarketingReferralEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class UserDeviceToken(Base):
+    __tablename__ = "user_device_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    fcm_token: Mapped[str] = mapped_column(String(512))
+    platform: Mapped[str] = mapped_column(String(20), default="unknown")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class MarketingAttributionEvent(Base):
     __tablename__ = "marketing_attribution_events"
 

@@ -37,6 +37,7 @@ services:
       - ./database/024_auth_permissions_seed.sql:/docker-entrypoint-initdb.d/024_auth_permissions_seed.sql:ro
       - ./database/025_advertising_marketing_schema.sql:/docker-entrypoint-initdb.d/025_advertising_marketing_schema.sql:ro
       - ./database/026_advertising_marketing_seed.sql:/docker-entrypoint-initdb.d/026_advertising_marketing_seed.sql:ro
+      - ./database/027_device_tokens_schema.sql:/docker-entrypoint-initdb.d/027_device_tokens_schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

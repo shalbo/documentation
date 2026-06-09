@@ -18,5 +18,25 @@ class AppConfig {
     defaultValue: true,
   );
 
+  static const enableFcm = bool.fromEnvironment(
+    'ENABLE_FCM',
+    defaultValue: false,
+  );
+
+  static const sentryDsn = String.fromEnvironment(
+    'SENTRY_DSN',
+    defaultValue: '',
+  );
+
+  static const environment = String.fromEnvironment(
+    'ENVIRONMENT',
+    defaultValue: 'development',
+  );
+
+  static bool get isProduction {
+    final e = environment.toLowerCase();
+    return e == 'production' || e == 'prod';
+  }
+
   static const apiPrefix = '/api/v1';
 }

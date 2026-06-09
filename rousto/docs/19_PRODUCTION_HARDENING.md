@@ -31,14 +31,17 @@ CORS_ORIGINS=https://rousto.com
 
 ---
 
-## 2. تتبع الأخطاء والإشعارات
+## 2. تتبع الأخطاء والإشعارات (مربوط)
 
-| المكوّن | الملف |
-|---------|-------|
-| Sentry (اختياري) | `app/error_reporting.py` — عيّن `SENTRY_DSN` |
-| FCM (اختياري) | `app/notifications.py` — عيّن `FCM_ENABLED` |
-| Flutter errors | `lib/services/error_reporter.dart` |
-| Flutter FCM stub | `lib/services/push_notifications.dart` |
+| المكوّن | الملف | التفعيل |
+|---------|-------|---------|
+| Sentry Backend | `app/error_reporting.py` | `SENTRY_DSN` |
+| FCM Backend | `app/notifications.py` + `firebase-admin` | `FCM_ENABLED=true` + `FCM_CREDENTIALS_PATH` |
+| Device tokens | `027_device_tokens_schema.sql` | `POST /me/devices/register` |
+| إشعار الحجز | `logistics_services.py` | تلقائي عند تغيير الحالة |
+| Sentry Flutter | `lib/services/error_reporter.dart` | `--dart-define=SENTRY_DSN=...` |
+| FCM Flutter | `lib/services/push_notifications.dart` | `--dart-define=ENABLE_FCM=true` + `flutterfire configure` |
+| JWT Flutter | `lib/services/auth_storage.dart` + `login_screen.dart` | OTP → حفظ token |
 
 ---
 

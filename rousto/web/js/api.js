@@ -214,6 +214,12 @@
     getMyReferral: function () {
       return request("/me/referral");
     },
+    registerDevice: function (fcmToken, platform) {
+      return request("/me/devices/register", {
+        method: "POST",
+        body: { fcm_token: fcmToken, platform: platform || "web" },
+      });
+    },
   };
 
   function showToast(message, type) {

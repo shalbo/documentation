@@ -12,6 +12,7 @@ from app.routers import (
     auth,
     bookings,
     catalog,
+    devices,
     health,
     landing,
     logistics,
@@ -60,6 +61,7 @@ app.include_router(catalog.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
+app.include_router(devices.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(logistics.router, prefix=prefix)

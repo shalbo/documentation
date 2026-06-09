@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
-/// Central error reporting — wire to Sentry or Firebase Crashlytics in production.
+import '../config/app_config.dart';
+
 class ErrorReporter {
   ErrorReporter._();
   static final ErrorReporter instance = ErrorReporter._();
@@ -12,10 +12,6 @@ class ErrorReporter {
   Future<void> init() async {
     if (_initialized) return;
     _initialized = true;
-    if (kReleaseMode) {
-      // Production: SentryFlutter.init(...) or FirebaseCrashlytics.instance
-      debugPrint('ErrorReporter: release mode — connect Sentry/Crashlytics');
-    }
   }
 
   void capture(Object error, StackTrace stack, {String? hint}) {
@@ -23,14 +19,8 @@ class ErrorReporter {
       debugPrint('ErrorReporter: $error\n$stack');
       return;
     }
-    // Production SDK capture here
-    debugPrint('ErrorReporter captured: $hint — $error');
+    if (AppConfig.sentryDsn.isNotEmpty) {
+      Sentry.captureException(error, stackTrace: stack, hint: hint);
+    }
   }
-}
-
-void runRoustoApp(void Function() appRunner) {
-  runZonedGuarded(
-    appRunner,
-    (error, stack) => ErrorReporter.instance.capture(error, stack),
-  );
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../config/app_config.dart';
+import '../services/auth_storage.dart';
 
 class ApiClient {
   ApiClient({http.Client? client, String? baseUrl, String? userId})
@@ -20,8 +21,9 @@ class ApiClient {
   }
 
   Map<String, String> get _authHeaders {
-    if (AppConfig.accessToken.isNotEmpty) {
-      return {'Authorization': 'Bearer ${AppConfig.accessToken}'};
+    final token = AuthStorage.instance.accessToken;
+    if (token != null && token.isNotEmpty) {
+      return {'Authorization': 'Bearer $token'};
     }
     if (AppConfig.useLegacyUserHeader) {
       return {'X-User-Id': _userId};
@@ -228,6 +230,16 @@ class ApiClient {
   Future<Map<String, dynamic>> getLandingPage() async {
     final body = await _get('/landing/page');
     return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<void> registerDevice({
+    required String fcmToken,
+    required String platform,
+  }) async {
+    await _post('/me/devices/register', {
+      'fcm_token': fcmToken,
+      'platform': platform,
+    });
   }
 }
 

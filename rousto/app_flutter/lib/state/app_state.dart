@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../currency.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../services/push_notifications.dart';
 
 class AppState extends ChangeNotifier {
   AppState({AppRepository? repository})
@@ -66,6 +67,7 @@ class AppState extends ChangeNotifier {
     usingMockData = !apiLive;
     loading = false;
     notifyListeners();
+    await PushNotifications.instance.registerWithBackend(_repository.api);
   }
 
   Future<void> refreshActiveBooking() async {
