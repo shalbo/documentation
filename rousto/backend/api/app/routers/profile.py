@@ -14,6 +14,8 @@ from app.schemas import (
     UserStats,
     VehicleOut,
 )
+from app.config import settings
+from app.scan_services import list_user_scans, serialize_scan
 from app.services import get_user_stats, vehicle_display_name
 
 router = APIRouter(tags=["profile"])
@@ -66,6 +68,13 @@ def list_payment_methods(
         .order_by(PaymentMethod.is_default.desc())
     ).all()
     data = [PaymentMethodOut.model_validate(m).model_dump() for m in methods]
+    return {"data": data, "meta": {"total": len(data)}}
+
+
+@router.get("/me/scans")
+def list_my_scans(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    scans = list_user_scans(db, user.id)
+    data = [serialize_scan(s, api_prefix=settings.api_prefix) for s in scans]
     return {"data": data, "meta": {"total": len(data)}}
 
 

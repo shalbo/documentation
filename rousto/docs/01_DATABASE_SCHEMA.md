@@ -229,6 +229,42 @@ erDiagram
 | `is_published` | BOOLEAN | |
 | `created_at` | TIMESTAMPTZ | |
 
+### 14. `vehicle_scans` — فحوصات الصور (AI)
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `id` | UUID PK | |
+| `user_id` | UUID FK | المستخدم |
+| `vehicle_id` | UUID FK | المركبة |
+| `scan_type` | VARCHAR(40) | نوع الفحص |
+| `status` | VARCHAR(20) | pending / completed / failed |
+| `created_at` | TIMESTAMPTZ | |
+| `completed_at` | TIMESTAMPTZ | |
+
+### 15. `scan_images` — صور الفحص
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `id` | UUID PK | |
+| `scan_id` | UUID FK | |
+| `storage_key` | VARCHAR(255) | مسار التخزين |
+| `mime_type` | VARCHAR(80) | |
+| `sort_order` | SMALLINT | |
+
+### 16. `scan_findings` — نتائج التشخيص
+
+| العمود | النوع | الوصف |
+|--------|-------|-------|
+| `id` | UUID PK | |
+| `scan_id` | UUID FK | |
+| `code` | VARCHAR(60) | رمز النتيجة |
+| `label_ar` | VARCHAR(200) | الوصف بالعربية |
+| `severity` | VARCHAR(20) | low / medium / high |
+| `confidence` | NUMERIC(4,3) | نسبة الثقة |
+| `suggested_service_id` | UUID FK | خدمة مقترحة |
+
+`bookings.scan_id` — ربط اختياري بالفحص (انظر [`06_AI_AND_IMAGE_RECOGNITION`](06_AI_AND_IMAGE_RECOGNITION.md)).
+
 ---
 
 ## الفهارس (Indexes)
@@ -250,6 +286,8 @@ erDiagram
 rousto/backend/database/
 ├── 001_schema.sql    # إنشاء الجداول والأنواع والفهارس
 ├── 002_seed.sql      # بيانات تجريبية (مطابقة للتطبيق)
+├── 005_ai_schema.sql # جداول فحص الصور
+├── 006_ai_seed.sql   # فحص تجريبي
 └── README.md         # تعليمات التشغيل
 ```
 

@@ -16,6 +16,8 @@ services:
       - ./database/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
       - ./database/003_monetization.sql:/docker-entrypoint-initdb.d/003_monetization.sql:ro
       - ./database/004_monetization_seed.sql:/docker-entrypoint-initdb.d/004_monetization_seed.sql:ro
+      - ./database/005_ai_schema.sql:/docker-entrypoint-initdb.d/005_ai_schema.sql:ro
+      - ./database/006_ai_seed.sql:/docker-entrypoint-initdb.d/006_ai_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s
@@ -29,11 +31,15 @@ services:
     environment:
       DATABASE_URL: postgresql://rousto:rousto_dev@db:5432/rousto
       CORS_ORIGINS: "*"
+      SCAN_STORAGE_PATH: /data/scans
     ports:
       - "8000:8000"
+    volumes:
+      - rousto_scans:/data/scans
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   rousto_pgdata:
+  rousto_scans:

@@ -19,6 +19,8 @@
 | 4 | التتبّع | `tracking_screen.dart` | `/bookings/active`, `/bookings/{id}/tracking` |
 | 5 | العروض | `offers_screen.dart` | `/promotions`, `/me/loyalty` |
 | 6 | الملف الشخصي | `profile_screen.dart` | `/me`, `/me/vehicles` |
+| 7 | فحص بالصورة | `ai_scan_screen.dart` | `POST /scans`, `/scans/types` |
+| 8 | نتائج الفحص | `scan_results_screen.dart` | `/scans/{id}` → الحجز |
 
 التنقّل: `root_nav.dart` — شريط سفلي + FAB للحجز.
 
@@ -121,4 +123,5 @@ flutter test
 
 - [`04_BUSINESS_MONETIZATION`](04_BUSINESS_MONETIZATION.md) — اشتراكات، باقات، استبدال نقاط ✅
 - [`05_ADMIN_CATALOG_MANAGEMENT`](05_ADMIN_CATALOG_MANAGEMENT.md) — لوحة إدارة الكتالوج ✅
-- `06_AUTH` — OTP + JWT (استبدال `X-User-Id`)
+- [`06_AI_AND_IMAGE_RECOGNITION`](06_AI_AND_IMAGE_RECOGNITION.md) — فحص بالصورة ✅
+- `07_AUTH` — OTP + JWT (استبدال `X-User-Id`)

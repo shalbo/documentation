@@ -7,6 +7,7 @@ import '../data/models.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
+import 'ai_scan_screen.dart';
 import 'booking_screen.dart';
 import 'tracking_screen.dart';
 
@@ -55,6 +56,10 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+                  child: _aiScanCard(context),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
                   child: _promo(state),
                 ),
               ],
@@ -270,6 +275,49 @@ class HomeScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _aiScanCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const AiScanScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.line),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F15161A),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const IconBadge(Icons.document_scanner_outlined, size: 48),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('فحص بالصورة',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 15)),
+                  Text('تشخيص مبدئي بالذكاء الاصطناعي',
+                      style: TextStyle(
+                          color: AppColors.ink500, fontSize: 12)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_left, color: AppColors.ink300),
+          ],
+        ),
+      ),
     );
   }
 

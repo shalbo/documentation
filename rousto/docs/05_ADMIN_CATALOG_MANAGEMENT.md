@@ -4,7 +4,7 @@
 
 - **الكتالوج العام:** [02_BACKEND_APIS.md](02_BACKEND_APIS.md) (قراءة فقط)
 - **المخطط:** [01_DATABASE_SCHEMA.md](01_DATABASE_SCHEMA.md) — جداول `service_categories` و `services`
-- **المصادقة (مؤقتة):** هيدر `X-Admin-Key` — يُستبدل بـ JWT + دور `admin` في `06_AUTH`
+- **المصادقة (مؤقتة):** هيدر `X-Admin-Key` — يُستبدل بـ JWT + دور `admin` في `07_AUTH`
 
 ---
 
@@ -167,5 +167,5 @@ rousto/admin/js/admin.js
 
 ## الخطوة التالية
 
-- `06_AUTH` — OTP + JWT + أدوار (`admin`, `customer`, `technician`)
-- `07_ADMIN_PROMOTIONS` — إدارة أكواد الخصم والعروض
+- `07_AUTH` — OTP + JWT + أدوار (`admin`, `customer`, `technician`)
+- `08_ADMIN_PROMOTIONS` — إدارة أكواد الخصم والعروض

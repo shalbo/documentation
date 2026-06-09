@@ -10,7 +10,8 @@ import '../widgets/common.dart';
 
 class BookingScreen extends StatefulWidget {
   final ServiceModel? service;
-  const BookingScreen({super.key, this.service});
+  final String? scanId;
+  const BookingScreen({super.key, this.service, this.scanId});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -206,6 +207,7 @@ class _BookingScreenState extends State<BookingScreen> {
       addressId: address.id,
       paymentMethodId: payment.id,
       promotionCode: 'ROUSTO',
+      scanId: widget.scanId,
     );
 
     if (!context.mounted) return;

@@ -17,6 +17,7 @@ from app.models import (
     Technician,
     User,
     Vehicle,
+    VehicleScan,
 )
 from app.monetization import (
     calculate_membership_discount,
@@ -197,6 +198,7 @@ def create_booking(
     reward_slug: str | None,
     scheduled_at: datetime,
     notes: str | None,
+    scan_id: UUID | None = None,
 ) -> Booking:
     service = db.get(Service, service_id)
     if not service or not service.is_active:
@@ -213,6 +215,17 @@ def create_booking(
     )
     if not address:
         raise ValueError("العنوان غير موجود")
+
+    if scan_id:
+        scan = db.scalar(
+            select(VehicleScan).where(
+                VehicleScan.id == scan_id,
+                VehicleScan.user_id == user.id,
+                VehicleScan.status == "completed",
+            )
+        )
+        if not scan:
+            raise ValueError("الفحص غير موجود أو غير مكتمل")
 
     if payment_method_id:
         payment_method = db.scalar(
@@ -256,6 +269,7 @@ def create_booking(
         payment_method_id=payment_method_id,
         technician_id=technician.id if technician else None,
         promotion_id=promotion.id if promotion else None,
+        scan_id=scan_id,
         scheduled_at=scheduled_at,
         service_price_sar=service_price,
         discount_sar=promo_discount,

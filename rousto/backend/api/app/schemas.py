@@ -168,6 +168,7 @@ class BookingCreateIn(BaseModel):
     reward_slug: str | None = None
     scheduled_at: datetime
     notes: str | None = None
+    scan_id: UUID | None = None
 
 
 class BookingServiceBrief(BaseModel):

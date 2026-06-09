@@ -227,12 +227,43 @@ class AppRepository {
     }
   }
 
+  Future<List<ScanTypeModel>> loadScanTypes() async {
+    try {
+      final data = await _api.getScanTypes();
+      return data
+          .map((e) => ScanTypeModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return MockData.scanTypes;
+    }
+  }
+
+  Future<ScanModel> submitScan({
+    required String vehicleId,
+    required String scanType,
+    required List<int> imageBytes,
+    required String filename,
+  }) async {
+    try {
+      final data = await _api.createScan(
+        vehicleId: vehicleId,
+        scanType: scanType,
+        imageBytes: imageBytes,
+        filename: filename,
+      );
+      return ScanModel.fromJson(data);
+    } catch (_) {
+      return MockData.sampleScan;
+    }
+  }
+
   Future<bool> createBooking({
     required String serviceId,
     required String vehicleId,
     required String addressId,
     String? paymentMethodId,
     String? promotionCode,
+    String? scanId,
   }) async {
     try {
       await _api.createBooking({
@@ -241,6 +272,7 @@ class AppRepository {
         'address_id': addressId,
         if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
         if (promotionCode != null) 'promotion_code': promotionCode,
+        if (scanId != null) 'scan_id': scanId,
         'scheduled_at': DateTime.now()
             .add(const Duration(days: 1))
             .toUtc()

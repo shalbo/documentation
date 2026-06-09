@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     cors_origins: str = "*"
     dev_user_id: str = "a0000000-0000-4000-8000-000000000001"
     admin_api_key: str = "rousto_admin_dev"
+    scan_storage_path: str = "/data/scans"
+    ai_provider: str = "stub"
 
 
 settings = Settings()

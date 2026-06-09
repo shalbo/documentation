@@ -86,6 +86,19 @@ X-User-Id: a0000000-0000-4000-8000-000000000001
 
 ---
 
+### الفحص بالصورة (AI)
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/scans/types` | أنواع الفحص المتاحة | لا |
+| POST | `/api/v1/scans` | رفع صور وتحليل (multipart) | نعم |
+| GET | `/api/v1/scans/{id}` | تفاصيل فحص | نعم |
+| GET | `/api/v1/me/scans` | سجل فحوصات المستخدم | نعم |
+
+انظر [`06_AI_AND_IMAGE_RECOGNITION`](06_AI_AND_IMAGE_RECOGNITION.md).
+
+---
+
 ### الكتالوج (إدارة)
 
 > يتطلب هيدر `X-Admin-Key` — انظر [`05_ADMIN_CATALOG_MANAGEMENT`](05_ADMIN_CATALOG_MANAGEMENT.md).
@@ -331,4 +344,5 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`03_MOBILE_APP_UI`](../docs/03_MOBILE_APP_UI.md) — تطبيق Flutter المتصل بالـ API ✅
 - [`04_BUSINESS_MONETIZATION`](../docs/04_BUSINESS_MONETIZATION.md) — تحقيق الدخل والاشتراكات ✅
 - [`05_ADMIN_CATALOG_MANAGEMENT`](../docs/05_ADMIN_CATALOG_MANAGEMENT.md) — إدارة الكتالوج + لوحة الويب ✅
-- `06_AUTH` — OTP عبر الجوال + JWT
+- [`06_AI_AND_IMAGE_RECOGNITION`](../docs/06_AI_AND_IMAGE_RECOGNITION.md) — فحص بالصورة + تشخيص تجريبي ✅
+- `07_AUTH` — OTP عبر الجوال + JWT

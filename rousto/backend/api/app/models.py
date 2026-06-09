@@ -189,6 +189,7 @@ class Booking(Base):
     payment_method_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("payment_methods.id"))
     technician_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
     promotion_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("promotions.id"))
+    scan_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("vehicle_scans.id"))
     scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     service_price_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     discount_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
@@ -347,3 +348,48 @@ class BookingRevenue(Base):
     technician_payout_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     reserve_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class VehicleScan(Base):
+    __tablename__ = "vehicle_scans"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    vehicle_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vehicles.id"))
+    scan_type: Mapped[str] = mapped_column(String(40))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    images: Mapped[list["ScanImage"]] = relationship(back_populates="scan")
+    findings: Mapped[list["ScanFinding"]] = relationship(back_populates="scan")
+
+
+class ScanImage(Base):
+    __tablename__ = "scan_images"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    scan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vehicle_scans.id"))
+    storage_key: Mapped[str] = mapped_column(String(255))
+    mime_type: Mapped[str] = mapped_column(String(80))
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    scan: Mapped["VehicleScan"] = relationship(back_populates="images")
+
+
+class ScanFinding(Base):
+    __tablename__ = "scan_findings"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    scan_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vehicle_scans.id"))
+    code: Mapped[str] = mapped_column(String(60))
+    label_ar: Mapped[str] = mapped_column(String(200))
+    severity: Mapped[str] = mapped_column(String(20))
+    confidence: Mapped[float] = mapped_column(Numeric(4, 3))
+    suggested_service_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("services.id"))
+    details: Mapped[dict] = mapped_column(JSONB, default=dict)
+
+    scan: Mapped["VehicleScan"] = relationship(back_populates="findings")
+    suggested_service: Mapped["Service | None"] = relationship()

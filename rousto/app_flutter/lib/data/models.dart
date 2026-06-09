@@ -285,9 +285,100 @@ IconData iconFromKey(String? key) {
       return Icons.battery_charging_full_outlined;
     case 'laptop_mac':
       return Icons.laptop_mac_outlined;
+    case 'warning':
+      return Icons.warning_amber_outlined;
+    case 'water_drop':
+      return Icons.water_drop_outlined;
+    case 'car_crash':
+      return Icons.car_crash_outlined;
     default:
       return Icons.build_outlined;
   }
+}
+
+class ScanTypeModel {
+  final String id;
+  final String labelAr;
+  final String descriptionAr;
+  final String? iconKey;
+
+  const ScanTypeModel({
+    required this.id,
+    required this.labelAr,
+    required this.descriptionAr,
+    this.iconKey,
+  });
+
+  factory ScanTypeModel.fromJson(Map<String, dynamic> json) {
+    return ScanTypeModel(
+      id: json['id'] as String,
+      labelAr: json['label_ar'] as String,
+      descriptionAr: json['description_ar'] as String? ?? '',
+      iconKey: json['icon_key'] as String?,
+    );
+  }
+
+  IconData get icon => iconFromKey(iconKey);
+}
+
+class ScanFindingModel {
+  final String code;
+  final String labelAr;
+  final String severity;
+  final double confidence;
+  final ServiceModel? suggestedService;
+
+  const ScanFindingModel({
+    required this.code,
+    required this.labelAr,
+    required this.severity,
+    required this.confidence,
+    this.suggestedService,
+  });
+
+  factory ScanFindingModel.fromJson(Map<String, dynamic> json) {
+    final svc = json['suggested_service'] as Map<String, dynamic>?;
+    return ScanFindingModel(
+      code: json['code'] as String,
+      labelAr: json['label_ar'] as String,
+      severity: json['severity'] as String? ?? 'medium',
+      confidence: (json['confidence'] as num?)?.toDouble() ?? 0,
+      suggestedService:
+          svc != null ? ServiceModel.fromJson(svc) : null,
+    );
+  }
+}
+
+class ScanModel {
+  final String id;
+  final String vehicleId;
+  final String scanType;
+  final String status;
+  final List<ScanFindingModel> findings;
+
+  const ScanModel({
+    required this.id,
+    required this.vehicleId,
+    required this.scanType,
+    required this.status,
+    required this.findings,
+  });
+
+  factory ScanModel.fromJson(Map<String, dynamic> json) {
+    final findingsJson = json['findings'] as List<dynamic>? ?? [];
+    return ScanModel(
+      id: json['id'] as String,
+      vehicleId: json['vehicle_id'] as String,
+      scanType: json['scan_type'] as String,
+      status: json['status'] as String? ?? 'completed',
+      findings: findingsJson
+          .map((e) => ScanFindingModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  ScanFindingModel? get primaryFinding =>
+      findings.isNotEmpty ? findings.first : null;
 }
 
 class MembershipPlanModel {

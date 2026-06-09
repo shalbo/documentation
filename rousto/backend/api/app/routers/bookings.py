@@ -99,6 +99,7 @@ def post_booking(
             reward_slug=body.reward_slug,
             scheduled_at=body.scheduled_at,
             notes=body.notes,
+            scan_id=body.scan_id,
         )
     except ValueError as exc:
         raise HTTPException(

@@ -239,6 +239,49 @@ class MockData {
     lifetimeSavingsSar: 30,
   );
 
+  static const scanTypes = <ScanTypeModel>[
+    ScanTypeModel(
+      id: 'dashboard_warning',
+      labelAr: 'أضواء تحذير (الطبلون)',
+      descriptionAr: 'صورة لأضواء التحذير على لوحة القيادة',
+      iconKey: 'warning',
+    ),
+    ScanTypeModel(
+      id: 'tire_tread',
+      labelAr: 'الإطارات والتآكل',
+      descriptionAr: 'صورة واضحة لسطح الإطار',
+      iconKey: 'tire_repair',
+    ),
+    ScanTypeModel(
+      id: 'fluid_leak',
+      labelAr: 'تسرب سوائل',
+      descriptionAr: 'صورة لبقعة زيت تحت السيارة',
+      iconKey: 'water_drop',
+    ),
+    ScanTypeModel(
+      id: 'battery_corrosion',
+      labelAr: 'البطارية والأكسدة',
+      descriptionAr: 'صورة لقطب البطارية',
+      iconKey: 'battery_charging',
+    ),
+  ];
+
+  static final sampleScan = ScanModel(
+    id: 'mock-scan-001',
+    vehicleId: vehicle.id,
+    scanType: 'dashboard_warning',
+    status: 'completed',
+    findings: [
+      ScanFindingModel(
+        code: 'check_engine',
+        labelAr: 'ضوء فحص المحرك — يُنصح بفحص إلكتروني',
+        severity: 'medium',
+        confidence: 0.82,
+        suggestedService: services[5],
+      ),
+    ],
+  );
+
   static const promotions = <PromotionModel>[
     PromotionModel(
       code: 'ROUSTO',

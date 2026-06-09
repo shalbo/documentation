@@ -164,6 +164,41 @@ class ApiClient {
     });
     return body['data'] as Map<String, dynamic>;
   }
+
+  Future<List<dynamic>> getScanTypes() async {
+    final body = await _get('/scans/types');
+    return body['data'] as List<dynamic>;
+  }
+
+  Future<Map<String, dynamic>> createScan({
+    required String vehicleId,
+    required String scanType,
+    required List<int> imageBytes,
+    required String filename,
+  }) async {
+    final request = http.MultipartRequest('POST', _uri('/scans'));
+    request.headers.addAll(_authHeaders);
+    request.fields['vehicle_id'] = vehicleId;
+    request.fields['scan_type'] = scanType;
+    request.files.add(
+      http.MultipartFile.fromBytes('images', imageBytes, filename: filename),
+    );
+    final streamed = await _client.send(request);
+    final response = await http.Response.fromStream(streamed);
+    _ensureSuccess(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getScan(String scanId) async {
+    final body = await _get('/scans/$scanId', auth: true);
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<List<dynamic>> getMyScans() async {
+    final body = await _get('/me/scans', auth: true);
+    return body['data'] as List<dynamic>;
+  }
 }
 
 class ApiException implements Exception {

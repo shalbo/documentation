@@ -11,6 +11,7 @@ from app.routers import (
     monetization,
     profile,
     promotions,
+    scans,
     testimonials,
 )
 
@@ -40,6 +41,7 @@ app.include_router(health.router, prefix=prefix)
 app.include_router(catalog.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
+app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(promotions.router, prefix=prefix)
 app.include_router(testimonials.router, prefix=prefix)
