@@ -88,6 +88,39 @@ class RegistrationService {
     return body;
   }
 
+  Future<double> fetchDriverRegistrationFee() async {
+    return 150.0;
+  }
+
+  Future<Map<String, dynamic>> initiateDriverRegistrationPayment({
+    required String profileId,
+    required String phone,
+    required String gateway,
+    String returnUrl = 'rousto://payment/return',
+  }) async {
+    return _post('/api/v1/auth/register/driver/initiate-payment', {
+      'profile_id': profileId,
+      'phone': phone,
+      'gateway': gateway,
+      'return_url': returnUrl,
+    });
+  }
+
+  Future<Map<String, dynamic>> getDriverPaymentStatus({
+    required String profileId,
+    required String phone,
+  }) async {
+    final uri = Uri.parse(
+      '$_base/api/v1/auth/register/driver/$profileId/payment-status?phone=${Uri.encodeComponent(phone)}',
+    );
+    final res = await http.get(uri);
+    final body = jsonDecode(res.body) as Map<String, dynamic>;
+    if (res.statusCode >= 400) {
+      throw Exception(_msg(body));
+    }
+    return body;
+  }
+
   Future<Map<String, dynamic>> _post(String path, Map<String, dynamic> payload) async {
     final res = await http.post(
       Uri.parse('$_base$path'),

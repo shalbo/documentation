@@ -8,6 +8,22 @@ function toast(msg, isError = false) {
   setTimeout(() => el.classList.remove('show'), 2800);
 }
 
+function feeBadge(item) {
+  if (item.role !== 'driver' || item.service_type !== 'tow') return '';
+  const status = item.registration_fee_status || 'unpaid';
+  const gateway = item.registration_fee_gateway;
+  if (status === 'paid') {
+    const gwLabel = gateway === 'muamalat' ? 'معاملات' : gateway === 'sadad' ? 'سداد' : gateway || 'بوابة محلية';
+    return `<span class="badge badge-paid">الرسوم مدفوعة عبر ${gwLabel}</span>`;
+  }
+  return '<span class="badge badge-unpaid">الرسوم غير مدفوعة</span>';
+}
+
+function canApproveDriver(item) {
+  if (item.role !== 'driver' || item.service_type !== 'tow') return true;
+  return item.registration_fee_status === 'paid';
+}
+
 async function loadPending() {
   const list = document.getElementById('pendingList');
   list.innerHTML = 'جاري التحميل…';
@@ -49,14 +65,20 @@ function renderCard(item) {
         ${docImg('سيارة', item.vehicle_doc_path)}
       </div>`
     : '';
+  const fee = feeBadge(item);
+  const approveDisabled = !canApproveDriver(item);
+  const approveBtn = approveDisabled
+    ? `<button class="btn btn-approve" disabled title="يجب سداد رسوم التفعيل أولاً">اعتماد الحساب (الرسوم غير مدفوعة)</button>`
+    : `<button class="btn btn-approve" data-approve="${item.role}" data-id="${item.id}">اعتماد وتفعيل السائق</button>`;
   return `<article class="card pending-card" style="margin-bottom:12px">
     <strong>${title}</strong>
     <div class="subheading">${roleLabel} · ${u.phone} · ${item.city || u.city || ''}</div>
     ${item.plate_number ? `<div>اللوحة: ${item.plate_number} · ${item.service_type}</div>` : ''}
     ${item.specialty ? `<div>التخصص: ${item.specialty}</div>` : ''}
+    ${fee ? `<div style="margin-top:8px">${fee}</div>` : ''}
     ${docs}
     <div class="actions-row">
-      <button class="btn btn-approve" data-approve="${item.role}" data-id="${item.id}">اعتماد الحساب</button>
+      ${approveBtn}
       <button class="btn btn-reject" data-reject="${item.role}" data-id="${item.id}">رفض الطلب</button>
     </div>
   </article>`;

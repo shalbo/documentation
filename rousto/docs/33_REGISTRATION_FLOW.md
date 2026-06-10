@@ -21,6 +21,9 @@
 | POST | `/api/v1/registration/workshop` |
 | POST | `/api/v1/registration/driver` |
 | POST | `/api/v1/registration/driver/{id}/documents` |
+| POST | `/api/v1/auth/register/driver` (بيانات + وثائق multipart) |
+| POST | `/api/v1/auth/register/driver/initiate-payment` |
+| GET | `/api/v1/auth/register/driver/{id}/payment-status` |
 | GET | `/api/v1/admin/registration/pending` |
 | POST | `/api/v1/admin/registration/{role}/{id}/approve` |
 | POST | `/api/v1/admin/registration/{role}/{id}/reject` |
@@ -29,7 +32,7 @@
 
 - `RegisterRoleScreen` — اختيار زبون/سائق
 - `CustomerRegisterScreen` — اسم، هاتف، مدينة
-- `DriverRegisterScreen` — خطوتان + رفع مستندات
+- `DriverRegisterScreen` — 3 خطوات لسائقي الساحبات: بيانات + مستندات + رسوم تفعيل (معاملات/سداد)
 
 ## Admin
 

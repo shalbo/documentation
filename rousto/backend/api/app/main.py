@@ -52,6 +52,7 @@ from app.routers import (
     libyan_payments,
     payment_webhooks,
     registration,
+    driver_registration_auth,
     vin_decoder,
     vendors,
 )
@@ -126,6 +127,7 @@ app.include_router(libyan_payments.router, prefix=prefix)
 app.include_router(payment_webhooks.router, prefix=prefix)
 app.include_router(payment_webhooks.legacy_router, prefix=prefix)
 app.include_router(registration.router, prefix=prefix)
+app.include_router(driver_registration_auth.router, prefix=prefix)
 app.include_router(vin_decoder.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)
 app.include_router(towing_dispatch.router, prefix=prefix)

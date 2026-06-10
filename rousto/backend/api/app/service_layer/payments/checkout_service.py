@@ -183,6 +183,10 @@ def complete_gateway_webhook(
                 gateway_ref=ref,
                 description_ar="شحن محفظة عبر بوابة محلية",
             )
+        elif gp.order_type == "driver_registration_fee" and gp.order_id:
+            from app.registration_services import complete_driver_registration_payment
+
+            complete_driver_registration_payment(db, gp.order_id, gp)
         else:
             vendor_id = gp.metadata_json.get("vendor_id")
             if vendor_id and gp.order_id:
