@@ -60,6 +60,7 @@ services:
       - ./database/043_part_vin_compatibilities_seed.sql:/docker-entrypoint-initdb.d/043_part_vin_compatibilities_seed.sql:ro
       - ./database/044_vin_decoders_schema.sql:/docker-entrypoint-initdb.d/044_vin_decoders_schema.sql:ro
       - ./database/044_vin_decoders_libya_seed.sql:/docker-entrypoint-initdb.d/044_vin_decoders_libya_seed.sql:ro
+      - ./database/045_part_categories_comprehensive_seed.sql:/docker-entrypoint-initdb.d/045_part_categories_comprehensive_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s
