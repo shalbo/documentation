@@ -11,6 +11,7 @@ from app.error_reporting import capture_exception, init_error_reporting
 from app.security_middleware import SecurityHeadersMiddleware
 from app.routers import (
     admin_catalog,
+    admin_cities,
     admin_fitment,
     admin_marketing,
     admin_marketplace,
@@ -84,6 +85,7 @@ app.include_router(auth.router, prefix=prefix)
 app.include_router(catalog.router, prefix=prefix)
 app.include_router(cities.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
+app.include_router(admin_cities.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(admin_notifications.router, prefix=prefix)
 app.include_router(admin_parts.router, prefix=prefix)

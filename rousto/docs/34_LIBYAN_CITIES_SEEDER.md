@@ -41,11 +41,27 @@ python3 ../scripts/seed_libyan_cities.py
 
 ## API
 
+### عام (قراءة)
+
 | الطريقة | المسار | الوصف |
 |---------|--------|--------|
 | GET | `/api/v1/cities` | قائمة المدن النشطة |
 | GET | `/api/v1/cities?region=West` | فلترة حسب الإقليم |
 | GET | `/api/v1/registration/cities` | نفس القائمة لنماذج التسجيل |
+
+### إدارة (Super Admin — `X-Admin-Key`)
+
+| الطريقة | المسار | الوصف |
+|---------|--------|--------|
+| GET | `/api/v1/admin/cities` | كل المدن (نشطة ومعطّلة) |
+| GET | `/api/v1/admin/cities?region=East&active=true` | فلترة |
+| POST | `/api/v1/admin/cities` | إضافة مدينة |
+| GET | `/api/v1/admin/cities/{id}` | تفاصيل مدينة |
+| PATCH | `/api/v1/admin/cities/{id}` | تعديل أو تعطيل (`is_active: false`) |
+
+### لوحة التحكم
+
+`rousto/admin/cities.html` — ضمن **الإعدادات اللوجستية** في `logistics.html`
 
 ---
 
