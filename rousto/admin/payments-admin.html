@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة المدفوعات والعمولات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; }
+    .ov-card { background: var(--brand-navy-050); border: 1px solid var(--brand-line); border-radius: 14px; padding: 16px; }
+    .ov-card b { display: block; font-size: 1.5rem; color: var(--brand-navy); margin-top: 4px; }
+    .ov-card.highlight { background: linear-gradient(135deg,#003049,#1a5578); color:#fff; }
+    .ov-card.highlight b { color: #f2b705; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>إدارة المدفوعات والعمولات</h1>
+      <p>أرباح المنصة، طلبات السحب، وسجل التدقيق المالي</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label for="apiBase">API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="adminKey">مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>نظرة عامة</h2>
+      <div id="overview" class="overview-grid"><div class="empty">جاري التحميل…</div></div>
+    </section>
+
+    <section class="card">
+      <h2>طلبات سحب التجار</h2>
+      <table id="withdrawTable">
+        <thead><tr><th>التاجر</th><th>المبلغ</th><th>IBAN</th><th>الحالة</th><th></th></tr></thead>
+        <tbody><tr><td colspan="5" class="empty">—</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>سجل التدقيق المالي</h2>
+      <div id="auditList" class="tx-list" style="max-height:280px;overflow:auto"></div>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script src="js/payments-admin.js"></script>
+</body>
+</html>

@@ -252,6 +252,93 @@ class Payment(Base):
     booking: Mapped["Booking"] = relationship(back_populates="payments")
 
 
+class Wallet(Base):
+    __tablename__ = "wallets"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    owner_type: Mapped[str] = mapped_column(String(20))
+    owner_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
+    balance_lyd: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
+    pending_lyd: Mapped[float] = mapped_column(Numeric(12, 2), default=0)
+    currency: Mapped[str] = mapped_column(String(3), default="LYD")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    transactions: Mapped[list["WalletTransaction"]] = relationship(back_populates="wallet")
+
+
+class WalletTransaction(Base):
+    __tablename__ = "wallet_transactions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    wallet_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("wallets.id", ondelete="CASCADE"))
+    amount_lyd: Mapped[float] = mapped_column(Numeric(12, 2))
+    direction: Mapped[str] = mapped_column(String(10))
+    transaction_type: Mapped[str] = mapped_column(String(20))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    reference_type: Mapped[str | None] = mapped_column(String(40))
+    reference_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    gateway: Mapped[str | None] = mapped_column(String(20))
+    gateway_ref: Mapped[str | None] = mapped_column(String(120))
+    description_ar: Mapped[str | None] = mapped_column(String(300))
+    metadata_json: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    wallet: Mapped["Wallet"] = relationship(back_populates="transactions")
+
+
+class WithdrawalRequest(Base):
+    __tablename__ = "withdrawal_requests"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    wallet_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("wallets.id"))
+    vendor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vendors.id"))
+    amount_lyd: Mapped[float] = mapped_column(Numeric(12, 2))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    bank_name: Mapped[str | None] = mapped_column(String(80))
+    iban: Mapped[str | None] = mapped_column(String(34))
+    note: Mapped[str | None] = mapped_column(Text)
+    admin_note: Mapped[str | None] = mapped_column(Text)
+    approved_by: Mapped[str | None] = mapped_column(String(80))
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class GatewayPayment(Base):
+    __tablename__ = "gateway_payments"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    amount_lyd: Mapped[float] = mapped_column(Numeric(12, 2))
+    gateway: Mapped[str] = mapped_column(String(20))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    order_type: Mapped[str] = mapped_column(String(40))
+    order_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    redirect_url: Mapped[str | None] = mapped_column(Text)
+    gateway_ref: Mapped[str | None] = mapped_column(String(120))
+    signature_hash: Mapped[str | None] = mapped_column(String(128))
+    metadata_json: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class PaymentAuditLog(Base):
+    __tablename__ = "payment_audit_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(60))
+    gateway: Mapped[str | None] = mapped_column(String(20))
+    reference_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    ip_address: Mapped[str | None] = mapped_column(String(45))
+    payload_hash: Mapped[str | None] = mapped_column(String(64))
+    details_json: Mapped[dict] = mapped_column("details", JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class LoyaltyTransaction(Base):
     __tablename__ = "loyalty_transactions"
 
@@ -465,6 +552,7 @@ class Tier(Base):
     allow_unlimited_chat: Mapped[bool] = mapped_column(Boolean, default=False)
     has_gold_badge: Mapped[bool] = mapped_column(Boolean, default=False)
     search_priority: Mapped[int] = mapped_column(SmallInteger, default=100)
+    platform_commission_rate: Mapped[float] = mapped_column(Numeric(5, 4), default=0.15)
     sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

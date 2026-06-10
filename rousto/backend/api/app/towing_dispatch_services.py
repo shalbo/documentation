@@ -399,6 +399,43 @@ def advance_dispatch_status(db: Session, dispatch: TowingDispatch) -> TowingDisp
     dispatch.updated_at = now
     if new_status == "completed":
         dispatch.completed_at = now
+        try:
+            from app.config import settings
+            from app.models import DriverProfile
+            from app.payment_audit_services import log_payment_event
+            from app.wallet_services import deduct_driver_commission
+
+            commission = settings.driver_trip_commission_lyd
+            driver_user_id = None
+            if dispatch.technician_id:
+                profile = db.scalar(
+                    select(DriverProfile).where(
+                        DriverProfile.technician_id == dispatch.technician_id
+                    )
+                )
+                if profile:
+                    driver_user_id = profile.user_id
+
+            if driver_user_id and commission > 0:
+                deduct_driver_commission(
+                    db,
+                    driver_user_id=driver_user_id,
+                    amount_lyd=commission,
+                    trip_ref=dispatch.reference,
+                )
+
+            log_payment_event(
+                db,
+                event_type="driver.trip.completed",
+                reference_id=dispatch.id,
+                details={
+                    "commission_lyd": commission,
+                    "reference": dispatch.reference,
+                    "driver_user_id": str(driver_user_id) if driver_user_id else None,
+                },
+            )
+        except Exception:
+            pass
 
     db.add(
         TowingDispatchEvent(

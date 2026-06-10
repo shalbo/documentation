@@ -20,6 +20,7 @@ from app.routers import (
     admin_shipping,
     admin_tiers,
     admin_subscriptions,
+    admin_payments,
     auth,
     bookings,
     catalog,
@@ -47,6 +48,9 @@ from app.routers import (
     vendor_map,
     vendor_parts,
     vendor_subscription,
+    vendor_wallet,
+    libyan_payments,
+    payment_webhooks,
     registration,
     vin_decoder,
     vendors,
@@ -97,6 +101,7 @@ app.include_router(admin_fitment.router, prefix=prefix)
 app.include_router(admin_shipping.router, prefix=prefix)
 app.include_router(admin_tiers.router, prefix=prefix)
 app.include_router(admin_subscriptions.router, prefix=prefix)
+app.include_router(admin_payments.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)
@@ -116,6 +121,9 @@ app.include_router(split_payments.router, prefix=prefix)
 app.include_router(vendors.router, prefix=prefix)
 app.include_router(vendor_parts.router, prefix=prefix)
 app.include_router(vendor_subscription.router, prefix=prefix)
+app.include_router(vendor_wallet.router, prefix=prefix)
+app.include_router(libyan_payments.router, prefix=prefix)
+app.include_router(payment_webhooks.router, prefix=prefix)
 app.include_router(registration.router, prefix=prefix)
 app.include_router(vin_decoder.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)

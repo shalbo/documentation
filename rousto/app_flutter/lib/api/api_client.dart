@@ -427,6 +427,38 @@ class ApiClient {
     _ensureSuccess(response);
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
+
+  Future<Map<String, dynamic>> getLibyanCheckoutOptions() async {
+    final body = await _get('/payments/libyan/options', auth: true);
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> checkoutLibyan({
+    required double amountLyd,
+    required String gateway,
+    required String orderType,
+    String? orderId,
+    String? vendorId,
+  }) async {
+    final body = await _post(
+      '/payments/checkout',
+      {
+        'amount_lyd': amountLyd,
+        'gateway': gateway,
+        'order_type': orderType,
+        if (orderId != null) 'order_id': orderId,
+        if (vendorId != null) 'vendor_id': vendorId,
+        'return_url': 'rousto://payment/return',
+      },
+      auth: true,
+    );
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getMyWallet() async {
+    final body = await _get('/me/wallet', auth: true);
+    return body['data'] as Map<String, dynamic>;
+  }
 }
 
 class ApiException implements Exception {

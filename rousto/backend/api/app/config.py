@@ -37,6 +37,17 @@ class Settings(BaseSettings):
     sentry_dsn: str = ""
     log_level: str = "INFO"
 
+    # Libyan payment gateways (local only)
+    gateway_sandbox_mode: bool = True
+    payment_return_url_base: str = "https://pay.rousto.ly"
+    muamalat_merchant_id: str = ""
+    muamalat_webhook_secret: str = ""
+    sadad_api_key: str = ""
+    sadad_webhook_secret: str = ""
+    edfali_api_key: str = ""
+    edfali_webhook_secret: str = ""
+    driver_trip_commission_lyd: float = 5.0
+
     # Push notifications (FCM)
     fcm_enabled: bool = False
     fcm_project_id: str = ""
