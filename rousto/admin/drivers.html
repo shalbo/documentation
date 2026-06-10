@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — شبكة السائقين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+    .stat-grid b { font-size: 1.3rem; color: #E11B22; }
+    .type-tow { color: #b45309; }
+    .type-service { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — شبكة السائقين</h1>
+      <p>فنيو الخدمة · سائقو السطحات · حوض المهام</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="logistics.html" class="btn btn-ghost-light">لوجستيات</a>
+      <a href="towing-dispatch.html" class="btn btn-ghost-light">إرسال السطحات</a>
+      <a href="vendor-map.html" class="btn btn-ghost-light">خريطة الفنيين</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="adminKey">مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>ملخص الشبكة</h2>
+      <div id="analyticsGrid" class="stat-grid"></div>
+    </section>
+
+    <section class="card">
+      <h2>
+        السائقون
+        <select id="typeFilter">
+          <option value="">الكل</option>
+          <option value="service">فني خدمة</option>
+          <option value="tow">سطحة</option>
+          <option value="courier">مندوب</option>
+        </select>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>النوع</th>
+            <th>التقييم</th>
+            <th>متاح</th>
+            <th>نشط</th>
+            <th>مكتمل</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody id="driversBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/drivers.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

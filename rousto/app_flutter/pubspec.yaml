@@ -1,0 +1,41 @@
+name: rousto
+description: "تطبيق روستو للعناية الذكية بالسيارات — Rousto Auto Care."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ">=0.19.0 <0.21.0"
+  cupertino_icons: ^1.0.6
+  flutter_svg: ^2.0.10
+  google_fonts: ^6.2.1
+  http: ^1.2.2
+  image_picker: ^1.1.2
+  provider: ^6.1.2
+  shared_preferences: ^2.3.3
+  sentry_flutter: ^8.14.1
+  firebase_core: ^3.8.1
+  firebase_messaging: ^15.1.6
+  webview_flutter: ^4.10.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/logo.svg
+    - assets/logo_wordmark.svg
+    - assets/logo.png
+    - assets/app_icon.png
+    - assets/app_icon_foreground.png

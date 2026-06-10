@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة المدن</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>الإعدادات اللوجستية — إدارة المدن</h1>
+      <p>إضافة وتعديل وتعطيل مدن التوصيل والشحن بين المدن</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="logistics.html" class="btn btn-ghost-light">لوجستيات</a>
+      <a href="shipping.html" class="btn btn-ghost-light">تعرفة الشحن</a>
+      <button id="refreshBtn" class="btn btn-secondary">اتصال وتحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة (X-Admin-Key)</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2 id="cityFormTitle">إضافة مدينة</h2>
+        <form id="cityForm">
+          <input type="hidden" id="cityId" />
+          <div class="form-row">
+            <div>
+              <label for="nameAr">الاسم بالعربية</label>
+              <input id="nameAr" required placeholder="طرابلس" />
+            </div>
+            <div>
+              <label for="nameEn">الاسم بالإنجليزية</label>
+              <input id="nameEn" required placeholder="Tripoli" />
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <label for="region">الإقليم</label>
+            <select id="region" required>
+              <option value="West">غرب (West)</option>
+              <option value="East">شرق (East)</option>
+              <option value="South">جنوب (South)</option>
+            </select>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button id="citySubmit" class="btn btn-primary" type="submit">إضافة</button>
+            <button id="cityCancel" class="btn btn-ghost" type="button" style="display:none">إلغاء</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>فلترة القائمة</h2>
+        <div class="config-grid">
+          <div>
+            <label for="filterRegion">الإقليم</label>
+            <select id="filterRegion">
+              <option value="">الكل</option>
+              <option value="West">غرب</option>
+              <option value="East">شرق</option>
+              <option value="South">جنوب</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterActive">الحالة</label>
+            <select id="filterActive">
+              <option value="">الكل</option>
+              <option value="true">نشطة فقط</option>
+              <option value="false">معطّلة فقط</option>
+            </select>
+          </div>
+        </div>
+        <p style="color:var(--ink-500);font-size:.85rem;margin-top:12px">
+          المدن المعطّلة لا تظهر في التسجيل أو الفلاتر العامة، لكن تبقى مرتبطة بالسجلات السابقة.
+        </p>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>قائمة المدن <span id="cityCount" class="badge badge-on" style="margin-right:8px">0</span></h2>
+      <table id="citiesTable">
+        <thead>
+          <tr>
+            <th>الاسم (عربي)</th>
+            <th>الاسم (إنجليزي)</th>
+            <th>الإقليم</th>
+            <th>الحالة</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5" class="empty">اضغط «اتصال وتحديث» لتحميل البيانات</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/cities-admin.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — توافق المركبات (Fitment)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>محدد التوافق — Guaranteed Fitment</h1>
+      <p>ربط القطع بسنة/موديل/ماركة المركبة</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="parts.html" class="btn btn-ghost-light">القطع</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label>مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>إضافة توافق لقطعة</h2>
+      <form id="compatForm" class="form-row">
+        <div>
+          <label>معرّف القطعة (UUID)</label>
+          <input id="partId" required placeholder="pt000000-..." />
+        </div>
+        <div>
+          <label>معرّف سنة المركبة (car_year_id)</label>
+          <input id="carYearId" required placeholder="cy000000-..." />
+        </div>
+        <div style="align-self:end">
+          <button class="btn btn-primary" type="submit">ربط</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>كتالوج الماركات</h2>
+      <table>
+        <thead><tr><th>الماركة</th><th>slug</th><th>المعرّف</th></tr></thead>
+        <tbody id="makesBody"><tr><td colspan="3" class="empty">تحديث</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>توافقات قطعة</h2>
+      <div class="form-row">
+        <input id="lookupPartId" placeholder="معرّف القطعة لعرض التوافقات" />
+        <button id="lookupBtn" class="btn btn-secondary" type="button">عرض</button>
+      </div>
+      <table style="margin-top:12px">
+        <thead><tr><th>السنة</th><th>الموديل</th><th>الماركة</th><th>ملاحظة</th></tr></thead>
+        <tbody id="compatBody"><tr><td colspan="4" class="empty">—</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/fitment-admin.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

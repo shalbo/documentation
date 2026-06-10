@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة باقات المنصة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .tiers-hero {
+      background: linear-gradient(135deg, var(--brand-navy) 0%, #1a5578 100%);
+      color: #fff;
+      border-radius: var(--r-brand);
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    .tiers-hero h2 { margin: 0 0 6px; font-size: 1.35rem; }
+    .tiers-hero p { margin: 0; opacity: .88; font-size: .92rem; }
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .tier-card {
+      border: 1px solid var(--brand-line);
+      border-radius: var(--r-brand);
+      background: var(--brand-surface);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 48, 73, .06);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .tier-card.editing {
+      border-color: var(--brand-red);
+      box-shadow: 0 12px 32px rgba(193, 18, 31, .12);
+    }
+    .tier-card.gold {
+      border-color: var(--brand-gold, #f2b705);
+    }
+    .tier-head {
+      padding: 16px 18px;
+      background: var(--brand-navy-050);
+      border-bottom: 1px solid var(--brand-line);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .tier-card.gold .tier-head {
+      background: linear-gradient(135deg, #fff9e6, var(--brand-navy-050));
+    }
+    .tier-name { font-weight: 800; color: var(--brand-navy); font-size: 1.05rem; }
+    .tier-slug { font-size: .75rem; color: var(--ink-500); margin-top: 2px; }
+    .tier-price {
+      font-weight: 800;
+      color: var(--brand-red);
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+    .tier-body { padding: 16px 18px; }
+    .tier-limit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1px solid var(--brand-line);
+    }
+    .tier-limit label { font-size: .82rem; color: var(--ink-500); flex: 1; }
+    .tier-limit input {
+      width: 110px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .tier-limit small {
+      display: block;
+      font-size: .72rem;
+      color: var(--ink-300);
+      margin-top: 4px;
+    }
+    .feature-toggles { display: grid; gap: 10px; }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--brand-line);
+    }
+    .toggle-row span { font-size: .88rem; font-weight: 600; color: var(--brand-navy); }
+    .toggle-row small { display: block; font-size: .72rem; color: var(--ink-500); font-weight: 400; }
+    .switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      background: var(--ink-300);
+      border-radius: 999px;
+      transition: .2s;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      right: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .2s;
+    }
+    .switch input:checked + .slider { background: var(--brand-navy); }
+    .switch input:checked + .slider::before { transform: translateX(-20px); }
+    .tier-foot {
+      padding: 14px 18px;
+      border-top: 1px solid var(--brand-line);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tier-meta { font-size: .78rem; color: var(--ink-500); }
+    .tier-meta b { color: var(--brand-navy); }
+    .name-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .name-fields input { font-weight: 600; }
+    .badge-gold {
+      background: linear-gradient(135deg, #f2b705, #d4a004);
+      color: #003049;
+      font-size: .7rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .empty-tiers { text-align: center; padding: 40px; color: var(--ink-500); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>إدارة باقات المنصة</h1>
+      <p>تعديل ديناميكي لقيود الاشتراك — السعر، سقف القطع، والميزات</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="vendors.html" class="btn btn-ghost-light">المحلات</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث الباقات</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card" style="padding:0;border:none;background:transparent;box-shadow:none">
+      <div class="tiers-hero">
+        <h2>باقات التجار الديناميكية</h2>
+        <p>كل تعديل يُطبَّق فوراً على جميع التجار المرتبطين بالباقة. ضع <b>-1</b> في سقف القطع لتمكين مخزون غير محدود.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة (X-Admin-Key)</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <div id="tierGrid" class="tier-grid">
+      <div class="empty-tiers">جاري تحميل الباقات…</div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/tiers-admin.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

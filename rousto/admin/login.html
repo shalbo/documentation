@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — تسجيل الدخول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="icon" href="static/images/logo.png" type="image/png" />
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="login-card">
+      <img src="static/images/logo.png" alt="Rousto" class="login-logo" width="220" height="84" />
+      <h1>مرحباً بك في روستو</h1>
+      <p class="login-sub">اختر بوابة الدخول المناسبة لحسابك</p>
+
+      <div class="login-portals">
+        <a href="index.html" class="login-portal-card">
+          <strong>لوحة السوبر أدمن</strong>
+          <span>إدارة السوق، المدفوعات، والتجار</span>
+        </a>
+        <a href="vendor-portal.html" class="login-portal-card">
+          <strong>بوابة التاجر / الورشة</strong>
+          <span>المنتجات، المحفظة، والاشتراك</span>
+        </a>
+        <a href="register-portal.html" class="login-portal-card">
+          <strong>تسجيل حساب جديد</strong>
+          <span>تاجر قطع غيار أو ورشة صيانة</span>
+        </a>
+      </div>
+
+      <section class="card" style="margin-top:20px">
+        <h2 style="margin-top:0;font-size:1rem">إعدادات الاتصال (تطوير)</h2>
+        <div class="config-grid">
+          <div>
+            <label for="apiBase">عنوان API</label>
+            <input id="apiBase" type="url" value="http://localhost:8000" />
+          </div>
+          <div>
+            <label for="adminKey">مفتاح الأدمن</label>
+            <input id="adminKey" value="rousto_admin_dev" />
+          </div>
+        </div>
+        <button type="button" id="saveCfg" class="btn btn-primary" style="margin-top:12px">حفظ الإعدادات</button>
+      </section>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script>
+    const KEY = "rousto_admin_config";
+    const $ = (id) => document.getElementById(id);
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || "{}");
+      if (s.apiBase) $("apiBase").value = s.apiBase;
+      if (s.adminKey) $("adminKey").value = s.adminKey;
+    } catch (_) {}
+    $("saveCfg").onclick = () => {
+      localStorage.setItem(KEY, JSON.stringify({
+        apiBase: $("apiBase").value.replace(/\/$/, ""),
+        adminKey: $("adminKey").value.trim(),
+      }));
+      const t = $("toast");
+      t.textContent = "تم حفظ الإعدادات";
+      t.className = "toast show";
+      setTimeout(() => t.classList.remove("show"), 2200);
+    };
+  </script>
+</body>
+</html>

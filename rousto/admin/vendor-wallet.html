@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — المالية والمحفظة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .finance-hero {
+      background: linear-gradient(135deg, #003049, #1a5578);
+      color: #fff;
+      border-radius: var(--r-brand);
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+    .balance-big { font-size: 2rem; font-weight: 800; }
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 12px; margin-top: 14px; }
+    .stat-box { background: rgba(255,255,255,.12); border-radius: 12px; padding: 12px; }
+    .tx-list { max-height: 360px; overflow: auto; }
+    .tx-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--brand-line);
+      font-size: .88rem;
+    }
+    .tx-credit { color: var(--green); font-weight: 700; }
+    .tx-debit { color: var(--brand-red); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>المالية والمحفظة</h1>
+      <p>الرصيد الصافي، الأرباح المعلقة، وسجل العمليات بالدينار الليبي</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="templates/invoice.html" class="btn btn-ghost-light">نموذج فاتورة</a>
+      <a href="vendor-products.html" class="btn btn-ghost-light">المخزون</a>
+      <a href="vendor-subscription.html" class="btn btn-ghost-light">الباقة</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card" style="padding:0;border:none;background:transparent">
+      <div class="finance-hero">
+        <div>الرصيد المتاح</div>
+        <div class="balance-big" id="balanceLyd">— د.ل</div>
+        <div class="stat-row">
+          <div class="stat-box"><span>معلق سحب</span><b id="pendingLyd">—</b></div>
+          <div class="stat-box"><span>العملة</span><b>LYD</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label for="apiBase">API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="vendorId">معرّف التاجر</label><input id="vendorId" value="v0000000-0000-4000-8000-000000000001" /></div>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>طلب سحب الأرباح</h2>
+        <form id="withdrawForm">
+          <div><label for="amount">المبلغ (د.ل)</label><input id="amount" type="number" min="1" step="0.01" required /></div>
+          <div style="margin-top:8px"><label for="iban">IBAN</label><input id="iban" placeholder="LY..." /></div>
+          <div style="margin-top:8px"><label for="note">ملاحظة</label><input id="note" /></div>
+          <button class="btn btn-primary" type="submit" style="margin-top:12px">طلب سحب</button>
+        </form>
+      </section>
+      <section class="card">
+        <h2>سجل العمليات</h2>
+        <div id="txList" class="tx-list"><div class="empty">—</div></div>
+      </section>
+    </div>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script src="js/services/api-client.js"></script>
+  <script src="js/services/vendor-wallet-service.js"></script>
+  <script src="js/vendor-wallet.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

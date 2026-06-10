@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — تسجيل تاجر / ورشة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .map-pick { height: 200px; background: var(--brand-navy-050); border-radius: 14px; border: 1px dashed var(--brand-line); display: grid; place-items: center; color: var(--ink-500); cursor: pointer; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tabs button { flex: 1; padding: 10px; border-radius: 14px; border: 1px solid var(--brand-line); background: #fff; font-family: inherit; font-weight: 800; cursor: pointer; }
+    .tabs button.active { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>تسجيل تاجر أو ورشة</h1>
+      <p>حقول واضحة + مدينة + موقع GPS</p>
+    </div>
+    <a href="registration-approvals.html" class="btn btn-ghost-light">طلبات الاعتماد</a>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="tabs">
+        <button type="button" id="tabVendor" class="active">تاجر قطع غيار</button>
+        <button type="button" id="tabWorkshop">ورشة صيانة</button>
+      </div>
+      <form id="regForm">
+        <input type="hidden" id="role" value="vendor" />
+        <div class="form-row">
+          <div><label>اسم المسؤول</label><input id="fullName" required /></div>
+          <div><label>الجوال</label><input id="phone" placeholder="+2189XXXXXXXX" required /></div>
+        </div>
+        <div class="form-row">
+          <div><label>البريد</label><input id="email" type="email" required /></div>
+          <div><label id="bizLabel">اسم المحل</label><input id="bizName" required /></div>
+        </div>
+        <div class="form-row">
+          <div><label>التخصص</label><input id="specialty" placeholder="فلاتر، فرامل…" /></div>
+          <div><label>المدينة</label><select id="city" required></select></div>
+        </div>
+        <label>تحديد الموقع (انقر لمحاكاة GPS)</label>
+        <div class="map-pick" id="mapPick">انقر لتحديد الإحداثيات · طرابلس الافتراضي</div>
+        <input type="hidden" id="lat" value="32.8872" />
+        <input type="hidden" id="lng" value="13.1913" />
+        <div style="margin-top:16px">
+          <button type="submit" class="btn btn-primary">إرسال طلب التسجيل</button>
+        </div>
+      </form>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script src="js/register-portal.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

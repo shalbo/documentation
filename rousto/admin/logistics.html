@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — الخدمات اللوجستية والمساعدة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .module-card { display: block; text-decoration: none; color: inherit; border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: var(--bg); }
+    .module-card h3 { margin: 8px 0 4px; font-size: 1rem; }
+    .module-card p { margin: 0; color: var(--ink-500); font-size: .85rem; }
+    .module-icon { font-size: 1.6rem; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>الخدمات اللوجستية والمساعدة</h1>
+      <p>موديول ثانوي — سطحات، ورش صيانة، وتتبع الفنيين</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="parts.html" class="btn btn-ghost-light">قطع الغيار</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>وحدات الخدمة المكمّلة</h2>
+      <p style="color:var(--ink-500);font-size:.9rem;margin-top:0">
+        سوق قطع الغيار هو الأساس. هذه الأدوات لإدارة الصيانة والنقل فقط.
+      </p>
+      <h3 style="margin:20px 0 8px;font-size:.95rem;color:var(--ink-500)">الإعدادات اللوجستية</h3>
+      <div class="module-grid" style="margin-top:8px">
+        <a class="module-card" href="cities.html">
+          <div class="module-icon">🏙️</div>
+          <h3>إدارة المدن</h3>
+          <p>إضافة وتعديل وتعطيل مدن التوصيل والشحن</p>
+        </a>
+        <a class="module-card" href="shipping.html">
+          <div class="module-icon">📦</div>
+          <h3>تعرفة الشحن بين المدن</h3>
+          <p>تكاليف ثابتة للشحن بين المدن الليبية</p>
+        </a>
+      </div>
+
+      <h3 style="margin:24px 0 8px;font-size:.95rem;color:var(--ink-500)">عمليات الخدمة</h3>
+      <div class="module-grid" style="margin-top:8px">
+        <a class="module-card" href="towing-dispatch.html">
+          <div class="module-icon">🚛</div>
+          <h3>إرسال السطحات</h3>
+          <p>تعيين سائقين ومسارات السحب من موقع العطل</p>
+        </a>
+        <a class="module-card" href="drivers.html">
+          <div class="module-icon">👤</div>
+          <h3>شبكة السائقين</h3>
+          <p>سائقو السطحات ومجمع المهام</p>
+        </a>
+        <a class="module-card" href="vendor-map.html">
+          <div class="module-icon">🗺️</div>
+          <h3>خريطة الفنيين</h3>
+          <p>تتبع مواقع الفنيين أثناء الخدمة</p>
+        </a>
+        <a class="module-card" href="services-catalog.html">
+          <div class="module-icon">🔧</div>
+          <h3>كتالوج خدمات الورش</h3>
+          <p>تصنيفات وخدمات الصيانة (ثانوي)</p>
+        </a>
+        <a class="module-card" href="support.html">
+          <div class="module-icon">💬</div>
+          <h3>الدعم الفني</h3>
+          <p>تذاكر العملاء والمساعدة</p>
+        </a>
+      </div>
+    </section>
+  </main>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

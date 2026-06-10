@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — انضمام الفنيين</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — انضمام الفنيين والمالية</h1>
+      <p>مراجعة طلبات الانضمام وربط الحسابات البنكية</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">الكتالوج</a>
+      <a href="vendor-portal.html" class="btn btn-ghost-light">بوابة الفني</a>
+      <a href="vendor-map.html" class="btn btn-ghost-light">خريطة الفنيين</a>
+      <a href="towing-dispatch.html" class="btn btn-ghost-light">إرسال السطحات</a>
+      <a href="support.html" class="btn btn-ghost-light">الدعم</a>
+      <button id="connectBtn" class="btn btn-secondary">اتصال وتحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة (X-Admin-Key)</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>
+        طلبات الانضمام
+        <select id="statusFilter">
+          <option value="">الكل</option>
+          <option value="pending" selected>معلّقة</option>
+          <option value="approved">مُوافَق عليها</option>
+          <option value="rejected">مرفوضة</option>
+        </select>
+      </h2>
+      <table id="vendorsTable">
+        <thead>
+          <tr>
+            <th>النشاط</th>
+            <th>المسؤول</th>
+            <th>الجوال</th>
+            <th>الحالة</th>
+            <th>IBAN</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" class="empty">اضغط «اتصال وتحديث» لتحميل البيانات</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>تقديم طلب تجريبي (API عام)</h2>
+      <form id="applicationForm">
+        <div class="form-row">
+          <div>
+            <label for="bizName">اسم النشاط</label>
+            <input id="bizName" required placeholder="ورشة السريع" />
+          </div>
+          <div>
+            <label for="contactName">اسم المسؤول</label>
+            <input id="contactName" required placeholder="محمد العتيبي" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="email">البريد</label>
+            <input id="email" type="email" required placeholder="vendor@example.com" />
+          </div>
+          <div>
+            <label for="phone">الجوال</label>
+            <input id="phone" required placeholder="+9665XXXXXXXX" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="bankName">البنك</label>
+            <input id="bankName" required placeholder="البنك الأهلي" />
+          </div>
+          <div>
+            <label for="accountHolder">صاحب الحساب</label>
+            <input id="accountHolder" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="iban">IBAN</label>
+            <input id="iban" required placeholder="SA0380000000608010167519" />
+          </div>
+          <div>
+            <label for="city">المدينة</label>
+            <input id="city" value="الرياض" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">إرسال الطلب</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendors.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

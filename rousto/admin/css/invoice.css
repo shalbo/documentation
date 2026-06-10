@@ -1,0 +1,92 @@
+/* Printable invoice / sales report — Rousto brand */
+.invoice-doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  background: #fff;
+  color: var(--brand-navy);
+}
+
+.invoice-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 3px solid var(--brand-red);
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+
+.invoice-logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.invoice-meta h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  color: var(--brand-navy);
+}
+
+.invoice-meta p {
+  margin: 4px 0;
+  font-size: .9rem;
+  color: var(--ink-500);
+}
+
+.invoice-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.invoice-parties h2 {
+  margin: 0 0 6px;
+  font-size: .95rem;
+  color: var(--brand-red);
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.invoice-table th,
+.invoice-table td {
+  border: 1px solid var(--brand-line);
+  padding: 10px 12px;
+  text-align: right;
+}
+
+.invoice-table th {
+  background: var(--brand-navy-050);
+  color: var(--brand-navy);
+}
+
+.invoice-table tfoot td {
+  font-weight: 700;
+}
+
+.invoice-net td {
+  color: var(--brand-red);
+  font-size: 1.05rem;
+}
+
+.invoice-footer {
+  border-top: 1px solid var(--brand-line);
+  padding-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .invoice-doc { padding: 0; max-width: none; }
+}

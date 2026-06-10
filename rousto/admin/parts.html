@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — كتالوج قطع الغيار</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — كتالوج قطع الغيار</h1>
+      <p>النواة المركزية — إدارة القطع والمخزون والضمان</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="fitment.html" class="btn btn-ghost-light">التوافق</a>
+      <a href="shipping.html" class="btn btn-ghost-light">الشحن</a>
+      <a href="vendors.html" class="btn btn-ghost-light">المحلات</a>
+      <a href="logistics.html" class="btn btn-ghost-light">لوجستيات</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label>مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>القطع</h2>
+      <table>
+        <thead>
+          <tr><th>OEM</th><th>الاسم</th><th>VIN prefix</th><th>الفئة</th><th>OEM؟</th><th>السعر</th></tr>
+        </thead>
+        <tbody id="partsBody"><tr><td colspan="6" class="empty">تحديث</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>مطالبات الضمان</h2>
+      <table>
+        <thead><tr><th>المستخدم</th><th>الوصف</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+        <tbody id="claimsBody"><tr><td colspan="4" class="empty">—</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/services/api-client.js"></script>
+  <script src="js/services/parts-service.js"></script>
+  <script src="js/parts-admin.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>

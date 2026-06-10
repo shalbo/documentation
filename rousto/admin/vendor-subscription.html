@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — باقة الاشتراك</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .sub-hero {
+      background: linear-gradient(135deg, var(--brand-navy) 0%, #1a5578 100%);
+      color: #fff;
+      border-radius: var(--r-brand);
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    .sub-hero h2 { margin: 0 0 6px; }
+    .sub-hero p { margin: 0; opacity: .9; font-size: .9rem; }
+    .current-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .current-stat {
+      background: rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .current-stat span { display: block; font-size: .75rem; opacity: .85; }
+    .current-stat b { font-size: 1.15rem; }
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .plan-card {
+      border: 1px solid var(--brand-line);
+      border-radius: var(--r-brand);
+      background: var(--brand-surface);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+    .plan-card.current { border-color: var(--brand-red); box-shadow: 0 10px 28px rgba(193,18,31,.12); }
+    .plan-card.enterprise {
+      background: linear-gradient(160deg, #003049 0%, #1a5578 55%, rgba(242,183,5,.18) 100%);
+      color: #fff;
+      border-color: #f2b705;
+    }
+    .plan-card.enterprise .plan-body,
+    .plan-card.enterprise .plan-head { color: #fff; }
+    .plan-card.enterprise .feat { color: rgba(255,255,255,.9); }
+    .plan-head {
+      padding: 16px 18px;
+      background: var(--brand-navy-050);
+      border-bottom: 1px solid var(--brand-line);
+    }
+    .plan-card.enterprise .plan-head {
+      background: rgba(0,0,0,.15);
+      border-color: rgba(255,255,255,.15);
+    }
+    .plan-name { font-weight: 800; font-size: 1.05rem; color: var(--brand-navy); }
+    .plan-card.enterprise .plan-name { color: #fff; }
+    .plan-price { color: var(--brand-red); font-weight: 800; font-size: 1.2rem; margin-top: 4px; }
+    .plan-card.enterprise .plan-price { color: #f2b705; }
+    .plan-body { padding: 16px 18px; flex: 1; }
+    .feat { font-size: .85rem; color: var(--ink-700); margin-bottom: 6px; }
+    .plan-foot { padding: 14px 18px; border-top: 1px solid var(--brand-line); }
+    .plan-card.enterprise .plan-foot { border-color: rgba(255,255,255,.15); }
+    .vip-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f2b705, #d4a004);
+      color: #003049;
+      font-size: .72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+    }
+    .btn-upgrade {
+      width: 100%;
+      background: var(--brand-red);
+      color: #fff;
+      border: none;
+      padding: 11px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .plan-card.enterprise .btn-upgrade {
+      background: linear-gradient(135deg, #f2b705, #c9a004);
+      color: #003049;
+    }
+    .btn-upgrade:disabled { opacity: .5; cursor: not-allowed; }
+    .current-pill {
+      display: inline-block;
+      background: var(--brand-red-050);
+      color: var(--brand-red-600);
+      font-size: .78rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>باقة الاشتراك</h1>
+      <p>الباقة الحالية، تاريخ الانتهاء، وطلب الترقية</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="vendor-products.html" class="btn btn-ghost-light">مخزوني</a>
+      <a href="vendor-portal.html" class="btn btn-ghost-light">البوابة</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card" style="padding:0;border:none;background:transparent;box-shadow:none">
+      <div class="sub-hero">
+        <h2 id="currentTierName">باقتك الحالية</h2>
+        <p id="expiryLine">—</p>
+        <div class="current-box">
+          <div class="current-stat"><span>القطع المستخدمة</span><b id="usedCount">—</b></div>
+          <div class="current-stat"><span>السقف</span><b id="limitCount">—</b></div>
+          <div class="current-stat"><span>المتبقي</span><b id="remainCount">—</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="vendorId">معرّف التاجر</label><input id="vendorId" value="v0000000-0000-4000-8000-000000000001" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>باقات المنصة</h2>
+      <div id="planGrid" class="plan-grid">
+        <div class="empty">جاري التحميل…</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-subscription.js"></script>
+  <script src="js/brand-topbar.js"></script>
+</body>
+</html>
