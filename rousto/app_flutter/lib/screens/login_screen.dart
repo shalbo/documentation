@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
+import 'register_role_screen.dart';
 import 'root_nav.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -117,6 +118,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : Text(_otpSent ? l10n.confirmLogin : l10n.sendCode),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const RegisterRoleScreen()),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.navy,
+                side: const BorderSide(color: AppColors.navy),
+              ),
+              child: const Text('إنشاء حساب جديد'),
             ),
           ],
         ),

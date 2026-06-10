@@ -10,6 +10,9 @@ ROLE_CUSTOMER = "customer"
 ROLE_ADMIN = "admin"
 ROLE_TECHNICIAN = "technician"
 ROLE_SUPPORT = "support"
+ROLE_VENDOR = "vendor"
+ROLE_DRIVER = "driver"
+ROLE_WORKSHOP = "workshop"
 
 
 @dataclass

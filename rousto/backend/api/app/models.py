@@ -61,6 +61,7 @@ class User(Base):
     avatar_initials: Mapped[str | None] = mapped_column(String(1))
     loyalty_points: Mapped[int] = mapped_column(Integer, default=0)
     locale: Mapped[str] = mapped_column(String(5), default="ar")
+    city: Mapped[str | None] = mapped_column(String(60))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
@@ -1168,6 +1169,61 @@ class TowVehicle(Base):
     max_capacity_kg: Mapped[float | None] = mapped_column(Numeric(8, 2))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class VendorProfile(Base):
+    __tablename__ = "vendor_profiles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), unique=True)
+    shop_name: Mapped[str] = mapped_column(String(120))
+    specialty: Mapped[str | None] = mapped_column(String(120))
+    city: Mapped[str] = mapped_column(String(60))
+    latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    verification_status: Mapped[str] = mapped_column(String(20), default="pending")
+    is_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    rejection_reason: Mapped[str | None] = mapped_column(Text)
+    vendor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("vendors.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class DriverProfile(Base):
+    __tablename__ = "driver_profiles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), unique=True)
+    service_type: Mapped[str] = mapped_column(String(20))
+    plate_number: Mapped[str] = mapped_column(String(20))
+    city: Mapped[str] = mapped_column(String(60))
+    license_doc_path: Mapped[str | None] = mapped_column(String(300))
+    id_doc_path: Mapped[str | None] = mapped_column(String(300))
+    vehicle_doc_path: Mapped[str | None] = mapped_column(String(300))
+    is_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    verification_status: Mapped[str] = mapped_column(String(20), default="pending")
+    rejection_reason: Mapped[str | None] = mapped_column(Text)
+    technician_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class WorkshopProfile(Base):
+    __tablename__ = "workshop_profiles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), unique=True)
+    center_name: Mapped[str] = mapped_column(String(120))
+    specialty: Mapped[str | None] = mapped_column(String(120))
+    city: Mapped[str] = mapped_column(String(60))
+    latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    is_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    verification_status: Mapped[str] = mapped_column(String(20), default="pending")
+    rejection_reason: Mapped[str | None] = mapped_column(Text)
+    vendor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("vendors.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class MarketingAttributionEvent(Base):
