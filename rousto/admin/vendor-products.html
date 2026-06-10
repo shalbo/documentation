@@ -63,7 +63,11 @@
         </div>
         <div class="form-row" style="margin-top:10px">
           <div><label>رقم OEM (اختياري)</label><input id="oemNumber" /></div>
-          <div><label>بادئة VIN (اختياري)</label><input id="vinPrefix" maxlength="11" /></div>
+        </div>
+        <div style="margin-top:10px">
+          <label for="vinPrefixes">بادئات VIN المتوافقة (11 رمزاً لكل سطر)</label>
+          <textarea id="vinPrefixes" rows="3" placeholder="4T1B11HK5JK&#10;2T1BURHE0JC"></textarea>
+          <p class="required-hint">يمكن إدخال أكثر من هيكل — سطر أو فاصلة لكل بادئة</p>
         </div>
         <div style="margin-top:12px">
           <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>

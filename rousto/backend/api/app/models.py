@@ -990,6 +990,20 @@ class Part(Base):
 
     category: Mapped["PartCategory"] = relationship()
     supplier: Mapped["PartSupplier | None"] = relationship()
+    vin_compatibilities: Mapped[list["PartVinCompatibility"]] = relationship(
+        back_populates="part"
+    )
+
+
+class PartVinCompatibility(Base):
+    __tablename__ = "part_vin_compatibilities"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parts.id"))
+    vin_prefix: Mapped[str] = mapped_column(String(11))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    part: Mapped["Part"] = relationship(back_populates="vin_compatibilities")
 
 
 class PartInventory(Base):

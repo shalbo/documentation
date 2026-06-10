@@ -8,6 +8,7 @@ from app.db import get_db
 from app.deps import get_current_user
 from app.i18n import resolve_locale
 from app.models import User
+from app.vin_compat_services import normalize_vin_prefix
 from app.parts_services import (
     create_warranty_claim,
     get_part_detail,
@@ -60,6 +61,14 @@ def search_parts_catalog(
                 "message": "أدخل نص بحث أو فئة أو مركبة أو رقم OEM أو VIN",
             },
         )
+    if vin:
+        try:
+            normalize_vin_prefix(vin)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail={"code": "INVALID_VIN", "message": str(exc)},
+            ) from exc
     check_rate_limit(request, suffix="parts_search", limit=60)
     data = search_parts(
         db,
@@ -84,6 +93,8 @@ def search_parts_catalog(
             "query": q,
             "car_year_id": str(car_year_id) if car_year_id else None,
             "in_stock_only": in_stock_only,
+            "vin_prefix": normalize_vin_prefix(vin) if vin else None,
+            "strict_vin_match": bool(vin),
         },
     }
 

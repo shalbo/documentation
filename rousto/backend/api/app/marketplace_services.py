@@ -73,7 +73,7 @@ def list_featured_parts(
     parts = db.scalars(
         stmt.order_by(Part.is_oem.desc(), Part.name_ar).limit(limit)
     ).unique().all()
-    return [part_out(p, locale) for p in parts]
+    return [part_out(p, locale, db=db) for p in parts]
 
 
 def get_marketplace_home(

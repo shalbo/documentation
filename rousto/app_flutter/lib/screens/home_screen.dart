@@ -193,6 +193,7 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => PartsScreen(
                     initialCarYearId: state.fitment?.carYearId,
+                    openVinMode: false,
                   ),
                 ),
               ),
@@ -215,6 +216,23 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PartsScreen(
+                      initialCarYearId: state.fitment?.carYearId,
+                      openVinMode: true,
+                    ),
+                  ),
+                ),
+                icon: const Icon(Icons.qr_code_scanner, size: 18),
+                label: const Text('البحث برقم الهيكل (VIN)'),
+                style: TextButton.styleFrom(foregroundColor: Colors.white70),
               ),
             ),
           ],

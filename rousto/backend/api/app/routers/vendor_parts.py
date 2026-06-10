@@ -23,7 +23,8 @@ class VendorProductIn(BaseModel):
     price_sar: float = Field(gt=0)
     qty_available: int = Field(ge=1, le=9999)
     oem_number: str | None = Field(default=None, max_length=60)
-    vin_prefix: str | None = Field(default=None, max_length=11)
+    vin_prefix: str | None = Field(default=None, max_length=17)
+    vin_prefixes: list[str] = Field(default_factory=list)
     is_oem: bool = False
     warranty_months: int = Field(default=6, ge=1, le=36)
 
@@ -71,6 +72,7 @@ def vendor_add_product(
             qty_available=body.qty_available,
             oem_number=body.oem_number,
             vin_prefix=body.vin_prefix,
+            vin_prefixes=body.vin_prefixes,
             is_oem=body.is_oem,
             warranty_months=body.warranty_months,
             locale=locale,

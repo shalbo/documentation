@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models import PartInventory, Vendor
 from app.parts_services import create_part, part_out
+from app.vin_compat_services import add_part_vin_compatibilities, parse_vin_prefixes
 
 
 def _now() -> datetime:
@@ -26,6 +27,7 @@ def vendor_create_product(
     name_en: str | None = None,
     oem_number: str | None = None,
     vin_prefix: str | None = None,
+    vin_prefixes: list[str] | None = None,
     is_oem: bool = False,
     warranty_months: int = 6,
     locale: str = "ar",
@@ -33,6 +35,7 @@ def vendor_create_product(
     if vendor.status != "approved":
         raise ValueError("المحل غير معتمد بعد")
 
+    prefixes = parse_vin_prefixes(vin_prefixes or vin_prefix)
     part = create_part(
         db,
         part_number=part_number,
@@ -42,11 +45,13 @@ def vendor_create_product(
         category_id=category_id,
         price_sar=price_sar,
         oem_number=oem_number,
-        vin_prefix=vin_prefix,
+        vin_prefix=prefixes[0] if prefixes else vin_prefix,
         is_oem=is_oem,
         warranty_months=warranty_months,
         require_leaf_category=True,
     )
+    if prefixes:
+        add_part_vin_compatibilities(db, part.id, prefixes)
 
     inv = PartInventory(
         id=uuid.uuid4(),
@@ -59,7 +64,8 @@ def vendor_create_product(
     db.add(inv)
     db.flush()
 
-    data = part_out(part, locale)
+    data = part_out(part, locale, db=db)
+    data["vin_prefixes"] = prefixes
     data["inventory"] = {
         "vendor_id": vendor.id,
         "qty_available": qty_available,

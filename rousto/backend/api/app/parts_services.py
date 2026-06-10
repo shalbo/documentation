@@ -9,6 +9,10 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.category_services import collect_filter_category_ids, is_leaf_category
 from app.fitment_services import part_ids_for_car_year
+from app.vin_compat_services import (
+    apply_where_compatible_with_vin,
+    list_vin_prefixes_for_part,
+)
 from app.i18n import pick_localized
 from app.models import (
     Booking,
@@ -49,12 +53,21 @@ def _vendors_in_stock(db: Session, part_id: uuid.UUID) -> list[dict]:
     ]
 
 
-def part_out(part: Part, locale: str, *, vendors: list[dict] | None = None) -> dict:
+def part_out(
+    part: Part,
+    locale: str,
+    *,
+    db: Session | None = None,
+    vendors: list[dict] | None = None,
+) -> dict:
     data = {
         "id": part.id,
         "part_number": part.part_number,
         "oem_number": part.oem_number or part.part_number,
         "vin_prefix": part.vin_prefix,
+        "vin_prefixes": list_vin_prefixes_for_part(db, part.id)
+        if db
+        else [],
         "slug": part.slug,
         "name": pick_localized(part, "name", locale),
         "name_ar": part.name_ar,
@@ -144,10 +157,9 @@ def search_parts(
         )
 
     if vin:
-        vin_clean = vin.strip().upper()[:11]
-        stmt = stmt.where(Part.vin_prefix.ilike(f"{vin_clean}%"))
+        stmt = apply_where_compatible_with_vin(stmt, db, vin)
 
-    if query:
+    if query and not vin:
         needle = f"%{query.strip()}%"
         stmt = stmt.where(
             or_(
@@ -184,7 +196,7 @@ def search_parts(
         vendors = _vendors_in_stock(db, part.id)
         if in_stock_only and not vendors:
             continue
-        results.append(part_out(part, locale, vendors=vendors))
+        results.append(part_out(part, locale, db=db, vendors=vendors))
     return results
 
 
@@ -216,7 +228,7 @@ def get_part_detail(db: Session, part_id: uuid.UUID, locale: str) -> dict | None
         return None
 
     vendors = _vendors_in_stock(db, part_id)
-    return part_out(part, locale, vendors=vendors)
+    return part_out(part, locale, db=db, vendors=vendors)
 
 
 def list_booking_parts(db: Session, booking_id: uuid.UUID, locale: str) -> list[dict]:
@@ -355,7 +367,7 @@ def list_parts_admin(db: Session, locale: str = "ar") -> list[dict]:
         .options(joinedload(Part.category), joinedload(Part.supplier))
         .order_by(Part.name_ar)
     ).unique().all()
-    return [part_out(p, locale) for p in parts]
+    return [part_out(p, locale, db=db) for p in parts]
 
 
 def create_part(

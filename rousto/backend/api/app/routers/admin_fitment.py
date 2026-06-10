@@ -7,6 +7,11 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.deps import require_admin_key
 from app.fitment_services import add_part_compatibility, list_part_compatibilities
+from app.vin_compat_services import (
+    add_part_vin_compatibilities,
+    list_vin_prefixes_for_part,
+    parse_vin_prefixes,
+)
 from app.i18n import resolve_locale
 
 router = APIRouter(prefix="/admin", tags=["admin-fitment"])
@@ -19,7 +24,11 @@ class CompatibilityIn(BaseModel):
 
 class PartOemPatchIn(BaseModel):
     oem_number: str | None = Field(default=None, max_length=60)
-    vin_prefix: str | None = Field(default=None, max_length=11)
+    vin_prefix: str | None = Field(default=None, max_length=17)
+
+
+class VinCompatIn(BaseModel):
+    vin_prefixes: list[str] = Field(min_length=1)
 
 
 @router.get("/parts/{part_id}/compatibilities")
@@ -81,5 +90,40 @@ def admin_patch_part_oem(
             "id": part.id,
             "oem_number": part.oem_number,
             "vin_prefix": part.vin_prefix,
+            "vin_prefixes": list_vin_prefixes_for_part(db, part.id),
+        }
+    }
+
+
+@router.get("/parts/{part_id}/vin-compatibilities")
+def admin_list_vin_compat(
+    part_id: UUID,
+    _: None = Depends(require_admin_key),
+    db: Session = Depends(get_db),
+):
+    prefixes = list_vin_prefixes_for_part(db, part_id)
+    return {"data": prefixes, "meta": {"total": len(prefixes)}}
+
+
+@router.post("/parts/{part_id}/vin-compatibilities", status_code=201)
+def admin_add_vin_compat(
+    part_id: UUID,
+    body: VinCompatIn,
+    _: None = Depends(require_admin_key),
+    db: Session = Depends(get_db),
+):
+    try:
+        prefixes = parse_vin_prefixes(body.vin_prefixes)
+        rows = add_part_vin_compatibilities(db, part_id, prefixes)
+        db.commit()
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "VIN_ERROR", "message": str(exc)},
+        ) from exc
+    return {
+        "data": {
+            "part_id": part_id,
+            "vin_prefixes": [r.vin_prefix for r in rows],
         }
     }

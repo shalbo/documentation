@@ -30,6 +30,15 @@ async function vendorApi(path, opts = {}) {
   return body;
 }
 
+function parseVinPrefixes(raw) {
+  if (!raw || !raw.trim()) return [];
+  return raw
+    .split(/[\s,;]+/)
+    .map((s) => s.trim().toUpperCase())
+    .filter((s) => s.length >= 11)
+    .map((s) => s.slice(0, 11));
+}
+
 async function loadRoots() {
   const { data } = await vendorApi("/vendor/parts/categories/roots");
   const sel = $("rootCategory");
@@ -86,7 +95,7 @@ $("productForm").addEventListener("submit", async (e) => {
         price_sar: parseFloat($("price").value),
         qty_available: parseInt($("qty").value, 10),
         oem_number: $("oemNumber").value.trim() || null,
-        vin_prefix: $("vinPrefix").value.trim() || null,
+        vin_prefixes: parseVinPrefixes($("vinPrefixes").value),
         is_oem: $("isOem").checked,
       }),
     });

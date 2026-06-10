@@ -85,7 +85,7 @@ def admin_create_part(
             status_code=400,
             detail={"code": "CREATE_ERROR", "message": str(exc)},
         ) from exc
-    return {"data": part_out(part, locale)}
+    return {"data": part_out(part, locale, db=db)}
 
 
 @router.patch("/parts/{part_id}")
@@ -111,7 +111,7 @@ def admin_patch_part(
     if body.warranty_months is not None:
         part.warranty_months = body.warranty_months
     db.commit()
-    return {"data": part_out(part, locale)}
+    return {"data": part_out(part, locale, db=db)}
 
 
 @router.get("/part-warranty-claims")
