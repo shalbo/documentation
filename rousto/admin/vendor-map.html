@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — خريطة الفنيين</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — خريطة الفنيين</h1>
+      <p>عرض مواقع الفنيين المُوافَقين والمهام النشطة</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="vendor-portal.html" class="btn btn-ghost-light">بوابة الفني</a>
+      <a href="vendors.html" class="btn btn-ghost-light">الطلبات</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>الخريطة <span id="vendorCount" class="badge badge-on">0</span></h2>
+      <div id="mapView" class="map-host map-host-wide"></div>
+    </section>
+
+    <section class="card">
+      <h2>قائمة الفنيين</h2>
+      <table id="vendorsTable">
+        <thead>
+          <tr>
+            <th>النشاط</th>
+            <th>التوفر</th>
+            <th>المهمة</th>
+            <th>الموقع</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" class="empty">اضغط تحديث</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-map.js"></script>
+  <script>
+    const state = { apiBase: "http://localhost:8000", adminKey: "rousto_admin_dev", vendors: [] };
+
+    function loadConfig() {
+      const saved = loadStoredConfig(ADMIN_STORAGE_KEY);
+      if (saved.apiBase) state.apiBase = saved.apiBase;
+      if (saved.adminKey) state.adminKey = saved.adminKey;
+      document.getElementById("apiBase").value = state.apiBase;
+      document.getElementById("adminKey").value = state.adminKey;
+    }
+
+    function saveConfig() {
+      state.apiBase = document.getElementById("apiBase").value.replace(/\/$/, "");
+      state.adminKey = document.getElementById("adminKey").value.trim();
+      saveStoredConfig(ADMIN_STORAGE_KEY, { apiBase: state.apiBase, adminKey: state.adminKey });
+    }
+
+    async function adminApi(path) {
+      saveConfig();
+      return fetchApi(state.apiBase, path, { headers: { "X-Admin-Key": state.adminKey } });
+    }
+
+    function renderTable() {
+      const tbody = document.querySelector("#vendorsTable tbody");
+      if (!state.vendors.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">لا يوجد فنيون</td></tr>';
+        return;
+      }
+      tbody.innerHTML = state.vendors.map((v) => {
+        const avail = v.is_available
+          ? '<span class="badge badge-on">متاح</span>'
+          : '<span class="badge badge-off">غير متاح</span>';
+        const job = v.active_job
+          ? `${v.active_job.reference} (${v.active_job.status})`
+          : "—";
+        const loc = v.live_location
+          ? `${v.live_location.lat.toFixed(4)}, ${v.live_location.lng.toFixed(4)}`
+          : v.base_location
+            ? `قاعدة: ${v.base_location.lat.toFixed(4)}`
+            : "—";
+        return `<tr>
+          <td><b>${v.business_name}</b><br><small>${v.city}</small></td>
+          <td>${avail}</td>
+          <td>${job}</td>
+          <td><small>${loc}</small></td>
+        </tr>`;
+      }).join("");
+    }
+
+    async function refresh() {
+      const body = await adminApi("/admin/vendors/map");
+      state.vendors = body.data || [];
+      document.getElementById("vendorCount").textContent = `${body.meta?.available_count || 0} متاح / ${body.meta?.total || 0}`;
+      renderMultiVendorMap(document.getElementById("mapView"), state.vendors);
+      renderTable();
+      toast("تم تحديث الخريطة");
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", () => {
+      refresh().catch((e) => toast(e.message, true));
+    });
+
+    loadConfig();
+    refresh().catch(() => {});
+  </script>
+</body>
+</html>

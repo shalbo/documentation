@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — لوحة سوق قطع الغيار</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .stat-card { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+    .stat-label { display: block; font-size: .78rem; color: var(--ink-500); }
+    .stat-value { display: block; font-size: 1.6rem; margin-top: 4px; }
+    .stat-hint { display: block; font-size: .72rem; color: var(--ink-300); margin-top: 2px; }
+    .nav-section { margin-bottom: 8px; font-size: .75rem; color: rgba(255,255,255,.7); }
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .quick-links a { text-decoration: none; color: var(--ink-900); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-weight: 700; }
+    .quick-links a small { display: block; font-weight: 400; color: var(--ink-500); margin-top: 4px; font-size: .78rem; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — سوق قطع الغيار</h1>
+      <p>لوحة التحكم الرئيسية: المبيعات، المخزون، والمحلات</p>
+    </div>
+    <div class="topbar-actions">
+      <span class="nav-section">السوق</span>
+      <a href="parts.html" class="btn btn-ghost-light">كتالوج القطع</a>
+      <a href="fitment.html" class="btn btn-ghost-light">التوافق</a>
+      <a href="shipping.html" class="btn btn-ghost-light">الشحن</a>
+      <a href="vendor-products.html" class="btn btn-ghost-light">بوابة التاجر</a>
+      <a href="registration-approvals.html" class="btn btn-ghost-light">اعتماد التسجيلات</a>
+      <a href="vendors.html" class="btn btn-ghost-light">المحلات</a>
+      <span class="nav-section">عمليات</span>
+      <a href="tiers.html" class="btn btn-ghost-light">باقات المنصة</a>
+      <a href="vendor-subscriptions.html" class="btn btn-ghost-light">اشتراكات التجار</a>
+      <a href="marketing.html" class="btn btn-ghost-light">التسويق</a>
+      <a href="notifications.html" class="btn btn-ghost-light">الإشعارات</a>
+      <a href="security.html" class="btn btn-ghost-light">الأمان</a>
+      <span class="nav-section">لوجستيات</span>
+      <a href="logistics.html" class="btn btn-ghost-light">الخدمات اللوجستية</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث الإحصائيات</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="adminKey">مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>إحصائيات السوق</h2>
+      <div id="statsGrid" class="stat-grid">
+        <div class="empty">اضغط «تحديث الإحصائيات» لتحميل البيانات</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>اختصارات الإدارة</h2>
+      <div class="quick-links">
+        <a href="parts.html">إدارة القطع<small>OEM، VIN، مخزون، ضمان</small></a>
+        <a href="fitment.html">توافق المركبات<small>Year / Make / Model</small></a>
+        <a href="shipping.html">الشحن الهجين<small>محلي + بين المدن</small></a>
+        <a href="vendors.html">المحلات والفنيين<small>انضمام وموافقات</small></a>
+        <a href="tiers.html">باقات المنصة<small>قيود ديناميكية للتجار</small></a>
+        <a href="marketing.html">العروض والتسويق<small>حملات وخصومات</small></a>
+        <a href="logistics.html">الخدمات اللوجستية والمساعدة<small>سطحات، ورش، سائقون</small></a>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/dashboard-admin.js"></script>
+</body>
+</html>

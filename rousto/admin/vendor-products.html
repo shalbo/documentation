@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — مخزون التاجر</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .required-hint { color: var(--brand-red); font-size: .78rem; margin-top: 4px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn {
+      border: 1px solid var(--brand-line);
+      background: var(--brand-surface);
+      color: var(--brand-navy);
+      padding: 10px 18px;
+      border-radius: var(--r-brand);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      background: var(--brand-navy);
+      color: #fff;
+      border-color: var(--brand-navy);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .drop-zone {
+      border: 2px dashed var(--brand-navy);
+      background: var(--brand-navy-050);
+      border-radius: var(--r-brand);
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .drop-zone.dragover {
+      border-color: var(--brand-red);
+      background: var(--brand-red-050);
+    }
+    .drop-zone strong { color: var(--brand-navy); display: block; margin-bottom: 6px; }
+    .drop-zone small { color: var(--ink-500); }
+    .bulk-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+    .result-panel {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: var(--r-brand);
+      border: 1px solid var(--brand-line);
+      display: none;
+    }
+    .result-panel.show { display: block; }
+    .result-panel.success { background: var(--brand-navy-050); border-color: var(--brand-navy); }
+    .result-panel.error { background: var(--brand-red-050); border-color: var(--brand-red); }
+    .result-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+    .stat-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+    .stat-pill.ok { background: var(--brand-navy); color: #fff; }
+    .stat-pill.fail { background: var(--brand-red); color: #fff; }
+    .stat-pill.warn { background: #fff; color: var(--brand-navy); border: 1px solid var(--brand-navy); }
+    .error-list { max-height: 220px; overflow: auto; font-size: .85rem; }
+    .error-list li { margin-bottom: 6px; color: var(--brand-red-600); }
+    .template-link {
+      color: var(--brand-red);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px dashed var(--brand-red);
+    }
+    .template-link:hover { color: var(--brand-navy); border-color: var(--brand-navy); }
+    #bulkFileName, #zipFileName { color: var(--brand-navy); font-weight: 600; }
+    .bulk-steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 12px;
+    }
+    @media (max-width: 900px) { .bulk-steps { grid-template-columns: 1fr; } }
+    .step-card {
+      border: 1px solid var(--brand-line);
+      border-radius: var(--r-brand);
+      padding: 18px;
+      background: var(--brand-surface);
+    }
+    .step-badge {
+      display: inline-block;
+      background: var(--brand-navy);
+      color: #fff;
+      font-size: .75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .step-badge.optional { background: var(--brand-red); }
+    .zip-hint {
+      background: var(--brand-red-050);
+      border: 1px solid var(--brand-red);
+      border-radius: var(--r-brand);
+      padding: 10px 12px;
+      font-size: .82rem;
+      color: var(--brand-navy);
+      margin: 10px 0;
+    }
+    .progress-wrap {
+      margin-top: 12px;
+      display: none;
+    }
+    .progress-wrap.show { display: block; }
+    .progress-track {
+      height: 10px;
+      background: var(--brand-navy-050);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--brand-navy), var(--brand-red));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+    .progress-label {
+      font-size: .8rem;
+      color: var(--ink-500);
+      margin-top: 6px;
+    }
+    .condition-opt {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 2px solid var(--brand-line);
+      border-radius: var(--r-brand);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--brand-navy);
+      background: var(--brand-surface);
+    }
+    .condition-opt.active {
+      border-color: var(--brand-navy);
+      background: var(--brand-navy-050);
+    }
+    .condition-opt.used-active {
+      border-color: var(--brand-red);
+      background: var(--brand-red-050);
+      color: var(--brand-red);
+    }
+    .condition-opt input { accent-color: var(--brand-navy); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>بوابة التاجر — المخزون</h1>
+      <p>إضافة فردية أو رفع جماعي عبر Excel / CSV</p>
+    </div>
+    <div class="topbar-actions">
+      <div id="storeStatusWrap" class="store-status-wrap store-open">
+        <div>
+          <div id="storeStatusLabel" class="store-status-label">
+            <span class="status-dot ping"></span> المحل يستقبل طلبات
+          </div>
+          <div id="storeClosedNotice" class="store-closed-notice" style="display:none"></div>
+        </div>
+        <label class="store-toggle" title="تفعيل / إيقاف المحل">
+          <input type="checkbox" id="storeStatusToggle" checked />
+          <span class="store-toggle-slider"></span>
+        </label>
+      </div>
+      <a href="vendor-subscription.html" class="btn btn-ghost-light">باقة الاشتراك</a>
+      <a href="vendor-portal.html" class="btn btn-ghost-light">الخريطة</a>
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label>معرّف التاجر (X-Vendor-Id)</label>
+          <input id="vendorId" value="v0000000-0000-4000-8000-000000000001" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button type="button" class="tab-btn active" data-tab="single">إضافة منتج</button>
+        <button type="button" class="tab-btn" data-tab="bulk">رفع جماعي (Excel)</button>
+      </div>
+
+      <div id="panel-single" class="tab-panel active">
+        <h2>إضافة منتج جديد</h2>
+        <form id="productForm">
+          <div class="form-row">
+            <div>
+              <label for="rootCategory">القسم الرئيسي *</label>
+              <select id="rootCategory" required>
+                <option value="">— اختر القسم الرئيسي —</option>
+              </select>
+            </div>
+            <div id="subWrap">
+              <label for="subCategory">القسم الفرعي *</label>
+              <select id="subCategory" required disabled>
+                <option value="">— اختر القسم الفرعي —</option>
+              </select>
+              <p class="required-hint">إلزامي — لا يُحفظ منتج بدون قسم فرعي</p>
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:12px">
+            <div><label>رقم القطعة / OEM *</label><input id="partNumber" required /></div>
+            <div><label>المعرّف (slug) *</label><input id="slug" required pattern="[a-z][a-z0-9-]*" /></div>
+          </div>
+          <div style="margin-top:10px"><label>اسم القطعة *</label><input id="nameAr" required /></div>
+          <div class="form-row" style="margin-top:10px">
+            <div><label>السعر (ر.س) *</label><input id="price" type="number" min="1" step="0.01" required /></div>
+            <div><label>الكمية في المخزون *</label><input id="qty" type="number" min="1" required value="1" /></div>
+          </div>
+          <div class="form-row" style="margin-top:10px">
+            <div><label>رقم OEM (اختياري)</label><input id="oemNumber" /></div>
+          </div>
+          <div style="margin-top:10px">
+            <label for="vinPrefixes">بادئات VIN المتوافقة (11 رمزاً لكل سطر)</label>
+            <textarea id="vinPrefixes" rows="3" placeholder="4T1B11HK5JK&#10;2T1BURHE0JC"></textarea>
+          </div>
+        <div style="margin-top:12px">
+          <label>حالة القطعة *</label>
+          <div class="condition-segment" style="display:flex;gap:8px;margin-top:8px">
+            <label class="condition-opt active" id="condNewLbl">
+              <input type="radio" name="partCondition" id="condNew" value="new" checked />
+              جديد (New)
+            </label>
+            <label class="condition-opt" id="condUsedLbl">
+              <input type="radio" name="partCondition" id="condUsed" value="used" />
+              مستعمل / ربش (Used)
+            </label>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>
+        </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:16px">حفظ المنتج</button>
+        </form>
+      </div>
+
+      <div id="panel-bulk" class="tab-panel">
+        <h2>رفع المخزون الجماعي</h2>
+        <p style="color:var(--ink-500);font-size:.9rem;margin-top:0">
+          خطوتان: ملف Excel (مع عمود <code>image_url</code> اختياري) ثم أرشيف صور ZIP اختياري.
+          <a href="#" id="templateLink" class="template-link">Download Excel Template</a>
+        </p>
+
+        <div class="bulk-steps">
+          <div class="step-card">
+            <span class="step-badge">الخطوة 1 — إلزامية</span>
+            <h3 style="margin:0 0 8px;font-size:1rem">ملف Excel / CSV</h3>
+            <div id="dropZone" class="drop-zone">
+              <strong>اسحب ملف الإكسيل هنا</strong>
+              <small>.xlsx أو .csv — يدعم عمود image_url</small>
+              <div id="bulkFileName" style="margin-top:10px"></div>
+            </div>
+            <input type="file" id="bulkFileInput" accept=".csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden />
+            <div class="bulk-actions">
+              <button id="bulkUploadBtn" class="btn btn-primary" disabled>رفع ومعالجة</button>
+            </div>
+            <div id="bulkProgress" class="progress-wrap">
+              <div class="progress-track"><div id="bulkProgressFill" class="progress-fill"></div></div>
+              <div id="bulkProgressLabel" class="progress-label">0%</div>
+            </div>
+            <div id="bulkResult" class="result-panel">
+              <div class="result-stats" id="bulkStats"></div>
+              <ul class="error-list" id="bulkErrors"></ul>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <span class="step-badge optional">الخطوة 2 — اختيارية</span>
+            <h3 style="margin:0 0 8px;font-size:1rem">Upload Images Archive (.ZIP)</h3>
+            <div class="zip-hint">
+              تنبيه: يرجى تسمية كل صورة برقم الـ OEM الخاص بالقطعة قبل ضغط المجلد لضمان التوافق التلقائي
+              (مثال: <b>58101-H5A10.png</b>)
+            </div>
+            <div id="zipDropZone" class="drop-zone">
+              <strong>اسحب ملف ZIP هنا</strong>
+              <small>jpg · png · webp — يُعاد ضغطها تلقائياً</small>
+              <div id="zipFileName" style="margin-top:10px"></div>
+            </div>
+            <input type="file" id="zipFileInput" accept=".zip,application/zip" hidden />
+            <div class="bulk-actions">
+              <button id="zipUploadBtn" class="btn btn-secondary" disabled>رفع الأرشيف وربط الصور</button>
+            </div>
+            <div id="zipProgress" class="progress-wrap">
+              <div class="progress-track"><div id="zipProgressFill" class="progress-fill"></div></div>
+              <div id="zipProgressLabel" class="progress-label">0%</div>
+            </div>
+            <div id="zipResult" class="result-panel">
+              <div class="result-stats" id="zipStats"></div>
+              <ul class="error-list" id="zipErrors"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-status-toggle.js"></script>
+  <script src="js/vendor-products.js"></script>
+</body>
+</html>
