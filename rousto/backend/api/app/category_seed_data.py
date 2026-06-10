@@ -12,6 +12,7 @@ MAIN_CATEGORIES: dict[str, tuple[str, str, str]] = {
     "fluids": ("الفلاتر والزيوت والمواد الاستهلاكية", "Filters, Oils & Consumables", "fluids"),
     "body": ("الهيكل الخارجي والزجاج", "Body & Glass", "body"),
     "interior": ("الأكسسوارات والقطع الداخلية", "Interior & Accessories", "interior"),
+    "general": ("عام", "General", "folder"),
 }
 
 # (slug, name_ar, name_en, parent_slug, icon_key)
@@ -45,6 +46,7 @@ SUB_CATEGORIES: list[tuple[str, str, str, str, str]] = [
     # قطع داخلية
     ("accessories", "كماليات وأكسسوارات السيارة", "Car Accessories", "interior", "accessory"),
     ("interior-salon", "قطع الصالون الداخلي وأحزمة الأمان", "Interior & Seat Belts", "interior", "seat_belt"),
+    ("uncategorized", "غير مصنف", "Uncategorized", "general", "folder"),
 ]
 
 # Stable UUIDs for SQL/docker init (slug -> id)
@@ -57,6 +59,7 @@ MAIN_CATEGORY_IDS: dict[str, str] = {
     "fluids": "c1000000-0000-4000-8000-000000000006",
     "body": "c1000000-0000-4000-8000-000000000007",
     "interior": "c1000000-0000-4000-8000-000000000008",
+    "general": "c1000000-0000-4000-8000-000000000009",
 }
 
 SUB_CATEGORY_IDS: dict[str, str] = {
@@ -81,4 +84,5 @@ SUB_CATEGORY_IDS: dict[str, str] = {
     "glass-mirrors": "c1000000-0000-4000-8000-000000000119",
     "accessories": "c1000000-0000-4000-8000-000000000120",
     "interior-salon": "c1000000-0000-4000-8000-000000000121",
+    "uncategorized": "c1000000-0000-4000-8000-000000000122",
 }

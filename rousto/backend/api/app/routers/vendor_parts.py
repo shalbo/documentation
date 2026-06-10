@@ -1,6 +1,7 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -9,6 +10,7 @@ from app.db import get_db
 from app.deps import get_current_vendor
 from app.i18n import resolve_locale
 from app.models import Vendor
+from app.spare_parts_bulk_services import BULK_COLUMNS, TEMPLATE_CSV, process_bulk_upload
 from app.vendor_parts_services import vendor_create_product
 
 router = APIRouter(prefix="/vendor/parts", tags=["vendor-parts"])
@@ -90,3 +92,62 @@ def vendor_add_product(
             detail={"code": "CREATE_ERROR", "message": str(exc)},
         ) from exc
     return {"data": data}
+
+
+@router.get("/bulk-upload/template")
+def vendor_bulk_upload_template(
+    vendor: Vendor = Depends(get_current_vendor),
+):
+    _ = vendor
+    return Response(
+        content=TEMPLATE_CSV.encode("utf-8-sig"),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": 'attachment; filename="rousto-parts-template.csv"',
+        },
+    )
+
+
+@router.post("/bulk-upload")
+async def vendor_bulk_upload(
+    file: UploadFile = File(...),
+    vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db),
+):
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "NO_FILE", "message": "لم يُرفَع أي ملف"},
+        )
+    content = await file.read()
+    try:
+        result = process_bulk_upload(db, vendor, content, file.filename)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "BULK_ERROR", "message": str(exc)},
+        ) from exc
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail={"code": "BULK_FAILED", "message": "فشلت المعالجة — لم يُحفظ أي صف"},
+        ) from exc
+
+    payload = result.to_dict()
+    if result.errors:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "code": "BULK_VALIDATION",
+                "message": f"فشل التحقق — {len(result.errors)} خطأ",
+                "data": payload,
+            },
+        )
+    return {
+        "data": payload,
+        "meta": {
+            "message": f"تم رفع {result.imported} قطعة بنجاح",
+            "columns": BULK_COLUMNS,
+        },
+    }

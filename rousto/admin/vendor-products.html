@@ -3,19 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>روستو — إضافة منتج (التاجر)</title>
+  <title>روستو — مخزون التاجر</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/admin.css" />
   <style>
     .required-hint { color: var(--brand-red); font-size: .78rem; margin-top: 4px; }
-    .sub-disabled { opacity: .5; pointer-events: none; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn {
+      border: 1px solid var(--brand-line);
+      background: var(--brand-surface);
+      color: var(--brand-navy);
+      padding: 10px 18px;
+      border-radius: var(--r-brand);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      background: var(--brand-navy);
+      color: #fff;
+      border-color: var(--brand-navy);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .drop-zone {
+      border: 2px dashed var(--brand-navy);
+      background: var(--brand-navy-050);
+      border-radius: var(--r-brand);
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .drop-zone.dragover {
+      border-color: var(--brand-red);
+      background: var(--brand-red-050);
+    }
+    .drop-zone strong { color: var(--brand-navy); display: block; margin-bottom: 6px; }
+    .drop-zone small { color: var(--ink-500); }
+    .bulk-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+    .result-panel {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: var(--r-brand);
+      border: 1px solid var(--brand-line);
+      display: none;
+    }
+    .result-panel.show { display: block; }
+    .result-panel.success { background: var(--brand-navy-050); border-color: var(--brand-navy); }
+    .result-panel.error { background: var(--brand-red-050); border-color: var(--brand-red); }
+    .result-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+    .stat-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+    .stat-pill.ok { background: var(--brand-navy); color: #fff; }
+    .stat-pill.fail { background: var(--brand-red); color: #fff; }
+    .stat-pill.warn { background: #fff; color: var(--brand-navy); border: 1px solid var(--brand-navy); }
+    .error-list { max-height: 220px; overflow: auto; font-size: .85rem; }
+    .error-list li { margin-bottom: 6px; color: var(--brand-red-600); }
+    .template-link {
+      color: var(--brand-red);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px dashed var(--brand-red);
+    }
+    .template-link:hover { color: var(--brand-navy); border-color: var(--brand-navy); }
+    #bulkFileName { color: var(--brand-navy); font-weight: 600; }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div>
-      <h1>بوابة التاجر — إضافة منتج</h1>
-      <p>تصنيف شجري إلزامي: قسم رئيسي ← قسم فرعي</p>
+      <h1>بوابة التاجر — المخزون</h1>
+      <p>إضافة فردية أو رفع جماعي عبر Excel / CSV</p>
     </div>
     <div class="topbar-actions">
       <a href="vendor-portal.html" class="btn btn-ghost-light">الخريطة</a>
@@ -34,46 +97,76 @@
     </section>
 
     <section class="card">
-      <h2>إضافة منتج جديد</h2>
-      <form id="productForm">
-        <div class="form-row">
-          <div>
-            <label for="rootCategory">القسم الرئيسي *</label>
-            <select id="rootCategory" required>
-              <option value="">— اختر القسم الرئيسي —</option>
-            </select>
+      <div class="tabs">
+        <button type="button" class="tab-btn active" data-tab="single">إضافة منتج</button>
+        <button type="button" class="tab-btn" data-tab="bulk">رفع جماعي (Excel)</button>
+      </div>
+
+      <div id="panel-single" class="tab-panel active">
+        <h2>إضافة منتج جديد</h2>
+        <form id="productForm">
+          <div class="form-row">
+            <div>
+              <label for="rootCategory">القسم الرئيسي *</label>
+              <select id="rootCategory" required>
+                <option value="">— اختر القسم الرئيسي —</option>
+              </select>
+            </div>
+            <div id="subWrap">
+              <label for="subCategory">القسم الفرعي *</label>
+              <select id="subCategory" required disabled>
+                <option value="">— اختر القسم الفرعي —</option>
+              </select>
+              <p class="required-hint">إلزامي — لا يُحفظ منتج بدون قسم فرعي</p>
+            </div>
           </div>
-          <div id="subWrap">
-            <label for="subCategory">القسم الفرعي *</label>
-            <select id="subCategory" required disabled>
-              <option value="">— اختر القسم الفرعي —</option>
-            </select>
-            <p class="required-hint">إلزامي — لا يُحفظ منتج بدون قسم فرعي</p>
+          <div class="form-row" style="margin-top:12px">
+            <div><label>رقم القطعة / OEM *</label><input id="partNumber" required /></div>
+            <div><label>المعرّف (slug) *</label><input id="slug" required pattern="[a-z][a-z0-9-]*" /></div>
           </div>
+          <div style="margin-top:10px"><label>اسم القطعة *</label><input id="nameAr" required /></div>
+          <div class="form-row" style="margin-top:10px">
+            <div><label>السعر (ر.س) *</label><input id="price" type="number" min="1" step="0.01" required /></div>
+            <div><label>الكمية في المخزون *</label><input id="qty" type="number" min="1" required value="1" /></div>
+          </div>
+          <div class="form-row" style="margin-top:10px">
+            <div><label>رقم OEM (اختياري)</label><input id="oemNumber" /></div>
+          </div>
+          <div style="margin-top:10px">
+            <label for="vinPrefixes">بادئات VIN المتوافقة (11 رمزاً لكل سطر)</label>
+            <textarea id="vinPrefixes" rows="3" placeholder="4T1B11HK5JK&#10;2T1BURHE0JC"></textarea>
+          </div>
+          <div style="margin-top:12px">
+            <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:16px">حفظ المنتج</button>
+        </form>
+      </div>
+
+      <div id="panel-bulk" class="tab-panel">
+        <h2>رفع جماعي — SparePartsImport</h2>
+        <p style="color:var(--ink-500);font-size:.9rem;margin-top:0">
+          ارفع ملف <b>.xlsx</b> أو <b>.csv</b> يحتوي آلاف القطع. يُربط المخزون تلقائياً بحسابك.
+          <a href="#" id="templateLink" class="template-link">Download Excel Template</a>
+        </p>
+
+        <div id="dropZone" class="drop-zone">
+          <strong>اسحب الملف وأفلته هنا</strong>
+          <small>أو انقر لاختيار ملف Excel / CSV</small>
+          <div id="bulkFileName" style="margin-top:10px"></div>
+        </div>
+        <input type="file" id="bulkFileInput" accept=".csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden />
+
+        <div class="bulk-actions">
+          <button id="bulkUploadBtn" class="btn btn-primary" disabled>رفع ومعالجة</button>
+          <span id="bulkStatus" style="color:var(--ink-500);font-size:.85rem"></span>
         </div>
 
-        <div class="form-row" style="margin-top:12px">
-          <div><label>رقم القطعة / OEM *</label><input id="partNumber" required /></div>
-          <div><label>المعرّف (slug) *</label><input id="slug" required pattern="[a-z][a-z0-9-]*" /></div>
+        <div id="bulkResult" class="result-panel">
+          <div class="result-stats" id="bulkStats"></div>
+          <ul class="error-list" id="bulkErrors"></ul>
         </div>
-        <div style="margin-top:10px"><label>اسم القطعة *</label><input id="nameAr" required /></div>
-        <div class="form-row" style="margin-top:10px">
-          <div><label>السعر (ر.س) *</label><input id="price" type="number" min="1" step="0.01" required /></div>
-          <div><label>الكمية في المخزون *</label><input id="qty" type="number" min="1" required value="1" /></div>
-        </div>
-        <div class="form-row" style="margin-top:10px">
-          <div><label>رقم OEM (اختياري)</label><input id="oemNumber" /></div>
-        </div>
-        <div style="margin-top:10px">
-          <label for="vinPrefixes">بادئات VIN المتوافقة (11 رمزاً لكل سطر)</label>
-          <textarea id="vinPrefixes" rows="3" placeholder="4T1B11HK5JK&#10;2T1BURHE0JC"></textarea>
-          <p class="required-hint">يمكن إدخال أكثر من هيكل — سطر أو فاصلة لكل بادئة</p>
-        </div>
-        <div style="margin-top:12px">
-          <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>
-        </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:16px">حفظ المنتج</button>
-      </form>
+      </div>
     </section>
   </main>
 

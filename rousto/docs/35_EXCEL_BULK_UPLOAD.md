@@ -1,0 +1,46 @@
+# 35 — الرفع الجماعي لقطع الغيار (Excel Bulk Upload)
+
+مكافئ Laravel `SparePartsImport` + `maatwebsite/excel` — مُنفَّذ في FastAPI مع دعم `.csv` و `.xlsx`.
+
+---
+
+## أعمدة الملف
+
+| العمود | مطلوب | الوصف |
+|--------|-------|--------|
+| `oem_number` | نعم | رقم القطعة / OEM |
+| `name_ar` | نعم | الاسم بالعربية |
+| `name_en` | لا | الاسم بالإنجليزية |
+| `part_brand` | لا | العلامة — يُربط بـ `part_suppliers` |
+| `price` | نعم | السعر |
+| `quantity` | نعم | الكمية في مخزون التاجر |
+| `sub_category` | لا | slug أو اسم القسم الفرعي |
+| `compatible_vehicles` | لا | مركبات متوافقة (فاصلة) |
+| `vin_prefixes` | لا | بادئات VIN (فاصلة) → `part_vin_compatibilities` |
+| `description` | لا | وصف عربي |
+
+---
+
+## API (التاجر — `X-Vendor-Id` أو JWT)
+
+| الطريقة | المسار |
+|---------|--------|
+| GET | `/api/v1/vendor/parts/bulk-upload/template` |
+| POST | `/api/v1/vendor/parts/bulk-upload` — `multipart/form-data` حقل `file` |
+
+- يُربط كل صف بـ `vendor_id` من التوكن تلقائياً
+- التحقق من كل الصفوف أولاً — عند أي خطأ لا يُحفظ شيء (معاملة واحدة)
+- `sub_category` غير المعروف → قسم **غير مصنف** (`uncategorized`)
+
+---
+
+## لوحة التاجر
+
+`rousto/admin/vendor-products.html` — تبويب **المخزون** مع منطقة سحب وإفلات ونتائج ملوّنة.
+
+---
+
+## الملفات
+
+- `app/spare_parts_bulk_services.py` — محرك الاستيراد
+- `database/048_uncategorized_category.sql` — قسم عام/غير مصنف

@@ -385,6 +385,7 @@ def create_part(
     vehicle_compatibility: list | None = None,
     oem_number: str | None = None,
     vin_prefix: str | None = None,
+    description_ar: str | None = None,
     require_leaf_category: bool = False,
 ) -> Part:
     if require_leaf_category and not is_leaf_category(db, category_id):
@@ -397,6 +398,7 @@ def create_part(
         slug=slug.strip(),
         name_ar=name_ar,
         name_en=name_en,
+        description_ar=description_ar,
         category_id=category_id,
         supplier_id=supplier_id,
         is_oem=is_oem,

@@ -1,6 +1,8 @@
 const STORAGE_KEY = "rousto_vendor_products_config";
 const $ = (id) => document.getElementById(id);
 
+let bulkFile = null;
+
 function cfg() {
   const apiBase = $("apiBase").value.replace(/\/$/, "");
   const vendorId = $("vendorId").value.trim();
@@ -20,13 +22,17 @@ async function vendorApi(path, opts = {}) {
   const res = await fetch(`${apiBase}/api/v1${path}`, {
     ...opts,
     headers: {
-      "Content-Type": "application/json",
       "X-Vendor-Id": vendorId,
       ...(opts.headers || {}),
     },
   });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.error?.message || `خطأ ${res.status}`);
+  if (!res.ok) {
+    const err = new Error(body?.error?.message || `خطأ ${res.status}`);
+    err.status = res.status;
+    err.payload = body?.error?.data || body?.error || body;
+    throw err;
+  }
   return body;
 }
 
@@ -73,6 +79,125 @@ async function loadChildren(parentId) {
   });
 }
 
+function setTab(name) {
+  document.querySelectorAll(".tab-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+  document.querySelectorAll(".tab-panel").forEach((p) => {
+    p.classList.toggle("active", p.id === `panel-${name}`);
+  });
+}
+
+document.querySelectorAll(".tab-btn").forEach((btn) => {
+  btn.addEventListener("click", () => setTab(btn.dataset.tab));
+});
+
+function setBulkFile(file) {
+  bulkFile = file;
+  const ext = file.name.split(".").pop().toLowerCase();
+  if (!["csv", "xlsx"].includes(ext)) {
+    toast("الصيغ المدعومة: .csv و .xlsx فقط", true);
+    bulkFile = null;
+    $("bulkFileName").textContent = "";
+    $("bulkUploadBtn").disabled = true;
+    return;
+  }
+  $("bulkFileName").textContent = file.name;
+  $("bulkUploadBtn").disabled = false;
+}
+
+const dropZone = $("dropZone");
+const fileInput = $("bulkFileInput");
+
+dropZone.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", (e) => {
+  if (e.target.files[0]) setBulkFile(e.target.files[0]);
+});
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  if (e.dataTransfer.files[0]) setBulkFile(e.dataTransfer.files[0]);
+});
+
+function showBulkResult(payload, isError) {
+  const panel = $("bulkResult");
+  const stats = $("bulkStats");
+  const errors = $("bulkErrors");
+  panel.className = "result-panel show " + (isError ? "error" : "success");
+  stats.innerHTML = `
+    <span class="stat-pill ok">ناجح: ${payload.imported || 0}</span>
+    <span class="stat-pill fail">أخطاء: ${payload.failed || 0}</span>
+    <span class="stat-pill warn">إجمالي الصفوف: ${payload.total_rows || 0}</span>
+    ${payload.used_uncategorized ? `<span class="stat-pill warn">غير مصنف: ${payload.used_uncategorized}</span>` : ""}
+  `;
+  errors.innerHTML = "";
+  (payload.errors || []).forEach((e) => {
+    const li = document.createElement("li");
+    li.textContent = `صف ${e.row} — ${e.field}: ${e.message}`;
+    errors.appendChild(li);
+  });
+}
+
+$("templateLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const { apiBase, vendorId } = cfg();
+  try {
+    const res = await fetch(`${apiBase}/api/v1/vendor/parts/bulk-upload/template`, {
+      headers: { "X-Vendor-Id": vendorId },
+    });
+    if (!res.ok) throw new Error("تعذّر تحميل النموذج");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "rousto-parts-template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("تم تحميل النموذج");
+  } catch (err) {
+    toast(err.message, true);
+  }
+});
+
+$("bulkUploadBtn").addEventListener("click", async () => {
+  if (!bulkFile) return;
+  const { apiBase, vendorId } = cfg();
+  const form = new FormData();
+  form.append("file", bulkFile);
+  $("bulkStatus").textContent = "جاري المعالجة…";
+  $("bulkUploadBtn").disabled = true;
+  try {
+    const res = await fetch(`${apiBase}/api/v1/vendor/parts/bulk-upload`, {
+      method: "POST",
+      headers: { "X-Vendor-Id": vendorId },
+      body: form,
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const data = body?.error?.data || { failed: body?.error?.data?.failed, errors: body?.error?.data?.errors, total_rows: body?.error?.data?.total_rows, imported: 0 };
+      showBulkResult(data, true);
+      toast(body?.error?.message || "فشل الرفع", true);
+      return;
+    }
+    showBulkResult(body.data, false);
+    toast(body.meta?.message || "تم الرفع بنجاح");
+    bulkFile = null;
+    $("bulkFileName").textContent = "";
+    fileInput.value = "";
+  } catch (err) {
+    toast(err.message, true);
+  } finally {
+    $("bulkStatus").textContent = "";
+    $("bulkUploadBtn").disabled = !bulkFile;
+  }
+});
+
 $("rootCategory").addEventListener("change", (e) => {
   loadChildren(e.target.value).catch((err) => toast(err.message, true));
 });
@@ -87,6 +212,7 @@ $("productForm").addEventListener("submit", async (e) => {
   try {
     const body = await vendorApi("/vendor/parts", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         category_id: categoryId,
         part_number: $("partNumber").value.trim(),

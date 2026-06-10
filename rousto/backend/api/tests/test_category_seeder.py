@@ -11,8 +11,8 @@ client = TestClient(app)
 
 
 def test_category_seed_data_counts():
-    assert len(MAIN_CATEGORIES) == 8
-    assert len(SUB_CATEGORIES) == 21
+    assert len(MAIN_CATEGORIES) == 9
+    assert len(SUB_CATEGORIES) == 22
 
 
 def test_sub_categories_reference_valid_parents():
@@ -30,6 +30,7 @@ def test_main_category_slugs_match_user_spec():
         "fluids",
         "body",
         "interior",
+        "general",
     }
     assert set(MAIN_CATEGORIES.keys()) == expected
 
