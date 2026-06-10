@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.models import AuthOtpRequest, AuthRefreshToken, User
-from app.permissions import AuthPrincipal, build_principal
+from app.permissions import AuthPrincipal, build_principal, build_staff_principal
 
 OTP_LENGTH = 6
 OTP_TTL_MINUTES = 5
@@ -142,14 +142,52 @@ def verify_otp(db: Session, phone: str, code: str, request_id: uuid.UUID | None 
 def _jwt_payload(principal: AuthPrincipal, token_type: str, expires_delta: timedelta) -> dict:
     now = datetime.now(timezone.utc)
     exp = now + expires_delta
-    return {
-        "sub": str(principal.user.id),
+    sub = str(principal.staff_id) if principal.is_staff else str(principal.user.id)  # type: ignore[union-attr]
+    payload = {
+        "sub": sub,
         "type": token_type,
+        "actor_type": "vendor_staff" if principal.is_staff else "user",
         "roles": principal.roles,
         "permissions": principal.permissions,
         "vendor_id": str(principal.vendor_id) if principal.vendor_id else None,
         "iat": int(now.timestamp()),
         "exp": int(exp.timestamp()),
+    }
+    if principal.staff_role:
+        payload["staff_role"] = principal.staff_role
+    return payload
+
+
+def issue_staff_tokens(db: Session, staff) -> dict:
+    from app.models import VendorStaff
+
+    if not isinstance(staff, VendorStaff) or not staff.is_active:
+        raise ValueError("الموظف غير نشط")
+    principal = build_staff_principal(staff)
+    access = jwt.encode(
+        _jwt_payload(principal, "access", timedelta(minutes=settings.jwt_access_minutes)),
+        settings.jwt_secret,
+        algorithm="HS256",
+    )
+    refresh_raw = secrets.token_urlsafe(48)
+    refresh_exp = datetime.now(timezone.utc) + timedelta(days=settings.jwt_refresh_days)
+    db.add(
+        AuthRefreshToken(
+            id=uuid.uuid4(),
+            user_id=None,
+            vendor_staff_id=staff.id,
+            token_hash=_hash_value(refresh_raw),
+            expires_at=refresh_exp,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
+    db.flush()
+    return {
+        "access_token": access,
+        "refresh_token": refresh_raw,
+        "token_type": "bearer",
+        "expires_in": settings.jwt_access_minutes * 60,
+        "principal": serialize_tokens_principal(principal),
     }
 
 
@@ -210,11 +248,17 @@ def refresh_access_token(db: Session, refresh_token: str) -> dict:
     if not stored:
         raise ValueError("رمز التجديد غير صالح")
 
-    user = db.get(User, stored.user_id)
-    if not user or not user.is_active:
-        raise ValueError("المستخدم غير نشط")
+    if stored.vendor_staff_id:
+        from app.models import VendorStaff
+        from app.vendor_staff_services import get_active_staff
 
-    principal = build_principal(db, user)
+        staff = get_active_staff(db, stored.vendor_staff_id)
+        principal = build_staff_principal(staff)
+    else:
+        user = db.get(User, stored.user_id)
+        if not user or not user.is_active:
+            raise ValueError("المستخدم غير نشط")
+        principal = build_principal(db, user)
     access = jwt.encode(
         _jwt_payload(principal, "access", timedelta(minutes=settings.jwt_access_minutes)),
         settings.jwt_secret,

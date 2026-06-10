@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.category_services import list_child_categories, list_root_categories
 from app.db import get_db
 from app.deps import get_current_vendor
+from app.vendor_staff_rbac import require_price_edit_access
 from app.i18n import resolve_locale
 from app.models import Vendor
 from app.part_image_services import process_bulk_images_zip
@@ -67,6 +68,7 @@ def vendor_add_product(
     body: VendorProductIn,
     locale: str = Depends(resolve_locale),
     vendor: Vendor = Depends(get_current_vendor),
+    _: None = Depends(require_price_edit_access),
     db: Session = Depends(get_db),
 ):
     try:
@@ -142,6 +144,7 @@ def vendor_bulk_upload_template(
 async def vendor_bulk_upload(
     file: UploadFile = File(...),
     vendor: Vendor = Depends(get_current_vendor),
+    _: None = Depends(require_price_edit_access),
     db: Session = Depends(get_db),
 ):
     if not file.filename:
