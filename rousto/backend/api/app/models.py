@@ -1376,6 +1376,11 @@ class DriverProfile(Base):
     is_approved: Mapped[bool] = mapped_column(Boolean, default=False)
     verification_status: Mapped[str] = mapped_column(String(20), default="pending")
     rejection_reason: Mapped[str | None] = mapped_column(Text)
+    registration_fee_status: Mapped[str] = mapped_column(String(10), default="unpaid")
+    payment_reference_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("gateway_payments.id")
+    )
+    registration_fee_gateway: Mapped[str | None] = mapped_column(String(20))
     technician_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

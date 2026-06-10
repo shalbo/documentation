@@ -14,6 +14,7 @@ from app.city_services import validate_city_name
 from app.config import settings
 from app.models import (
     DriverProfile,
+    GatewayPayment,
     Role,
     Technician,
     User,
@@ -27,6 +28,8 @@ from app.models import (
 PHONE_RE = re.compile(r"^\+(?:9665\d{8}|2189\d{8})$")
 PLATE_RE = re.compile(r"^[A-Za-z0-9\u0600-\u06FF\-]{3,20}$")
 ALLOWED_DOC_MIME = {"image/jpeg", "image/png", "image/webp"}
+DRIVER_REGISTRATION_FEE_ORDER_TYPE = "driver_registration_fee"
+DRIVER_PAYMENT_GATEWAYS = frozenset({"muamalat", "sadad"})
 
 
 def normalize_phone(phone: str) -> str:
@@ -214,6 +217,7 @@ def register_driver(
     user.city_id = city_row.id
     _assign_role(db, user.id, "driver")
     now = datetime.now(timezone.utc)
+    fee_status = "unpaid" if service_type == "tow" else "waived"
     profile = DriverProfile(
         id=uuid.uuid4(),
         user_id=user.id,
@@ -223,6 +227,7 @@ def register_driver(
         city_id=city_row.id,
         is_approved=False,
         verification_status="pending",
+        registration_fee_status=fee_status,
         created_at=now,
         updated_at=now,
     )
@@ -317,8 +322,194 @@ def driver_profile_out(p: DriverProfile, user: User) -> dict:
         "id_doc_path": p.id_doc_path,
         "vehicle_doc_path": p.vehicle_doc_path,
         "is_approved": p.is_approved,
+        "is_verified": p.is_approved,
         "verification_status": p.verification_status,
+        "registration_fee_status": p.registration_fee_status,
+        "payment_reference_id": str(p.payment_reference_id) if p.payment_reference_id else None,
+        "registration_fee_gateway": p.registration_fee_gateway,
+        "registration_fee_lyd": (
+            float(settings.driver_registration_fee_lyd) if p.service_type == "tow" else 0.0
+        ),
     }
+
+
+def _load_driver_profile_for_phone(
+    db: Session,
+    profile_id: uuid.UUID,
+    phone: str,
+) -> tuple[DriverProfile, User]:
+    profile = db.get(DriverProfile, profile_id)
+    if not profile:
+        raise ValueError("طلب السائق غير موجود")
+    user = db.get(User, profile.user_id)
+    if not user:
+        raise ValueError("المستخدم غير موجود")
+    if normalize_phone(phone) != user.phone:
+        raise ValueError("رقم الجوال لا يطابق طلب التسجيل")
+    return profile, user
+
+
+def driver_registration_fee_info(profile: DriverProfile) -> dict:
+    return {
+        "profile_id": str(profile.id),
+        "service_type": profile.service_type,
+        "registration_fee_status": profile.registration_fee_status,
+        "registration_fee_lyd": (
+            float(settings.driver_registration_fee_lyd) if profile.service_type == "tow" else 0.0
+        ),
+        "payment_required": profile.service_type == "tow",
+        "payment_reference_id": (
+            str(profile.payment_reference_id) if profile.payment_reference_id else None
+        ),
+        "registration_fee_gateway": profile.registration_fee_gateway,
+        "is_verified": profile.is_approved,
+    }
+
+
+def get_driver_registration_payment_status(
+    db: Session,
+    *,
+    profile_id: uuid.UUID,
+    phone: str,
+) -> dict:
+    profile, _user = _load_driver_profile_for_phone(db, profile_id, phone)
+    payment_status = None
+    if profile.payment_reference_id:
+        gp = db.get(GatewayPayment, profile.payment_reference_id)
+        if gp:
+            payment_status = gp.status
+    return {
+        **driver_registration_fee_info(profile),
+        "gateway_payment_status": payment_status,
+        "documents_complete": bool(
+            profile.license_doc_path and profile.id_doc_path and profile.vehicle_doc_path
+        ),
+    }
+
+
+def initiate_driver_registration_payment(
+    db: Session,
+    *,
+    profile_id: uuid.UUID,
+    phone: str,
+    gateway: str,
+    return_url: str,
+) -> dict:
+    profile, user = _load_driver_profile_for_phone(db, profile_id, phone)
+    if profile.service_type != "tow":
+        raise ValueError("رسوم التفعيل مطلوبة لسائقي الساحبات فقط")
+    if not (profile.license_doc_path and profile.id_doc_path and profile.vehicle_doc_path):
+        raise ValueError("أكمل رفع المستندات قبل الدفع")
+    if profile.registration_fee_status == "paid":
+        return {
+            "already_paid": True,
+            **driver_registration_fee_info(profile),
+        }
+
+    slug = gateway.strip().lower()
+    if slug not in DRIVER_PAYMENT_GATEWAYS:
+        raise ValueError("اختر بوابة معاملات أو سداد")
+
+    if profile.payment_reference_id:
+        existing = db.get(GatewayPayment, profile.payment_reference_id)
+        if existing and existing.status == "pending" and existing.redirect_url:
+            return {
+                "already_paid": False,
+                "payment_id": str(existing.id),
+                "gateway": existing.gateway,
+                "status": existing.status,
+                "amount_lyd": float(existing.amount_lyd),
+                "gateway_ref": existing.gateway_ref,
+                "redirect_url": existing.redirect_url,
+                "requires_webview": True,
+                "profile_id": str(profile.id),
+            }
+
+    from app.service_layer.payments.checkout_service import initiate_checkout
+
+    amount = float(settings.driver_registration_fee_lyd)
+    result = initiate_checkout(
+        db,
+        user,
+        amount_lyd=amount,
+        gateway=slug,
+        order_type=DRIVER_REGISTRATION_FEE_ORDER_TYPE,
+        order_id=profile.id,
+        return_url=return_url,
+    )
+    gp = db.get(GatewayPayment, result["payment_id"])
+    if gp:
+        profile.payment_reference_id = gp.id
+        profile.registration_fee_gateway = slug
+        profile.updated_at = datetime.now(timezone.utc)
+    return {
+        "already_paid": False,
+        "profile_id": str(profile.id),
+        **result,
+    }
+
+
+def complete_driver_registration_payment(
+    db: Session,
+    profile_id: uuid.UUID,
+    payment: GatewayPayment,
+) -> DriverProfile | None:
+    profile = db.get(DriverProfile, profile_id)
+    if not profile:
+        return None
+    if profile.registration_fee_status == "paid":
+        return profile
+
+    profile.registration_fee_status = "paid"
+    profile.payment_reference_id = payment.id
+    profile.registration_fee_gateway = payment.gateway
+    profile.updated_at = datetime.now(timezone.utc)
+
+    user = db.get(User, profile.user_id)
+    if user:
+        _notify_admins_driver_fee_paid(db, profile, user, payment.gateway)
+    return profile
+
+
+def _notify_admins_driver_fee_paid(
+    db: Session,
+    profile: DriverProfile,
+    user: User,
+    gateway: str,
+) -> None:
+    from app.notification_engine_services import engine_dispatch
+
+    admin_role = db.scalar(select(Role).where(Role.slug == "admin"))
+    if not admin_role:
+        return
+
+    admin_ids = db.scalars(
+        select(UserRole.user_id).where(UserRole.role_id == admin_role.id)
+    ).all()
+    gateway_label = "معاملات" if gateway == "muamalat" else "سداد" if gateway == "sadad" else gateway
+    title = "سائق ساحبة سدّد رسوم التفعيل"
+    body = (
+        f"{user.full_name} ({user.phone}) سدّد رسوم التسجيل عبر {gateway_label} "
+        f"— بانتظار مراجعة الأوراق"
+    )
+    for admin_user_id in admin_ids:
+        try:
+            engine_dispatch(
+                db,
+                admin_user_id,
+                event_source="driver_registration_fee",
+                category="system",
+                title=title,
+                body=body,
+                send_push=False,
+                data={
+                    "profile_id": str(profile.id),
+                    "driver_phone": user.phone,
+                    "gateway": gateway,
+                },
+            )
+        except Exception:
+            pass
 
 
 def workshop_profile_out(p: WorkshopProfile, user: User) -> dict:
@@ -419,6 +610,8 @@ def approve_registration(
             raise ValueError("طلب السائق غير موجود")
         if not (p.license_doc_path and p.id_doc_path and p.vehicle_doc_path):
             raise ValueError("المستندات غير مكتملة")
+        if p.service_type == "tow" and p.registration_fee_status != "paid":
+            raise ValueError("يجب سداد رسوم التفعيل قبل اعتماد سائق الساحبة")
         user = db.get(User, p.user_id)
         driver_type = "courier" if p.service_type == "courier" else "tow"
         tech = Technician(

@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     edfali_api_key: str = ""
     edfali_webhook_secret: str = ""
     driver_trip_commission_lyd: float = 5.0
+    driver_registration_fee_lyd: float = 150.0
 
     # Push notifications (FCM)
     fcm_enabled: bool = False

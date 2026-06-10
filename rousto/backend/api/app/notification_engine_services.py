@@ -36,6 +36,7 @@ EVENT_SOURCES = frozenset(
         "admin_broadcast",
         "vendor_hook",
         "driver_hook",
+        "driver_registration_fee",
         "system",
     }
 )

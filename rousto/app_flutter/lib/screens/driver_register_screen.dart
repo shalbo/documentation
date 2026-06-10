@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../services/registration_service.dart';
 import '../theme/app_colors.dart';
@@ -24,19 +26,28 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
 
   int _step = 0;
   String? _city;
-  String _serviceType = 'courier';
+  String _serviceType = 'tow';
   List<String> _cities = [];
   String? _profileId;
   Uint8List? _license;
   Uint8List? _idDoc;
   Uint8List? _vehicle;
   bool _loading = false;
+  String? _paymentError;
+  double _registrationFee = 150;
+  bool _paymentComplete = false;
+
+  bool get _requiresPayment => _serviceType == 'tow';
+  int get _totalSteps => _requiresPayment ? 3 : 2;
 
   @override
   void initState() {
     super.initState();
     _service.fetchCities().then((c) => setState(() => _cities = c)).catchError((_) {
       setState(() => _cities = ['طرابلس', 'مصراتة', 'بنغازي']);
+    });
+    _service.fetchDriverRegistrationFee().then((fee) {
+      if (mounted) setState(() => _registrationFee = fee);
     });
   }
 
@@ -85,47 +96,119 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
       return;
     }
 
-    if (_license == null || _idDoc == null || _vehicle == null || _profileId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ارفع الرخصة والهوية وصورة السيارة')),
-      );
+    if (_step == 1) {
+      if (_license == null || _idDoc == null || _vehicle == null || _profileId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ارفع الرخصة والهوية وصورة السيارة')),
+        );
+        return;
+      }
+      setState(() => _loading = true);
+      try {
+        await _service.uploadDriverDocuments(
+          profileId: _profileId!,
+          licenseBytes: _license!,
+          idBytes: _idDoc!,
+          vehicleBytes: _vehicle!,
+        );
+        if (!mounted) return;
+        if (_requiresPayment) {
+          setState(() => _step = 2);
+        } else {
+          _showSuccessAndExit();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+        }
+      } finally {
+        if (mounted) setState(() => _loading = false);
+      }
       return;
     }
-    setState(() => _loading = true);
+  }
+
+  Future<void> _payWithGateway(String gateway) async {
+    if (_profileId == null) return;
+    setState(() {
+      _loading = true;
+      _paymentError = null;
+    });
     try {
-      await _service.uploadDriverDocuments(
+      final res = await _service.initiateDriverRegistrationPayment(
         profileId: _profileId!,
-        licenseBytes: _license!,
-        idBytes: _idDoc!,
-        vehicleBytes: _vehicle!,
+        phone: _phone.text.trim(),
+        gateway: gateway,
       );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إرسال الطلب — بانتظار اعتماد الإدارة')),
-      );
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      final data = res['data'] as Map<String, dynamic>;
+      if (data['already_paid'] == true) {
+        setState(() => _paymentComplete = true);
+        _showSuccessAndExit();
+        return;
       }
+      final redirect = data['redirect_url'] as String?;
+      if (redirect == null) {
+        throw Exception('لم يُعاد رابط الدفع');
+      }
+      if (!mounted) return;
+      final webviewOk = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(builder: (_) => _DriverPaymentWebView(url: redirect)),
+      );
+      if (webviewOk != true) {
+        setState(() => _paymentError = 'لم تكتمل عملية الدفع — يمكنك إعادة المحاولة');
+        return;
+      }
+      final paid = await _pollPaymentConfirmed();
+      if (paid) {
+        setState(() => _paymentComplete = true);
+        _showSuccessAndExit();
+      } else {
+        setState(() => _paymentError = 'بانتظار تأكيد الدفع من البنك — أعد المحاولة بعد قليل');
+      }
+    } catch (e) {
+      setState(() => _paymentError = e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<bool> _pollPaymentConfirmed() async {
+    for (var i = 0; i < 15; i++) {
+      await Future<void>.delayed(const Duration(seconds: 2));
+      final status = await _service.getDriverPaymentStatus(
+        profileId: _profileId!,
+        phone: _phone.text.trim(),
+      );
+      final data = status['data'] as Map<String, dynamic>;
+      if (data['registration_fee_status'] == 'paid') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _showSuccessAndExit() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('تم تقديم طلبك بنجاح — بانتظار مراجعة الإدارة'),
+      ),
+    );
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: AppBar(title: Text('تسجيل سائق — خطوة ${_step + 1}/2')),
+      appBar: AppBar(title: Text('تسجيل سائق — خطوة ${_step + 1}/$_totalSteps')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            LinearProgressIndicator(value: (_step + 1) / 2),
+            LinearProgressIndicator(value: (_step + 1) / _totalSteps),
             const SizedBox(height: 20),
             if (_step == 0) ...[
               TextField(
@@ -160,14 +243,14 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                     child: Text('سائق ساحبة أعطال'),
                   ),
                 ],
-                onChanged: (v) => setState(() => _serviceType = v ?? 'courier'),
+                onChanged: (v) => setState(() => _serviceType = v ?? 'tow'),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _plate,
                 decoration: const InputDecoration(labelText: 'رقم اللوحة'),
               ),
-            ] else ...[
+            ] else if (_step == 1) ...[
               _DocTile(
                 label: 'رخصة القيادة',
                 done: _license != null,
@@ -185,17 +268,83 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                 done: _vehicle != null,
                 onTap: () => _pick('vehicle'),
               ),
+            ] else ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: AppDecorations.card(color: AppColors.red050),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'رسوم تفعيل الحساب',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: AppColors.navy,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${_registrationFee.toStringAsFixed(2)} دينار ليبي',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.red,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'الدفع إلزامي لتفعيل حساب سائق الساحبة ومراجعته من الإدارة.',
+                      style: TextStyle(color: AppColors.ink500, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _PaymentOptionTile(
+                label: 'بطاقة معاملات',
+                subtitle: 'مصرف الجمهورية — OTP',
+                icon: Icons.credit_card,
+                onTap: _loading ? null : () => _payWithGateway('muamalat'),
+              ),
+              const SizedBox(height: 10),
+              _PaymentOptionTile(
+                label: 'تطبيق سداد',
+                subtitle: 'المدار الجديد — دفع موبايل',
+                icon: Icons.phone_android,
+                onTap: _loading ? null : () => _payWithGateway('sadad'),
+              ),
+              if (_paymentError != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _paymentError!,
+                  style: const TextStyle(color: AppColors.red, fontSize: 13),
+                ),
+              ],
+              if (_paymentComplete) ...[
+                const SizedBox(height: 12),
+                const Row(
+                  children: [
+                    Icon(Icons.check_circle, color: AppColors.green),
+                    SizedBox(width: 8),
+                    Text('تم سداد الرسوم بنجاح', style: TextStyle(color: AppColors.green)),
+                  ],
+                ),
+              ],
             ],
             const Spacer(),
-            SizedBox(
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _loading ? null : _nextStep,
-                child: _loading
-                    ? const CircularProgressIndicator(strokeWidth: 2)
-                    : Text(_step == 0 ? 'التالي' : 'إرسال الطلب'),
+            if (_step < 2)
+              SizedBox(
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : _nextStep,
+                  child: _loading
+                      ? const CircularProgressIndicator(strokeWidth: 2)
+                      : Text(_step == 0 ? 'التالي' : 'التالي — الدفع'),
+                ),
               ),
-            ),
+            if (_step == 2 && _loading)
+              const Center(child: CircularProgressIndicator()),
           ],
         ),
       ),
@@ -242,6 +391,80 @@ class _DocTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PaymentOptionTile extends StatelessWidget {
+  final String label;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _PaymentOptionTile({
+    required this.label,
+    required this.subtitle,
+    required this.icon,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(14),
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppColors.line),
+        ),
+        leading: Icon(icon, color: AppColors.navy),
+        title: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.arrow_back_ios, size: 16, color: AppColors.navy),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _DriverPaymentWebView extends StatefulWidget {
+  final String url;
+  const _DriverPaymentWebView({required this.url});
+
+  @override
+  State<_DriverPaymentWebView> createState() => _DriverPaymentWebViewState();
+}
+
+class _DriverPaymentWebViewState extends State<_DriverPaymentWebView> {
+  late final WebViewController _controller;
+  bool _done = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (url) {
+            if (url.contains('success') || url.contains('rousto://payment/return')) {
+              if (!_done) {
+                _done = true;
+                Navigator.of(context).pop(true);
+              }
+            }
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(widget.url));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('بوابة الدفع الآمنة')),
+      body: WebViewWidget(controller: _controller),
     );
   }
 }
