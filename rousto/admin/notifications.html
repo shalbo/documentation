@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — محرك الإشعارات</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .stat-grid b { font-size: 1.4rem; color: var(--red, #E11B22); }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tabs button.active { background: #E11B22; color: #fff; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 720px) { .form-grid { grid-template-columns: 1fr; } }
+    .log-status { font-size: .75rem; padding: 2px 8px; border-radius: 6px; background: #eee; }
+    .log-status.skipped_prefs { background: #fff3cd; }
+    .log-status.delivered { background: #d4edda; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — محرك الإشعارات المركزي</h1>
+      <p>سجل الإرسال، القوالب، البث الجماعي، والإحصائيات</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">الكتالوج</a>
+      <a href="marketing.html" class="btn btn-ghost-light">التسويق</a>
+      <button id="connectBtn" class="btn btn-secondary">اتصال وتحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div>
+          <label for="apiBase">عنوان API</label>
+          <input id="apiBase" type="url" value="http://localhost:8000" />
+        </div>
+        <div>
+          <label for="adminKey">مفتاح الإدارة</label>
+          <input id="adminKey" type="password" value="rousto_admin_dev" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>ملخص المحرك</h2>
+      <div id="analyticsGrid" class="stat-grid"></div>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button type="button" class="btn btn-ghost btn-sm active" data-tab="log">سجل الإرسال</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-tab="send">إرسال فردي</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-tab="broadcast">بث جماعي</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-tab="templates">القوالب</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-tab="inbox">صندوق المستخدمين</button>
+      </div>
+
+      <div id="panel-log" class="panel active">
+        <table>
+          <thead>
+            <tr>
+              <th>الوقت</th>
+              <th>المصدر</th>
+              <th>المستخدم</th>
+              <th>الفئة</th>
+              <th>العنوان</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="dispatchLogBody"></tbody>
+        </table>
+      </div>
+
+      <div id="panel-send" class="panel">
+        <form id="sendForm" class="form-grid">
+          <div>
+            <label>بحث مستخدم (اسم/جوال)</label>
+            <input id="userSearch" type="text" placeholder="+966501234567" />
+            <select id="userSelect" size="4" style="width:100%;margin-top:6px"></select>
+          </div>
+          <div>
+            <label>الفئة</label>
+            <select id="sendCategory">
+              <option value="system">نظام</option>
+              <option value="promo">عروض</option>
+              <option value="booking">حجز</option>
+              <option value="support">دعم</option>
+              <option value="security">أمان</option>
+            </select>
+            <label style="margin-top:8px">العنوان</label>
+            <input id="sendTitle" type="text" required />
+            <label style="margin-top:8px">المحتوى</label>
+            <textarea id="sendBody" rows="4" required></textarea>
+            <label style="margin-top:8px"><input type="checkbox" id="sendPush" checked /> إرسال Push</label>
+            <button type="submit" class="btn btn-primary" style="margin-top:10px">إرسال</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="panel-broadcast" class="panel">
+        <form id="broadcastForm">
+          <div class="form-grid">
+            <div>
+              <label>الشريحة</label>
+              <select id="broadcastSegment">
+                <option value="all_users">كل المستخدمين</option>
+                <option value="customers">العملاء</option>
+                <option value="technicians">الفنيين</option>
+                <option value="admins">المدراء</option>
+              </select>
+            </div>
+            <div>
+              <label>الفئة</label>
+              <select id="broadcastCategory">
+                <option value="system">نظام</option>
+                <option value="promo">عروض</option>
+              </select>
+            </div>
+          </div>
+          <label>العنوان</label>
+          <input id="broadcastTitle" type="text" required />
+          <label>المحتوى</label>
+          <textarea id="broadcastBody" rows="4" required></textarea>
+          <label><input type="checkbox" id="broadcastPush" checked /> إرسال Push</label>
+          <button type="submit" class="btn btn-primary" style="margin-top:10px">بث الآن</button>
+        </form>
+        <h3 style="margin-top:20px">آخر البثوث</h3>
+        <table>
+          <thead><tr><th>المرجع</th><th>الشريحة</th><th>المستلمون</th><th>Push</th><th>التاريخ</th></tr></thead>
+          <tbody id="broadcastsBody"></tbody>
+        </table>
+      </div>
+
+      <div id="panel-templates" class="panel">
+        <table>
+          <thead>
+            <tr><th>المعرّف</th><th>الفئة</th><th>عنوان القالب</th><th>نشط</th></tr>
+          </thead>
+          <tbody id="templatesBody"></tbody>
+        </table>
+      </div>
+
+      <div id="panel-inbox" class="panel">
+        <table>
+          <thead>
+            <tr><th>المستخدم</th><th>الفئة</th><th>العنوان</th><th>مقروء</th><th>Push</th><th>التاريخ</th></tr>
+          </thead>
+          <tbody id="inboxBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/services/api-client.js"></script>
+  <script src="js/services/notifications-service.js"></script>
+  <script src="js/notifications-admin.js"></script>
+</body>
+</html>

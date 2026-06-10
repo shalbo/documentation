@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — بحث قطع الغيار</title>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/portal.css" />
+</head>
+<body class="portal-page">
+  <header class="portal-header" id="portalHeader"></header>
+
+  <main class="portal-main">
+    <section class="card">
+      <h1>بحث قطع الغيار الأصلية</h1>
+      <p class="muted">كتالوج منفصل عن خدمات الصيانة — ضمان 6 أشهر</p>
+      <form id="searchForm" class="search-row">
+        <input id="query" type="search" placeholder="رقم القطعة أو الاسم…" required />
+        <input id="make" type="text" placeholder="ماركة (Toyota)" />
+        <input id="model" type="text" placeholder="موديل (Camry)" />
+        <label><input type="checkbox" id="oemOnly" /> OEM فقط</label>
+        <button type="submit" class="btn btn-primary">بحث</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <div id="results"></div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/portal-layout.js"></script>
+  <script src="js/parts.js"></script>
+</body>
+</html>

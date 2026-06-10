@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — دعم العملاء</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>روستو — دعم العملاء</h1>
+      <p>إدارة التذاكر والردود</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="security.html" class="btn btn-ghost-light">الأمان</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="adminKey">مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>التذاكر</h2>
+        <table id="ticketsTable">
+          <thead><tr><th>المرجع</th><th>الموضوع</th><th>الحالة</th><th></th></tr></thead>
+          <tbody><tr><td colspan="4" class="empty">تحديث</td></tr></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2 id="detailTitle">تفاصيل التذكرة</h2>
+        <div id="messages" class="messages-panel"></div>
+        <form id="replyForm" style="margin-top:12px">
+          <textarea id="replyText" placeholder="رد الإدارة"></textarea>
+          <div class="actions" style="margin-top:8px">
+            <select id="replyStatus">
+              <option value="waiting_customer">بانتظار العميل</option>
+              <option value="in_progress">قيد المعالجة</option>
+              <option value="resolved">محلولة</option>
+            </select>
+            <button type="submit" class="btn btn-primary">إرسال</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <style>
+    .messages-panel { max-height: 320px; overflow: auto; }
+    .msg { padding: 10px; border-radius: 10px; margin-bottom: 8px; font-size: .85rem; }
+    .msg.customer { background: var(--red-050); }
+    .msg.admin { background: #e8f7f0; }
+    textarea { width: 100%; min-height: 80px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: inherit; }
+    select { border: 1px solid var(--line); border-radius: 10px; padding: 8px; font-family: inherit; }
+  </style>
+  <script src="js/services/api-client.js"></script>
+  <script src="js/services/support-service.js"></script>
+  <script src="js/support-admin.js"></script>
+</body>
+</html>
