@@ -137,6 +137,18 @@
       <p>إضافة فردية أو رفع جماعي عبر Excel / CSV</p>
     </div>
     <div class="topbar-actions">
+      <div id="storeStatusWrap" class="store-status-wrap store-open">
+        <div>
+          <div id="storeStatusLabel" class="store-status-label">
+            <span class="status-dot ping"></span> المحل يستقبل طلبات
+          </div>
+          <div id="storeClosedNotice" class="store-closed-notice" style="display:none"></div>
+        </div>
+        <label class="store-toggle" title="تفعيل / إيقاف المحل">
+          <input type="checkbox" id="storeStatusToggle" checked />
+          <span class="store-toggle-slider"></span>
+        </label>
+      </div>
       <a href="vendor-portal.html" class="btn btn-ghost-light">الخريطة</a>
       <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
     </div>
@@ -260,6 +272,7 @@
   </main>
 
   <div id="toast" class="toast"></div>
+  <script src="js/vendor-status-toggle.js"></script>
   <script src="js/vendor-products.js"></script>
 </body>
 </html>

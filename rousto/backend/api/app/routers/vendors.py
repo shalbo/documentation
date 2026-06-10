@@ -20,6 +20,7 @@ from app.vendor_services import (
     payout_leg_out,
     reject_vendor,
     submit_application,
+    toggle_vendor_store_status,
     update_vendor_financials,
     vendor_out,
 )
@@ -68,6 +69,22 @@ def get_vendor_profile(
     db: Session = Depends(get_db),
 ):
     return {"data": vendor_out(db, vendor)}
+
+
+@router.patch("/vendor/status/toggle")
+def patch_vendor_status_toggle(
+    vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db),
+):
+    try:
+        data = toggle_vendor_store_status(db, vendor)
+        db.commit()
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "STORE_TOGGLE_ERROR", "message": str(exc)},
+        ) from exc
+    return {"data": data}
 
 
 @router.put("/vendor/me/financials")

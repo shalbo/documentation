@@ -371,3 +371,7 @@ try {
 } catch (_) {}
 
 loadRoots().catch((e) => toast(e.message, true));
+
+if (window.VendorStoreStatus) {
+  VendorStoreStatus.bind(vendorApi, toast);
+}

@@ -17,7 +17,7 @@ from app.models import (
 )
 from app.category_services import get_category_tree, list_root_categories
 from app.fitment_services import part_ids_for_car_year
-from app.parts_services import part_out
+from app.parts_services import _part_has_only_inactive_vendor_stock, _vendors_in_stock, part_out
 
 DEFAULT_LAT = 24.7136
 DEFAULT_LNG = 46.6753
@@ -29,6 +29,7 @@ def _vendor_out(vendor: Vendor, locale: str, *, distance_km: float | None = None
         "business_name": vendor.business_name,
         "city": vendor.city,
         "status": vendor.status,
+        "is_active": vendor.is_active,
     }
     if vendor.base_lat is not None and vendor.base_lng is not None:
         data["location"] = {
@@ -44,7 +45,11 @@ def list_featured_vendors(db: Session, locale: str, *, limit: int = 6) -> list[d
     stmt = (
         select(Vendor, func.count(PartInventory.id).label("sku_count"))
         .join(PartInventory, PartInventory.vendor_id == Vendor.id)
-        .where(Vendor.status == "approved", PartInventory.qty_available > 0)
+        .where(
+            Vendor.status == "approved",
+            Vendor.is_active.is_(True),
+            PartInventory.qty_available > 0,
+        )
         .group_by(Vendor.id)
         .order_by(func.count(PartInventory.id).desc())
         .limit(limit)
@@ -71,9 +76,17 @@ def list_featured_parts(
             return []
         stmt = stmt.where(Part.id.in_(fit_ids))
     parts = db.scalars(
-        stmt.order_by(Part.is_oem.desc(), Part.name_ar).limit(limit)
+        stmt.order_by(Part.is_oem.desc(), Part.name_ar).limit(limit * 2)
     ).unique().all()
-    return [part_out(p, locale, db=db) for p in parts]
+    out: list[dict] = []
+    for p in parts:
+        if _part_has_only_inactive_vendor_stock(db, p.id):
+            continue
+        vendors = _vendors_in_stock(db, p.id)
+        out.append(part_out(p, locale, db=db, vendors=vendors))
+        if len(out) >= limit:
+            break
+    return out
 
 
 def get_marketplace_home(
@@ -132,6 +145,7 @@ def find_vendors_nearby_for_part(
             PartInventory.part_id == part_id,
             PartInventory.qty_available > 0,
             Vendor.status == "approved",
+            Vendor.is_active.is_(True),
             Vendor.base_lat.isnot(None),
             Vendor.base_lng.isnot(None),
         )

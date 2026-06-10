@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models import PaymentSplitLeg, Technician, Vendor, VendorBankAccount
+from app.models import PaymentSplitLeg, Technician, Vendor, VendorBankAccount, VendorProfile
 
 IBAN_PATTERN = re.compile(r"^SA\d{22}$")
 RELEASED_STATUSES = frozenset({"released", "paid"})
@@ -80,6 +80,7 @@ def vendor_out(db: Session, vendor: Vendor, *, include_summary: bool = True) -> 
         "national_id": vendor.national_id,
         "commercial_reg": vendor.commercial_reg,
         "status": vendor.status,
+        "is_active": vendor.is_active,
         "technician_id": vendor.technician_id,
         "rejection_reason": vendor.rejection_reason,
         "approved_at": vendor.approved_at,
@@ -272,3 +273,29 @@ def count_vendors_by_status(db: Session) -> dict[str, int]:
         select(Vendor.status, func.count()).group_by(Vendor.status)
     ).all()
     return {status: count for status, count in rows}
+
+
+def toggle_vendor_store_status(db: Session, vendor: Vendor) -> dict:
+    if vendor.status != "approved":
+        raise ValueError("لا يمكن تغيير حالة المحل قبل اعتماد الطلب")
+
+    now = datetime.now(timezone.utc)
+    vendor.is_active = not vendor.is_active
+    vendor.updated_at = now
+
+    profile = db.scalar(
+        select(VendorProfile).where(VendorProfile.vendor_id == vendor.id)
+    )
+    if profile:
+        profile.is_active = vendor.is_active
+        profile.updated_at = now
+
+    return {
+        "vendor_id": str(vendor.id),
+        "is_active": vendor.is_active,
+        "message_ar": (
+            "المحل يستقبل طلبات"
+            if vendor.is_active
+            else "المتجر مغلق مؤقتاً — بضاعتك مخفية الآن عن الزبائن"
+        ),
+    }

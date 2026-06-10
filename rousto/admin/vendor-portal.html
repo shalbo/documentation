@@ -15,6 +15,18 @@
       <p>الخريطة، الموقع المباشر، والمهمة النشطة</p>
     </div>
     <div class="topbar-actions">
+      <div id="portal-storeStatusWrap" class="store-status-wrap store-open">
+        <div>
+          <div id="portal-storeStatusLabel" class="store-status-label">
+            <span class="status-dot ping"></span> المحل يستقبل طلبات
+          </div>
+          <div id="portal-storeClosedNotice" class="store-closed-notice" style="display:none"></div>
+        </div>
+        <label class="store-toggle" title="تفعيل / إيقاف المحل">
+          <input type="checkbox" id="portal-storeStatusToggle" checked />
+          <span class="store-toggle-slider"></span>
+        </label>
+      </div>
       <a href="vendor-products.html" class="btn btn-ghost-light">إضافة منتج</a>
       <a href="vendors.html" class="btn btn-ghost-light">إدارة الطلبات</a>
       <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
@@ -89,6 +101,7 @@
   </main>
 
   <div id="toast" class="toast"></div>
+  <script src="js/vendor-status-toggle.js"></script>
   <script src="js/vendor-map.js"></script>
   <script>
     const state = { map: null, apiBase: "http://localhost:8000", vendorId: "" };
@@ -204,6 +217,10 @@
       document.getElementById("liveLng").value = lng.toFixed(7);
       document.getElementById("liveForm").dispatchEvent(new Event("submit"));
     });
+
+    if (window.VendorStoreStatus) {
+      VendorStoreStatus.bind(vendorApi, toast, "portal");
+    }
 
     loadConfig();
     refreshMap().catch(() => {});

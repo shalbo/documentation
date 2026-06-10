@@ -300,3 +300,91 @@ tr:hover td { background: var(--brand-bg); }
   padding: 2px 6px;
   border-radius: 8px;
 }
+
+/* Vendor store status toggle */
+.store-status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: var(--r-brand);
+  padding: 8px 14px;
+  min-width: 220px;
+}
+.store-status-wrap.store-closed {
+  background: var(--brand-red-050);
+  border-color: var(--brand-red);
+}
+.store-status-label {
+  font-size: .82rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.store-status-wrap.store-closed .store-status-label { color: var(--brand-red); }
+.store-closed-notice {
+  font-size: .72rem;
+  color: var(--brand-red);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.status-dot.ping {
+  box-shadow: 0 0 0 0 rgba(45, 159, 111, 0.7);
+  animation: store-ping 1.6s ease-out infinite;
+}
+@keyframes store-ping {
+  0% { box-shadow: 0 0 0 0 rgba(45, 159, 111, 0.65); }
+  70% { box-shadow: 0 0 0 10px rgba(45, 159, 111, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 159, 111, 0); }
+}
+.store-toggle {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.store-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.store-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.35);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.store-toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  right: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .2s, background .2s;
+}
+.store-toggle input:checked + .store-toggle-slider {
+  background: var(--green);
+}
+.store-toggle input:not(:checked) + .store-toggle-slider {
+  background: var(--brand-red);
+}
+.store-toggle input:not(:checked) + .store-toggle-slider::before {
+  transform: translateX(-22px);
+}

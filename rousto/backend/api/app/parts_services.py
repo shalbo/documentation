@@ -32,6 +32,26 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _vendor_store_visible() -> tuple:
+    return (
+        Vendor.status == "approved",
+        Vendor.is_active.is_(True),
+    )
+
+
+def _part_has_only_inactive_vendor_stock(db: Session, part_id: uuid.UUID) -> bool:
+    rows = db.execute(
+        select(PartInventory.qty_available, Vendor.is_active, Vendor.status)
+        .join(Vendor, Vendor.id == PartInventory.vendor_id)
+        .where(PartInventory.part_id == part_id, PartInventory.qty_available > 0)
+    ).all()
+    if not rows:
+        return False
+    return not any(
+        qty > 0 and status == "approved" and is_active for qty, is_active, status in rows
+    )
+
+
 def _vendors_in_stock(db: Session, part_id: uuid.UUID) -> list[dict]:
     rows = db.execute(
         select(PartInventory, Vendor)
@@ -39,7 +59,7 @@ def _vendors_in_stock(db: Session, part_id: uuid.UUID) -> list[dict]:
         .where(
             PartInventory.part_id == part_id,
             PartInventory.qty_available > 0,
-            Vendor.status == "approved",
+            *_vendor_store_visible(),
         )
     ).all()
     return [
@@ -174,7 +194,11 @@ def search_parts(
     if in_stock_only:
         stmt = (
             stmt.join(PartInventory, PartInventory.part_id == Part.id)
-            .where(PartInventory.qty_available > 0)
+            .join(Vendor, Vendor.id == PartInventory.vendor_id)
+            .where(
+                PartInventory.qty_available > 0,
+                *_vendor_store_visible(),
+            )
             .distinct()
         )
 
@@ -193,6 +217,8 @@ def search_parts(
             compat = part.vehicle_compatibility or []
             if not _matches_vehicle(compat, make, model):
                 continue
+        if _part_has_only_inactive_vendor_stock(db, part.id):
+            continue
         vendors = _vendors_in_stock(db, part.id)
         if in_stock_only and not vendors:
             continue
@@ -225,6 +251,9 @@ def get_part_detail(db: Session, part_id: uuid.UUID, locale: str) -> dict | None
         .where(Part.id == part_id, Part.is_active.is_(True))
     )
     if not part:
+        return None
+
+    if _part_has_only_inactive_vendor_stock(db, part_id):
         return None
 
     vendors = _vendors_in_stock(db, part_id)
