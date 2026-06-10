@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إضافة منتج (التاجر)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .required-hint { color: var(--brand-red); font-size: .78rem; margin-top: 4px; }
+    .sub-disabled { opacity: .5; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>بوابة التاجر — إضافة منتج</h1>
+      <p>تصنيف شجري إلزامي: قسم رئيسي ← قسم فرعي</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="vendor-portal.html" class="btn btn-ghost-light">الخريطة</a>
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label>معرّف التاجر (X-Vendor-Id)</label>
+          <input id="vendorId" value="v0000000-0000-4000-8000-000000000001" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>إضافة منتج جديد</h2>
+      <form id="productForm">
+        <div class="form-row">
+          <div>
+            <label for="rootCategory">القسم الرئيسي *</label>
+            <select id="rootCategory" required>
+              <option value="">— اختر القسم الرئيسي —</option>
+            </select>
+          </div>
+          <div id="subWrap">
+            <label for="subCategory">القسم الفرعي *</label>
+            <select id="subCategory" required disabled>
+              <option value="">— اختر القسم الفرعي —</option>
+            </select>
+            <p class="required-hint">إلزامي — لا يُحفظ منتج بدون قسم فرعي</p>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:12px">
+          <div><label>رقم القطعة / OEM *</label><input id="partNumber" required /></div>
+          <div><label>المعرّف (slug) *</label><input id="slug" required pattern="[a-z][a-z0-9-]*" /></div>
+        </div>
+        <div style="margin-top:10px"><label>اسم القطعة *</label><input id="nameAr" required /></div>
+        <div class="form-row" style="margin-top:10px">
+          <div><label>السعر (ر.س) *</label><input id="price" type="number" min="1" step="0.01" required /></div>
+          <div><label>الكمية في المخزون *</label><input id="qty" type="number" min="1" required value="1" /></div>
+        </div>
+        <div class="form-row" style="margin-top:10px">
+          <div><label>رقم OEM (اختياري)</label><input id="oemNumber" /></div>
+        </div>
+        <div style="margin-top:10px">
+          <label for="vinPrefixes">بادئات VIN المتوافقة (11 رمزاً لكل سطر)</label>
+          <textarea id="vinPrefixes" rows="3" placeholder="4T1B11HK5JK&#10;2T1BURHE0JC"></textarea>
+          <p class="required-hint">يمكن إدخال أكثر من هيكل — سطر أو فاصلة لكل بادئة</p>
+        </div>
+        <div style="margin-top:12px">
+          <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:16px">حفظ المنتج</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-products.js"></script>
+</body>
+</html>
