@@ -13,39 +13,22 @@ class AuthService {
   Uri _uri(String path) =>
       Uri.parse('${AppConfig.apiBaseUrl}${AppConfig.apiPrefix}$path');
 
-  Future<String> sendOtp(String phone) async {
-    final res = await _client.post(
-      _uri('/auth/otp/send'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phone': phone}),
-    );
-    final body = jsonDecode(res.body) as Map<String, dynamic>;
-    if (res.statusCode >= 400) {
-      final err = body['error'] as Map<String, dynamic>?;
-      throw Exception(err?['message'] ?? 'فشل إرسال الرمز');
-    }
-    final meta = body['meta'] as Map<String, dynamic>?;
-    return meta?['dev_otp'] as String? ?? '';
-  }
-
-  Future<void> verifyOtp({
+  Future<void> login({
     required String phone,
-    required String code,
-    String? requestId,
+    required String password,
   }) async {
     final res = await _client.post(
-      _uri('/auth/otp/verify'),
+      _uri('/auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'phone': phone,
-        'code': code,
-        if (requestId != null) 'request_id': requestId,
-      }),
+      body: jsonEncode({'phone': phone, 'password': password}),
     );
     final body = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode >= 400) {
+      final detail = body['detail'] as Map<String, dynamic>?;
       final err = body['error'] as Map<String, dynamic>?;
-      throw Exception(err?['message'] ?? 'فشل التحقق');
+      throw Exception(
+        detail?['message'] ?? err?['message'] ?? 'فشل تسجيل الدخول',
+      );
     }
     final data = body['data'] as Map<String, dynamic>;
     await AuthStorage.instance.saveTokens(

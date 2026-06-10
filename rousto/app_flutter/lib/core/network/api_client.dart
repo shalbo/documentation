@@ -460,6 +460,37 @@ class ApiClient {
     return body['data'] as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> generatePaymentOtp({
+    required String orderId,
+    double? amountLyd,
+  }) async {
+    final body = await _post(
+      '/payments/otp/generate',
+      {
+        'order_id': orderId,
+        if (amountLyd != null) 'amount_lyd': amountLyd,
+      },
+      auth: true,
+    );
+    final data = Map<String, dynamic>.from(body['data'] as Map<String, dynamic>);
+    if (body['meta'] != null) {
+      data['meta'] = body['meta'];
+    }
+    return data;
+  }
+
+  Future<Map<String, dynamic>> verifyPaymentOtp({
+    required String orderId,
+    required String code,
+  }) async {
+    final body = await _post(
+      '/payments/otp/verify',
+      {'order_id': orderId, 'code': code},
+      auth: true,
+    );
+    return body['data'] as Map<String, dynamic>;
+  }
+
   Future<List<dynamic>> getSupportFaq({String? category}) async {
     final query = category != null ? {'category': category} : null;
     final response = await _client.get(

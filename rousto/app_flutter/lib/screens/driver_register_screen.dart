@@ -8,6 +8,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../services/registration_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_decorations.dart';
+import '../widgets/payment_otp_sheet.dart';
 import 'login_screen.dart';
 
 class DriverRegisterScreen extends StatefulWidget {
@@ -140,17 +141,53 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
         phone: _phone.text.trim(),
         gateway: gateway,
       );
-      final data = res['data'] as Map<String, dynamic>;
+      final data = res['data'] as Map<String, dynamic>? ?? res;
       if (data['already_paid'] == true) {
         setState(() => _paymentComplete = true);
         _showSuccessAndExit();
         return;
       }
-      final redirect = data['redirect_url'] as String?;
-      if (redirect == null) {
-        throw Exception('لم يُعاد رابط الدفع');
+      final orderId = (data['order_id'] ?? data['intent_id']) as String?;
+      if (orderId == null) {
+        throw Exception('لم يُنشأ طلب الدفع');
       }
       if (!mounted) return;
+      setState(() => _loading = false);
+
+      final verified = await PaymentOtpSheet.show(
+        context,
+        amountLyd: _registrationFee,
+        onGenerate: () => _service.generateRegistrationPaymentOtp(
+          orderId: orderId,
+          phone: _phone.text.trim(),
+          amountLyd: _registrationFee,
+        ),
+        onResend: () => _service.generateRegistrationPaymentOtp(
+          orderId: orderId,
+          phone: _phone.text.trim(),
+          amountLyd: _registrationFee,
+        ),
+        onVerify: (code) => _service.verifyRegistrationPaymentOtp(
+          orderId: orderId,
+          phone: _phone.text.trim(),
+          code: code,
+        ),
+      );
+      if (verified == null) {
+        setState(() => _paymentError = 'لم يكتمل تأكيد الرمز المالي');
+        return;
+      }
+
+      final verifiedData = verified['data'] as Map<String, dynamic>? ?? verified;
+      final redirect = verifiedData['redirect_url'] as String?;
+      if (redirect == null) {
+        final paid = await _pollPaymentConfirmed();
+        if (paid) {
+          setState(() => _paymentComplete = true);
+          _showSuccessAndExit();
+        }
+        return;
+      }
       final webviewOk = await Navigator.of(context).push<bool>(
         MaterialPageRoute(builder: (_) => _DriverPaymentWebView(url: redirect)),
       );

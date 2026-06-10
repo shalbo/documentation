@@ -53,7 +53,7 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم التسجيل — سجّل الدخول برمز OTP')),
+        const SnackBar(content: Text('تم التسجيل — سجّل الدخول بكلمة المرور (آخر 6 أرقام من جوالك)')),
       );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const LoginScreen()),

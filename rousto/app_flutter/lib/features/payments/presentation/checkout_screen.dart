@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../theme/app_colors.dart';
 import '../../../widgets/common.dart';
+import '../../../widgets/payment_otp_sheet.dart';
 import '../data/repositories/payment_repository.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -73,26 +74,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (_selectedGateway == null) return;
     setState(() => _loading = true);
     try {
-      final result = await _payments.checkout(
+      final intent = await _payments.checkout(
         amountLyd: widget.amountLyd,
         gateway: _selectedGateway!,
         orderType: widget.orderType,
         orderId: widget.orderId,
         vendorId: widget.vendorId,
       );
-      final redirect = result['redirect_url'] as String?;
-      if (redirect != null && (result['requires_webview'] == true)) {
-        if (!mounted) return;
+      final orderId = (intent['order_id'] ?? intent['intent_id']) as String;
+      if (!mounted) return;
+      setState(() => _loading = false);
+
+      final verified = await PaymentOtpSheet.show(
+        context,
+        amountLyd: widget.amountLyd,
+        onGenerate: () => _payments.generatePaymentOtp(
+          orderId: orderId,
+          amountLyd: widget.amountLyd,
+        ),
+        onResend: () => _payments.generatePaymentOtp(
+          orderId: orderId,
+          amountLyd: widget.amountLyd,
+        ),
+        onVerify: (code) => _payments.verifyPaymentOtp(
+          orderId: orderId,
+          code: code,
+        ),
+      );
+      if (verified == null || !mounted) return;
+
+      final redirect = verified['redirect_url'] as String?;
+      if (redirect != null && (verified['requires_webview'] == true)) {
         final ok = await Navigator.of(context).push<bool>(
-          MaterialPageRoute(
-            builder: (_) => _PaymentWebView(url: redirect),
-          ),
+          MaterialPageRoute(builder: (_) => _PaymentWebView(url: redirect)),
         );
         if (ok == true && mounted) {
-          Navigator.of(context).pop(true);
+          _showSuccess();
         }
       } else if (mounted) {
-        Navigator.of(context).pop(true);
+        _showSuccess();
       }
     } catch (e) {
       setState(() {
@@ -100,6 +120,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         _loading = false;
       });
     }
+  }
+
+  void _showSuccess() {
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('تمت العملية بنجاح', style: TextStyle(color: AppColors.navy)),
+        content: const Text('تم تأكيد الدفع وإتمام العملية.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('حسناً', style: TextStyle(color: AppColors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -194,7 +233,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     height: 48,
                     child: ElevatedButton(
                       onPressed: _selectedGateway == null ? null : _pay,
-                      child: const Text('تأكيد الدفع'),
+                      child: const Text('تأكيد الشراء ودفع الحساب'),
                     ),
                   ),
                 ],

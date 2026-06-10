@@ -84,6 +84,9 @@ def _create_user(
     if db.scalar(select(User).where(User.email == email_val)):
         raise ValueError("البريد الإلكتروني مسجّل مسبقاً")
     now = datetime.now(timezone.utc)
+    from app.auth_services import hash_password
+
+    default_password = normalized.replace("+", "")[-6:]
     user = User(
         id=uuid.uuid4(),
         full_name=full_name.strip(),
@@ -94,6 +97,7 @@ def _create_user(
         loyalty_points=0,
         locale="ar",
         is_active=True,
+        password_hash=hash_password(default_password),
         created_at=now,
         updated_at=now,
     )
@@ -410,42 +414,43 @@ def initiate_driver_registration_payment(
     if slug not in DRIVER_PAYMENT_GATEWAYS:
         raise ValueError("اختر بوابة معاملات أو سداد")
 
-    if profile.payment_reference_id:
-        existing = db.get(GatewayPayment, profile.payment_reference_id)
-        if existing and existing.status == "pending" and existing.redirect_url:
-            return {
-                "already_paid": False,
-                "payment_id": str(existing.id),
-                "gateway": existing.gateway,
-                "status": existing.status,
-                "amount_lyd": float(existing.amount_lyd),
-                "gateway_ref": existing.gateway_ref,
-                "redirect_url": existing.redirect_url,
-                "requires_webview": True,
-                "profile_id": str(profile.id),
-            }
+    from app.models import PaymentIntent
+    from app.payment_otp_services import create_payment_intent, payment_intent_out
 
-    from app.service_layer.payments.checkout_service import initiate_checkout
+    pending_intent = db.scalar(
+        select(PaymentIntent).where(
+            PaymentIntent.user_id == user.id,
+            PaymentIntent.order_type == DRIVER_REGISTRATION_FEE_ORDER_TYPE,
+            PaymentIntent.order_ref_id == profile.id,
+            PaymentIntent.status == "pending_otp",
+            PaymentIntent.expires_at > datetime.now(timezone.utc),
+        )
+    )
+    if pending_intent:
+        return {
+            "already_paid": False,
+            "profile_id": str(profile.id),
+            "requires_otp": True,
+            **payment_intent_out(pending_intent),
+        }
 
     amount = float(settings.driver_registration_fee_lyd)
-    result = initiate_checkout(
+    intent = create_payment_intent(
         db,
         user,
         amount_lyd=amount,
         gateway=slug,
         order_type=DRIVER_REGISTRATION_FEE_ORDER_TYPE,
-        order_id=profile.id,
+        order_ref_id=profile.id,
         return_url=return_url,
     )
-    gp = db.get(GatewayPayment, result["payment_id"])
-    if gp:
-        profile.payment_reference_id = gp.id
-        profile.registration_fee_gateway = slug
-        profile.updated_at = datetime.now(timezone.utc)
+    profile.registration_fee_gateway = slug
+    profile.updated_at = datetime.now(timezone.utc)
     return {
         "already_paid": False,
         "profile_id": str(profile.id),
-        **result,
+        "requires_otp": True,
+        **payment_intent_out(intent),
     }
 
 
