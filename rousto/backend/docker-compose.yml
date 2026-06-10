@@ -71,6 +71,8 @@ services:
       - ./database/051_part_condition.sql:/docker-entrypoint-initdb.d/051_part_condition.sql:ro
       - ./database/052_vendor_tiers.sql:/docker-entrypoint-initdb.d/052_vendor_tiers.sql:ro
       - ./database/052_vendor_tiers_seed.sql:/docker-entrypoint-initdb.d/052_vendor_tiers_seed.sql:ro
+      - ./database/053_subscriptions.sql:/docker-entrypoint-initdb.d/053_subscriptions.sql:ro
+      - ./database/053_subscriptions_seed.sql:/docker-entrypoint-initdb.d/053_subscriptions_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

@@ -19,6 +19,7 @@ from app.routers import (
     admin_parts,
     admin_shipping,
     admin_tiers,
+    admin_subscriptions,
     auth,
     bookings,
     catalog,
@@ -45,6 +46,7 @@ from app.routers import (
     towing_dispatch,
     vendor_map,
     vendor_parts,
+    vendor_subscription,
     registration,
     vin_decoder,
     vendors,
@@ -94,6 +96,7 @@ app.include_router(admin_marketplace.router, prefix=prefix)
 app.include_router(admin_fitment.router, prefix=prefix)
 app.include_router(admin_shipping.router, prefix=prefix)
 app.include_router(admin_tiers.router, prefix=prefix)
+app.include_router(admin_subscriptions.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)
@@ -112,6 +115,7 @@ app.include_router(monetization.router, prefix=prefix)
 app.include_router(split_payments.router, prefix=prefix)
 app.include_router(vendors.router, prefix=prefix)
 app.include_router(vendor_parts.router, prefix=prefix)
+app.include_router(vendor_subscription.router, prefix=prefix)
 app.include_router(registration.router, prefix=prefix)
 app.include_router(vin_decoder.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)

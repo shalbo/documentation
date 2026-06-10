@@ -12,7 +12,12 @@ from app.i18n import resolve_locale
 from app.models import Vendor
 from app.part_image_services import process_bulk_images_zip
 from app.spare_parts_bulk_services import BULK_COLUMNS, TEMPLATE_CSV, process_bulk_upload
-from app.tier_services import require_excel_upload, vendor_tier_summary
+from app.tier_services import (
+    PRODUCTS_LIMIT_EXCEEDED_MSG,
+    require_excel_upload,
+    tier_limit_http_detail,
+    vendor_tier_summary,
+)
 from app.vendor_parts_services import vendor_create_product
 
 router = APIRouter(prefix="/vendor/parts", tags=["vendor-parts"])
@@ -85,6 +90,8 @@ def vendor_add_product(
         )
         db.commit()
     except ValueError as exc:
+        if str(exc) == PRODUCTS_LIMIT_EXCEEDED_MSG:
+            raise HTTPException(status_code=403, detail=tier_limit_http_detail(exc)) from exc
         raise HTTPException(
             status_code=400,
             detail={"code": "PRODUCT_ERROR", "message": str(exc)},
@@ -121,10 +128,7 @@ def vendor_bulk_upload_template(
     try:
         require_excel_upload(db, vendor)
     except ValueError as exc:
-        raise HTTPException(
-            status_code=403,
-            detail={"code": "TIER_FEATURE", "message": str(exc)},
-        ) from exc
+        raise HTTPException(status_code=403, detail=tier_limit_http_detail(exc)) from exc
     return Response(
         content=TEMPLATE_CSV.encode("utf-8-sig"),
         media_type="text/csv; charset=utf-8",
@@ -149,6 +153,8 @@ async def vendor_bulk_upload(
     try:
         result = process_bulk_upload(db, vendor, content, file.filename)
     except ValueError as exc:
+        if "Excel/ZIP" in str(exc) or str(exc) == PRODUCTS_LIMIT_EXCEEDED_MSG:
+            raise HTTPException(status_code=403, detail=tier_limit_http_detail(exc)) from exc
         raise HTTPException(
             status_code=400,
             detail={"code": "BULK_ERROR", "message": str(exc)},
@@ -190,6 +196,10 @@ async def vendor_bulk_images_zip(
             status_code=400,
             detail={"code": "NO_FILE", "message": "لم يُرفَع أي ملف"},
         )
+    try:
+        require_excel_upload(db, vendor)
+    except ValueError as exc:
+        raise HTTPException(status_code=403, detail=tier_limit_http_detail(exc)) from exc
     content = await file.read()
     try:
         result = process_bulk_images_zip(db, vendor, content, file.filename)

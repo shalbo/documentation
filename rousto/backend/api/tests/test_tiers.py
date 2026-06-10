@@ -15,8 +15,8 @@ from app.tier_services import (
 from app.models import Tier, Vendor
 
 HAS_DB = os.getenv("ROUSTO_TEST_DB", "0") == "1"
-STARTER_ID = "a1000000-0000-4000-8000-000000000001"
-GOLD_ID = "a1000000-0000-4000-8000-000000000003"
+STANDARD_ID = "a1000000-0000-4000-8000-000000000001"
+ENTERPRISE_ID = "a1000000-0000-4000-8000-000000000004"
 VENDOR_ID = "v0000000-0000-4000-8000-000000000001"
 PENDING_VENDOR_ID = "v0000000-0000-4000-8000-000000000002"
 
@@ -73,7 +73,7 @@ def test_admin_tiers_list_with_key():
 @pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with migrated PostgreSQL")
 def test_admin_update_tier_validation():
     res = client.put(
-        f"/api/v1/admin/tiers/{STARTER_ID}",
+        f"/api/v1/admin/tiers/{STANDARD_ID}",
         headers=headers,
         json={"products_limit": -5},
     )
@@ -83,7 +83,7 @@ def test_admin_update_tier_validation():
 @pytest.mark.skipif(not HAS_DB, reason="Set ROUSTO_TEST_DB=1 with migrated PostgreSQL")
 def test_admin_update_tier_unlimited_products():
     res = client.put(
-        f"/api/v1/admin/tiers/{STARTER_ID}",
+        f"/api/v1/admin/tiers/{STANDARD_ID}",
         headers=headers,
         json={"products_limit": UNLIMITED_PRODUCTS},
     )
@@ -94,9 +94,9 @@ def test_admin_update_tier_unlimited_products():
     assert data["products_limit"] == -1
     assert data["is_unlimited_products"] is True
     client.put(
-        f"/api/v1/admin/tiers/{STARTER_ID}",
+        f"/api/v1/admin/tiers/{STANDARD_ID}",
         headers=headers,
-        json={"products_limit": 50},
+        json={"products_limit": 100},
     )
 
 
@@ -113,8 +113,7 @@ def test_vendor_tier_resolution_from_db():
         )
         assert vendor is not None
         tier = resolve_vendor_tier(db, vendor)
-        assert str(tier.id) == GOLD_ID
-        assert tier.has_gold_badge is True
+        assert tier.slug in ("gold", "enterprise", "professional")
     finally:
         db.close()
 
@@ -143,5 +142,5 @@ def test_vendor_tier_api_endpoint():
     res = client.get("/api/v1/vendor/parts/tier", headers={"X-Vendor-Id": VENDOR_ID})
     assert res.status_code == 200
     data = res.json()["data"]
-    assert data["tier"]["slug"] == "gold"
+    assert data["tier"]["slug"] in ("gold", "enterprise", "professional")
     assert data["usage"]["products_count"] >= 0

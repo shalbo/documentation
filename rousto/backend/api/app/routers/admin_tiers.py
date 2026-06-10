@@ -20,6 +20,7 @@ class AdminTierUpdate(BaseModel):
     allow_vin_decoder: bool | None = None
     allow_unlimited_chat: bool | None = None
     has_gold_badge: bool | None = None
+    search_priority: int | None = Field(default=None, ge=0, le=999)
     sort_order: int | None = Field(default=None, ge=0, le=999)
     is_active: bool | None = None
 
@@ -78,6 +79,7 @@ def admin_update_tier(
             allow_vin_decoder=body.allow_vin_decoder,
             allow_unlimited_chat=body.allow_unlimited_chat,
             has_gold_badge=body.has_gold_badge,
+            search_priority=body.search_priority,
             sort_order=body.sort_order,
             is_active=body.is_active,
         )

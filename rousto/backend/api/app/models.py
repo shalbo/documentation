@@ -464,12 +464,33 @@ class Tier(Base):
     allow_vin_decoder: Mapped[bool] = mapped_column(Boolean, default=False)
     allow_unlimited_chat: Mapped[bool] = mapped_column(Boolean, default=False)
     has_gold_badge: Mapped[bool] = mapped_column(Boolean, default=False)
+    search_priority: Mapped[int] = mapped_column(SmallInteger, default=100)
     sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     vendors: Mapped[list["Vendor"]] = relationship(back_populates="tier")
+    subscriptions: Mapped[list["Subscription"]] = relationship(back_populates="tier")
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    vendor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vendors.id", ondelete="CASCADE"))
+    tier_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tiers.id"))
+    status: Mapped[str] = mapped_column(String(20), default="active")
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    payment_method: Mapped[str | None] = mapped_column(String(40))
+    payment_note: Mapped[str | None] = mapped_column(Text)
+    upgraded_by: Mapped[str | None] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    vendor: Mapped["Vendor"] = relationship(back_populates="subscriptions")
+    tier: Mapped["Tier"] = relationship(back_populates="subscriptions")
 
 
 class Vendor(Base):
@@ -498,6 +519,7 @@ class Vendor(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     tier: Mapped["Tier | None"] = relationship(back_populates="vendors")
+    subscriptions: Mapped[list["Subscription"]] = relationship(back_populates="vendor")
     bank_accounts: Mapped[list["VendorBankAccount"]] = relationship(back_populates="vendor")
 
 
@@ -1246,6 +1268,7 @@ class VendorProfile(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     rejection_reason: Mapped[str | None] = mapped_column(Text)
     vendor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("vendors.id"))
+    tier_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("tiers.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة اشتراكات التجار</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .tier-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 800;
+    }
+    .tier-standard { background: var(--brand-navy-050); color: var(--brand-navy); }
+    .tier-professional { background: #e8f0f8; color: #1a5578; }
+    .tier-enterprise { background: linear-gradient(135deg, #f2b705, #d4a004); color: #003049; }
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,48,73,.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: var(--brand-surface);
+      border-radius: var(--r-brand);
+      padding: 22px;
+      width: min(440px, 100%);
+      box-shadow: var(--shadow-md);
+    }
+    .modal h3 { margin-top: 0; color: var(--brand-navy); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>إدارة اشتراكات التجار</h1>
+      <p>تغيير باقة التاجر يدوياً عند استلام الدفع (كاش / تحويل)</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="tiers.html" class="btn btn-ghost-light">إعدادات الباقات</a>
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات الاتصال</h2>
+      <div class="config-grid">
+        <div><label for="apiBase">عنوان API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label for="adminKey">مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>التجار والاشتراكات <span id="vendorCount" class="badge badge-on">0</span></h2>
+      <table id="vendorsTable">
+        <thead>
+          <tr>
+            <th>المحل</th>
+            <th>الباقة</th>
+            <th>القطع</th>
+            <th>ينتهي في</th>
+            <th>الحالة</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody><tr><td colspan="6" class="empty">جاري التحميل…</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="modal" class="modal-backdrop">
+    <div class="modal">
+      <h3>تغيير باقة التاجر</h3>
+      <p id="modalVendorName" style="color:var(--ink-500);font-size:.9rem"></p>
+      <input type="hidden" id="modalVendorId" />
+      <div style="margin-top:12px">
+        <label for="modalTierId">الباقة الجديدة</label>
+        <select id="modalTierId"></select>
+      </div>
+      <div style="margin-top:10px">
+        <label for="modalExpires">تاريخ الانتهاء (اختياري)</label>
+        <input id="modalExpires" type="date" />
+      </div>
+      <div style="margin-top:10px">
+        <label for="modalPayment">طريقة الدفع</label>
+        <select id="modalPayment">
+          <option value="cash">كاش</option>
+          <option value="bank_transfer">تحويل مصرفي</option>
+          <option value="manual">يدوي</option>
+        </select>
+      </div>
+      <div style="margin-top:10px">
+        <label for="modalNote">ملاحظة</label>
+        <input id="modalNote" placeholder="رقم إيصال / مرجع التحويل" />
+      </div>
+      <div class="actions" style="margin-top:16px">
+        <button id="modalSave" class="btn btn-primary">حفظ التغيير</button>
+        <button id="modalCancel" class="btn btn-ghost" type="button">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-subscriptions-admin.js"></script>
+</body>
+</html>

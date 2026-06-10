@@ -8,10 +8,14 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
-from app.models import PartInventory, Tier, Vendor
+from app.models import PartInventory, Tier, Vendor, VendorProfile
 
-DEFAULT_STARTER_SLUG = "starter"
+DEFAULT_TIER_SLUG = "standard"
 UNLIMITED_PRODUCTS = -1
+PRODUCTS_LIMIT_EXCEEDED_MSG = (
+    "لقد تجاوزت الحد المسموح به لبقاكتك الحالية، يرجى الترقية"
+)
+BULK_UPLOAD_TIER_SLUGS = frozenset({"professional", "enterprise"})
 
 
 def _now() -> datetime:
@@ -42,6 +46,7 @@ def tier_out(tier: Tier, *, vendor_count: int | None = None) -> dict:
         "allow_vin_decoder": tier.allow_vin_decoder,
         "allow_unlimited_chat": tier.allow_unlimited_chat,
         "has_gold_badge": tier.has_gold_badge,
+        "search_priority": tier.search_priority,
         "sort_order": tier.sort_order,
         "is_active": tier.is_active,
         "updated_at": tier.updated_at.isoformat() if tier.updated_at else None,
@@ -54,9 +59,20 @@ def tier_out(tier: Tier, *, vendor_count: int | None = None) -> dict:
 def get_default_tier(db: Session) -> Tier | None:
     return db.scalar(
         select(Tier)
-        .where(Tier.slug == DEFAULT_STARTER_SLUG, Tier.is_active.is_(True))
+        .where(Tier.slug == DEFAULT_TIER_SLUG, Tier.is_active.is_(True))
         .limit(1)
     )
+
+
+def _tier_from_profile(db: Session, vendor: Vendor) -> Tier | None:
+    profile = db.scalar(
+        select(VendorProfile).where(VendorProfile.vendor_id == vendor.id)
+    )
+    if profile and profile.tier_id:
+        tier = db.get(Tier, profile.tier_id)
+        if tier and tier.is_active:
+            return tier
+    return None
 
 
 def resolve_vendor_tier(db: Session, vendor: Vendor) -> Tier:
@@ -66,6 +82,9 @@ def resolve_vendor_tier(db: Session, vendor: Vendor) -> Tier:
             return tier
     if vendor.tier and vendor.tier.is_active:
         return vendor.tier
+    profile_tier = _tier_from_profile(db, vendor)
+    if profile_tier:
+        return profile_tier
     tier = get_default_tier(db)
     if tier:
         return tier
@@ -91,6 +110,8 @@ def ensure_products_capacity(
         return tier
     current = count_vendor_products(db, vendor.id)
     if current + additional > tier.products_limit:
+        if tier.slug == "standard":
+            raise ValueError(PRODUCTS_LIMIT_EXCEEDED_MSG)
         raise ValueError(
             f"وصلت لسقف الباقة ({tier.products_limit} قطعة). "
             f"الحالي: {current}. ترقِّ باقتك لإضافة المزيد."
@@ -98,11 +119,16 @@ def ensure_products_capacity(
     return tier
 
 
+def _tier_allows_bulk_upload(tier: Tier) -> bool:
+    return tier.slug in BULK_UPLOAD_TIER_SLUGS and tier.allow_excel_upload
+
+
 def require_excel_upload(db: Session, vendor: Vendor) -> Tier:
     tier = resolve_vendor_tier(db, vendor)
-    if not tier.allow_excel_upload:
+    if not _tier_allows_bulk_upload(tier):
         raise ValueError(
-            f"باقة «{tier.name_ar}» لا تتضمن رفع Excel. رقِّ باقتك لتفعيل الرفع الجماعي."
+            "الرفع الجماعي (Excel/ZIP) متاح فقط لباقتي professional و enterprise. "
+            "يرجى ترقية اشتراكك."
         )
     return tier
 
@@ -174,6 +200,7 @@ def update_tier(
     allow_vin_decoder: bool | None = None,
     allow_unlimited_chat: bool | None = None,
     has_gold_badge: bool | None = None,
+    search_priority: int | None = None,
     sort_order: int | None = None,
     is_active: bool | None = None,
 ) -> Tier:
@@ -199,6 +226,8 @@ def update_tier(
         tier.allow_unlimited_chat = allow_unlimited_chat
     if has_gold_badge is not None:
         tier.has_gold_badge = has_gold_badge
+    if search_priority is not None:
+        tier.search_priority = search_priority
     if sort_order is not None:
         tier.sort_order = sort_order
     if is_active is not None:
@@ -206,6 +235,12 @@ def update_tier(
     tier.updated_at = _now()
     db.flush()
     return tier
+
+
+def tier_limit_http_detail(exc: ValueError) -> dict:
+    msg = str(exc)
+    code = "TIER_LIMIT_EXCEEDED" if msg == PRODUCTS_LIMIT_EXCEEDED_MSG else "TIER_FEATURE"
+    return {"code": code, "message": msg}
 
 
 def load_vendor_with_tier(db: Session, vendor_id: uuid.UUID) -> Vendor | None:

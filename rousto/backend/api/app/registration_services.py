@@ -133,6 +133,9 @@ def register_vendor(
     )
     user.city_id = city_row.id
     _assign_role(db, user.id, "vendor")
+    from app.tier_services import get_default_tier
+
+    default_tier = get_default_tier(db)
     now = datetime.now(timezone.utc)
     profile = VendorProfile(
         id=uuid.uuid4(),
@@ -143,6 +146,7 @@ def register_vendor(
         city_id=city_row.id,
         latitude=latitude,
         longitude=longitude,
+        tier_id=default_tier.id if default_tier else None,
         verification_status="pending",
         is_approved=False,
         created_at=now,

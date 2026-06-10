@@ -22,6 +22,7 @@ from app.models import (
     PartInventory,
     PartSupplier,
     PartWarrantyClaim,
+    Tier,
     Vendor,
 )
 
@@ -215,7 +216,30 @@ def search_parts(
             return []
         stmt = stmt.where(Part.id.in_(fitment_ids))
 
-    parts = db.scalars(stmt.order_by(Part.name_ar).limit(limit)).unique().all()
+    tier_priority_sq = (
+        select(
+            PartInventory.part_id.label("boost_part_id"),
+            func.max(func.coalesce(Tier.search_priority, 0)).label("max_tier_priority"),
+        )
+        .join(Vendor, Vendor.id == PartInventory.vendor_id)
+        .outerjoin(Tier, Tier.id == Vendor.tier_id)
+        .where(
+            PartInventory.qty_available > 0,
+            *_vendor_store_visible(),
+        )
+        .group_by(PartInventory.part_id)
+        .subquery()
+    )
+    stmt = stmt.outerjoin(
+        tier_priority_sq, Part.id == tier_priority_sq.c.boost_part_id
+    )
+    parts = db.scalars(
+        stmt.order_by(
+            func.coalesce(tier_priority_sq.c.max_tier_priority, 0).desc(),
+            Part.is_oem.desc(),
+            Part.name_ar,
+        ).limit(limit)
+    ).unique().all()
 
     results = []
     for part in parts:
