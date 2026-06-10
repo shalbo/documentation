@@ -5,10 +5,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.api_responses import success, success_list
 from app.db import get_db
 from app.deps import require_admin_key
 from app.models import PaymentAuditLog, Wallet, WithdrawalRequest
-from app.wallet_services import PLATFORM_OWNER_ID, approve_withdrawal
+from app.service_layer.payments import PLATFORM_OWNER_ID, approve_withdrawal
 
 router = APIRouter(prefix="/admin", tags=["admin-payments"])
 
@@ -39,14 +40,14 @@ def admin_payments_overview(
             WithdrawalRequest.status == "pending"
         )
     ) or 0
-    return {
-        "data": {
+    return success(
+        {
             "platform_commission_lyd": float(platform_wallet.balance_lyd) if platform_wallet else 0,
             "pending_withdrawals_count": pending,
             "pending_withdrawals_lyd": float(pending_amount),
             "currency": "LYD",
         }
-    }
+    )
 
 
 @router.get("/withdrawals")
@@ -72,7 +73,7 @@ def admin_list_withdrawals(
         }
         for r in rows
     ]
-    return {"data": data, "meta": {"total": len(data)}}
+    return success_list(data)
 
 
 @router.patch("/withdrawals/{request_id}")
@@ -99,16 +100,15 @@ def admin_process_withdrawal(
             status_code=400,
             detail={"code": "WITHDRAWAL_ERROR", "message": str(exc)},
         ) from exc
-    return {
-        "data": {
+    msg = "تم تحويل المبلغ وتحديث المحفظة" if body.mark_paid else "تم اعتماد الطلب"
+    return success(
+        {
             "id": updated.id,
             "status": updated.status,
             "paid_at": updated.paid_at.isoformat() if updated.paid_at else None,
         },
-        "meta": {
-            "message": "تم تحويل المبلغ وتحديث المحفظة" if body.mark_paid else "تم اعتماد الطلب",
-        },
-    }
+        message=msg,
+    )
 
 
 @router.get("/payments/audit")
@@ -120,8 +120,8 @@ def admin_payment_audit(
     rows = db.scalars(
         select(PaymentAuditLog).order_by(PaymentAuditLog.created_at.desc()).limit(limit)
     ).all()
-    return {
-        "data": [
+    return success_list(
+        [
             {
                 "id": r.id,
                 "event_type": r.event_type,
@@ -131,4 +131,4 @@ def admin_payment_audit(
             }
             for r in rows
         ]
-    }
+    )

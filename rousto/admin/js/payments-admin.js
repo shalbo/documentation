@@ -12,17 +12,18 @@ function cfg() {
   $("#adminKey").value = state.adminKey;
 }
 
-async function api(path, opts = {}) {
-  state.apiBase = $("#apiBase").value.replace(/\/$/, "");
-  state.adminKey = $("#adminKey").value.trim();
-  localStorage.setItem(KEY, JSON.stringify({ apiBase: state.apiBase, adminKey: state.adminKey }));
-  const res = await fetch(`${state.apiBase}/api/v1${path}`, {
-    ...opts,
-    headers: { "Content-Type": "application/json", "X-Admin-Key": state.adminKey, ...(opts.headers || {}) },
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.detail?.message || `خطأ ${res.status}`);
-  return body;
+function createPaymentService() {
+  return new PaymentService(
+    RoustoApiClient.createAdminClient({
+      getApiBase: () => $("#apiBase").value.replace(/\/$/, ""),
+      getAdminKey: () => $("#adminKey").value.trim(),
+      onConfigSave: ({ apiBase, adminKey }) => {
+        state.apiBase = apiBase;
+        state.adminKey = adminKey;
+        localStorage.setItem(KEY, JSON.stringify({ apiBase, adminKey }));
+      },
+    })
+  );
 }
 
 function toast(m, err) {
@@ -66,11 +67,12 @@ function renderAudit(rows) {
 }
 
 async function load() {
+  const payments = createPaymentService();
   try {
     const [ov, wd, audit] = await Promise.all([
-      api("/admin/payments/overview"),
-      api("/admin/withdrawals?status=pending"),
-      api("/admin/payments/audit?limit=30"),
+      payments.getOverview(),
+      payments.listPendingWithdrawals(),
+      payments.getAuditLog(30),
     ]);
     renderOverview(ov.data);
     renderWithdrawals(wd.data);
@@ -81,12 +83,13 @@ async function load() {
 }
 
 async function markPaid(id) {
+  const payments = createPaymentService();
   try {
-    const body = await api(`/admin/withdrawals/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ mark_paid: true, admin_note: "تحويل مصرفي مكتمل" }),
+    const body = await payments.approveWithdrawal(id, {
+      adminNote: "تحويل مصرفي مكتمل",
+      markPaid: true,
     });
-    toast(body.meta?.message || "تم التحويل");
+    toast(body.message || body.meta?.message || "تم التحويل");
     load();
   } catch (e) {
     toast(e.message, true);

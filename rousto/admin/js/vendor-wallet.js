@@ -12,17 +12,18 @@ function cfg() {
   $("#vendorId").value = state.vendorId || "v0000000-0000-4000-8000-000000000001";
 }
 
-async function api(path, opts = {}) {
-  state.apiBase = $("#apiBase").value.replace(/\/$/, "");
-  state.vendorId = $("#vendorId").value.trim();
-  localStorage.setItem(KEY, JSON.stringify(state));
-  const res = await fetch(`${state.apiBase}/api/v1${path}`, {
-    ...opts,
-    headers: { "Content-Type": "application/json", "X-Vendor-Id": state.vendorId, ...(opts.headers || {}) },
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.detail?.message || `خطأ ${res.status}`);
-  return body;
+function createWalletService() {
+  return new VendorWalletService(
+    RoustoApiClient.createVendorClient({
+      getApiBase: () => $("#apiBase").value.replace(/\/$/, ""),
+      getVendorId: () => $("#vendorId").value.trim(),
+      onConfigSave: ({ apiBase, vendorId }) => {
+        state.apiBase = apiBase;
+        state.vendorId = vendorId;
+        localStorage.setItem(KEY, JSON.stringify(state));
+      },
+    })
+  );
 }
 
 function toast(m, err) {
@@ -46,8 +47,9 @@ function render(data) {
 }
 
 async function load() {
+  const wallet = createWalletService();
   try {
-    const body = await api("/vendor/wallet");
+    const body = await wallet.getWallet();
     render(body.data);
   } catch (e) {
     toast(e.message, true);
@@ -60,16 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#refreshBtn").onclick = load;
   $("#withdrawForm").onsubmit = async (e) => {
     e.preventDefault();
+    const wallet = createWalletService();
     try {
-      const body = await api("/vendor/wallet/withdraw", {
-        method: "POST",
-        body: JSON.stringify({
-          amount_lyd: Number($("#amount").value),
-          iban: $("#iban").value || null,
-          note: $("#note").value || null,
-        }),
+      const body = await wallet.requestWithdrawal({
+        amountLyd: Number($("#amount").value),
+        iban: $("#iban").value || null,
+        note: $("#note").value || null,
       });
-      toast(body.meta?.message || "تم إرسال الطلب");
+      toast(body.message || body.meta?.message || "تم إرسال الطلب");
       load();
     } catch (err) {
       toast(err.message, true);

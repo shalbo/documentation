@@ -35,6 +35,21 @@ def test_checkout_options_requires_auth():
     assert res.status_code == 401
 
 
+def test_muamalat_initiate_requires_auth():
+    res = client.post(
+        "/api/v1/payments/muamalat/initiate",
+        json={"amount_lyd": 50, "order_type": "part_order"},
+    )
+    assert res.status_code == 401
+
+
+def test_error_envelope_includes_success_false():
+    res = client.post("/api/v1/webhooks/payments/stripe", json={})
+    body = res.json()
+    assert body.get("success") is False
+    assert "error" in body
+
+
 def test_webhook_rejects_bad_gateway():
     res = client.post("/api/v1/webhooks/payments/stripe", json={})
     assert res.status_code == 400

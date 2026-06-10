@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.deps import get_current_vendor
 from app.models import Vendor, WalletTransaction, WithdrawalRequest
-from app.wallet_services import (
+from app.api_responses import success
+from app.service_layer.payments import (
     get_or_create_wallet,
     list_wallet_transactions,
     request_withdrawal,
@@ -50,13 +51,13 @@ def vendor_wallet_summary(
             WithdrawalRequest.status == "pending",
         )
     )
-    return {
-        "data": {
+    return success(
+        {
             **wallet_out(wallet),
             "pending_withdrawals_lyd": float(pending_withdrawals or 0),
             "transactions": txs,
         }
-    }
+    )
 
 
 @router.post("/withdraw", status_code=201)
@@ -80,11 +81,11 @@ def vendor_request_withdrawal(
             status_code=400,
             detail={"code": "WITHDRAWAL_ERROR", "message": str(exc)},
         ) from exc
-    return {
-        "data": {
+    return success(
+        {
             "id": req.id,
             "amount_lyd": float(req.amount_lyd),
             "status": req.status,
         },
-        "meta": {"message": "تم إرسال طلب السحب — بانتظار اعتماد الإدارة"},
-    }
+        message="تم إرسال طلب السحب — بانتظار اعتماد الإدارة",
+    )

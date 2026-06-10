@@ -124,6 +124,7 @@ app.include_router(vendor_subscription.router, prefix=prefix)
 app.include_router(vendor_wallet.router, prefix=prefix)
 app.include_router(libyan_payments.router, prefix=prefix)
 app.include_router(payment_webhooks.router, prefix=prefix)
+app.include_router(payment_webhooks.legacy_router, prefix=prefix)
 app.include_router(registration.router, prefix=prefix)
 app.include_router(vin_decoder.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)
@@ -148,10 +149,13 @@ def on_startup() -> None:
 @app.exception_handler(HTTPException)
 async def http_exception_handler(_: Request, exc: HTTPException):
     if isinstance(exc.detail, dict) and "code" in exc.detail:
-        return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"success": False, "error": exc.detail},
+        )
     return JSONResponse(
         status_code=exc.status_code,
-        content={"error": {"code": "ERROR", "message": str(exc.detail)}},
+        content={"success": False, "error": {"code": "ERROR", "message": str(exc.detail)}},
     )
 
 
