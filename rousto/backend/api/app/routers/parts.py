@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -10,6 +11,7 @@ from app.i18n import resolve_locale
 from app.models import User
 from app.vin_compat_services import normalize_vin_prefix
 from app.vin_decoder_services import decode_vin
+from app.part_image_services import get_part_image_file
 from app.parts_services import (
     create_warranty_claim,
     get_part_detail,
@@ -21,6 +23,17 @@ from app.rate_limit import check_rate_limit
 from app.services import load_booking
 
 router = APIRouter(tags=["parts"])
+
+
+@router.get("/parts/media/{storage_path:path}")
+def serve_part_media(storage_path: str):
+    path = get_part_image_file(storage_path)
+    if not path:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "NOT_FOUND", "message": "الصورة غير موجودة"},
+        )
+    return FileResponse(path, media_type="image/webp")
 
 
 class WarrantyClaimIn(BaseModel):

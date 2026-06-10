@@ -2,6 +2,7 @@ const STORAGE_KEY = "rousto_vendor_products_config";
 const $ = (id) => document.getElementById(id);
 
 let bulkFile = null;
+let zipFile = null;
 
 function cfg() {
   const apiBase = $("apiBase").value.replace(/\/$/, "");
@@ -125,6 +126,41 @@ dropZone.addEventListener("drop", (e) => {
   if (e.dataTransfer.files[0]) setBulkFile(e.dataTransfer.files[0]);
 });
 
+function setProgress(prefix, pct, label) {
+  const wrap = $(`${prefix}Progress`);
+  const fill = $(`${prefix}ProgressFill`);
+  const lbl = $(`${prefix}ProgressLabel`);
+  wrap.classList.add("show");
+  fill.style.width = `${pct}%`;
+  lbl.textContent = label || `${pct}%`;
+  if (pct >= 100) {
+    setTimeout(() => wrap.classList.remove("show"), 1200);
+  }
+}
+
+function uploadWithProgress(url, formData, vendorId, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("X-Vendor-Id", vendorId);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        const pct = Math.round((e.loaded / e.total) * 90);
+        onProgress(pct, `جاري الرفع… ${pct}%`);
+      }
+    };
+    xhr.onload = () => {
+      let body = {};
+      try {
+        body = JSON.parse(xhr.responseText || "{}");
+      } catch (_) {}
+      resolve({ status: xhr.status, body });
+    };
+    xhr.onerror = () => reject(new Error("فشل الاتصال بالخادم"));
+    xhr.send(formData);
+  });
+}
+
 function showBulkResult(payload, isError) {
   const panel = $("bulkResult");
   const stats = $("bulkStats");
@@ -170,21 +206,28 @@ $("bulkUploadBtn").addEventListener("click", async () => {
   const { apiBase, vendorId } = cfg();
   const form = new FormData();
   form.append("file", bulkFile);
-  $("bulkStatus").textContent = "جاري المعالجة…";
   $("bulkUploadBtn").disabled = true;
+  setProgress("bulk", 0, "بدء الرفع…");
   try {
-    const res = await fetch(`${apiBase}/api/v1/vendor/parts/bulk-upload`, {
-      method: "POST",
-      headers: { "X-Vendor-Id": vendorId },
-      body: form,
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const data = body?.error?.data || { failed: body?.error?.data?.failed, errors: body?.error?.data?.errors, total_rows: body?.error?.data?.total_rows, imported: 0 };
+    const { status, body } = await uploadWithProgress(
+      `${apiBase}/api/v1/vendor/parts/bulk-upload`,
+      form,
+      vendorId,
+      (pct, lbl) => setProgress("bulk", pct, lbl)
+    );
+    setProgress("bulk", 95, "جاري المعالجة…");
+    if (status < 200 || status >= 300) {
+      const data = body?.error?.data || {
+        imported: 0,
+        failed: body?.error?.data?.failed,
+        errors: body?.error?.data?.errors,
+        total_rows: body?.error?.data?.total_rows,
+      };
       showBulkResult(data, true);
       toast(body?.error?.message || "فشل الرفع", true);
       return;
     }
+    setProgress("bulk", 100, "اكتمل");
     showBulkResult(body.data, false);
     toast(body.meta?.message || "تم الرفع بنجاح");
     bulkFile = null;
@@ -193,8 +236,96 @@ $("bulkUploadBtn").addEventListener("click", async () => {
   } catch (err) {
     toast(err.message, true);
   } finally {
-    $("bulkStatus").textContent = "";
     $("bulkUploadBtn").disabled = !bulkFile;
+  }
+});
+
+function setZipFile(file) {
+  zipFile = file;
+  if (!file.name.toLowerCase().endsWith(".zip")) {
+    toast("الصيغة المدعومة: .zip فقط", true);
+    zipFile = null;
+    $("zipFileName").textContent = "";
+    $("zipUploadBtn").disabled = true;
+    return;
+  }
+  $("zipFileName").textContent = file.name;
+  $("zipUploadBtn").disabled = false;
+}
+
+const zipDropZone = $("zipDropZone");
+const zipInput = $("zipFileInput");
+
+zipDropZone.addEventListener("click", () => zipInput.click());
+zipInput.addEventListener("change", (e) => {
+  if (e.target.files[0]) setZipFile(e.target.files[0]);
+});
+zipDropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  zipDropZone.classList.add("dragover");
+});
+zipDropZone.addEventListener("dragleave", () => zipDropZone.classList.remove("dragover"));
+zipDropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  zipDropZone.classList.remove("dragover");
+  if (e.dataTransfer.files[0]) setZipFile(e.dataTransfer.files[0]);
+});
+
+function showZipResult(payload, isError) {
+  const panel = $("zipResult");
+  const stats = $("zipStats");
+  const errors = $("zipErrors");
+  panel.className = "result-panel show " + (isError ? "error" : "success");
+  stats.innerHTML = `
+    <span class="stat-pill ok">مربوطة: ${payload.linked || 0}</span>
+    <span class="stat-pill fail">أخطاء: ${payload.failed || 0}</span>
+    <span class="stat-pill warn">ملفات: ${payload.total_files || 0}</span>
+    ${payload.unmatched?.length ? `<span class="stat-pill warn">بدون تطابق: ${payload.unmatched.length}</span>` : ""}
+  `;
+  errors.innerHTML = "";
+  (payload.errors || []).forEach((e) => {
+    const li = document.createElement("li");
+    li.textContent = `${e.file}: ${e.message}`;
+    errors.appendChild(li);
+  });
+  (payload.unmatched || []).forEach((f) => {
+    const li = document.createElement("li");
+    li.textContent = `بدون قطعة مطابقة: ${f}`;
+    li.style.color = "var(--brand-navy)";
+    errors.appendChild(li);
+  });
+}
+
+$("zipUploadBtn").addEventListener("click", async () => {
+  if (!zipFile) return;
+  const { apiBase, vendorId } = cfg();
+  const form = new FormData();
+  form.append("file", zipFile);
+  $("zipUploadBtn").disabled = true;
+  setProgress("zip", 0, "بدء رفع الأرشيف…");
+  try {
+    const { status, body } = await uploadWithProgress(
+      `${apiBase}/api/v1/vendor/parts/bulk-images-zip`,
+      form,
+      vendorId,
+      (pct, lbl) => setProgress("zip", pct, lbl)
+    );
+    setProgress("zip", 95, "جاري فك الضغط وربط الصور…");
+    if (status < 200 || status >= 300) {
+      showZipResult(body?.error?.data || { linked: 0, failed: 1, errors: [{ file: zipFile.name, message: body?.error?.message }] }, true);
+      toast(body?.error?.message || "فشل ربط الصور", true);
+      return;
+    }
+    setProgress("zip", 100, "اكتمل");
+    showZipResult(body.data, false);
+    toast(body.meta?.message || "تم ربط الصور");
+    zipFile = null;
+    $("zipFileName").textContent = "";
+    zipInput.value = "";
+  } catch (err) {
+    toast(err.message, true);
+  } finally {
+    $("zipUploadBtn").disabled = !zipFile;
   }
 });
 

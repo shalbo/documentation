@@ -10,6 +10,7 @@ from app.db import get_db
 from app.deps import get_current_vendor
 from app.i18n import resolve_locale
 from app.models import Vendor
+from app.part_image_services import process_bulk_images_zip
 from app.spare_parts_bulk_services import BULK_COLUMNS, TEMPLATE_CSV, process_bulk_upload
 from app.vendor_parts_services import vendor_create_product
 
@@ -149,5 +150,40 @@ async def vendor_bulk_upload(
         "meta": {
             "message": f"تم رفع {result.imported} قطعة بنجاح",
             "columns": BULK_COLUMNS,
+        },
+    }
+
+
+@router.post("/bulk-images-zip")
+async def vendor_bulk_images_zip(
+    file: UploadFile = File(...),
+    vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db),
+):
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "NO_FILE", "message": "لم يُرفَع أي ملف"},
+        )
+    content = await file.read()
+    try:
+        result = process_bulk_images_zip(db, vendor, content, file.filename)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "ZIP_ERROR", "message": str(exc)},
+        ) from exc
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail={"code": "ZIP_FAILED", "message": "فشلت معالجة الأرشيف"},
+        ) from exc
+
+    payload = result.to_dict()
+    return {
+        "data": payload,
+        "meta": {
+            "message": f"تم ربط {result.linked} صورة بنجاح",
         },
     }

@@ -996,6 +996,22 @@ class Part(Base):
     vin_compatibilities: Mapped[list["PartVinCompatibility"]] = relationship(
         back_populates="part"
     )
+    images: Mapped[list["SparePartImage"]] = relationship(back_populates="part")
+
+
+class SparePartImage(Base):
+    __tablename__ = "spare_part_images"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parts.id"))
+    storage_path: Mapped[str] = mapped_column(String(300))
+    public_url: Mapped[str] = mapped_column(String(400))
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    source: Mapped[str] = mapped_column(String(20), default="upload")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    part: Mapped["Part"] = relationship(back_populates="images")
 
 
 class VinDecoder(Base):

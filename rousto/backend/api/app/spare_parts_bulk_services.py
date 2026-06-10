@@ -13,6 +13,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models import Part, PartCategory, PartInventory, PartSupplier, Vendor
+from app.part_image_services import import_part_image_from_url, is_valid_image_url
 from app.parts_services import create_part
 from app.vin_compat_services import add_part_vin_compatibilities, parse_vin_prefixes
 
@@ -27,13 +28,15 @@ BULK_COLUMNS = [
     "compatible_vehicles",
     "vin_prefixes",
     "description",
+    "image_url",
 ]
 
 TEMPLATE_CSV = (
     "oem_number,name_ar,name_en,part_brand,price,quantity,"
-    "sub_category,compatible_vehicles,vin_prefixes,description\n"
+    "sub_category,compatible_vehicles,vin_prefixes,description,image_url\n"
     "TOY-04152-YZZA1,فلتر زيت تويوتا كامري,Toyota Camry Oil Filter,Toyota OEM,45,10,"
-    "maintenance-filters,Toyota Camry 2018-2024,4T1B11HK5JK,فلتر أصلي للكامري\n"
+    "maintenance-filters,Toyota Camry 2018-2024,4T1B11HK5JK,فلتر أصلي للكامري,"
+    "https://example.com/parts/toyota-filter.jpg\n"
 )
 
 MAX_BULK_BYTES = 10 * 1024 * 1024
@@ -287,6 +290,10 @@ def _validate_row(
     except ValueError as exc:
         errors.append(RowError(row_num, "sub_category", str(exc)))
 
+    image_url = row.get("image_url", "").strip()
+    if image_url and not is_valid_image_url(image_url):
+        errors.append(RowError(row_num, "image_url", "رابط الصورة غير صالح"))
+
     if errors:
         return None, errors, False
 
@@ -304,6 +311,7 @@ def _validate_row(
         "part_brand": row.get("part_brand", "").strip(),
         "compatible_vehicles": _parse_compatible_vehicles(row.get("compatible_vehicles")),
         "vin_prefixes": vin_prefixes,
+        "image_url": image_url or None,
         "used_uncategorized": used_uncategorized,
     }
     return parsed, [], used_uncategorized
@@ -375,6 +383,8 @@ def process_bulk_upload(
             )
             if prefixes:
                 add_part_vin_compatibilities(db, part.id, prefixes)
+            if data.get("image_url"):
+                import_part_image_from_url(db, part, data["image_url"])
             inv = PartInventory(
                 id=uuid.uuid4(),
                 vendor_id=vendor.id,
