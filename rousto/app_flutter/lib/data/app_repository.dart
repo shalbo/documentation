@@ -30,6 +30,7 @@ class AppRepository {
     String? carYearId,
     String? oem,
     String? vin,
+    String? condition,
     bool inStockOnly = false,
   }) async {
     try {
@@ -40,6 +41,7 @@ class AppRepository {
         carYearId: carYearId,
         oem: oem,
         vin: vin,
+        condition: condition,
         inStockOnly: inStockOnly,
       );
       DecodedVehicleModel? decoded;
@@ -64,6 +66,9 @@ class AppRepository {
                 p.nameAr.contains(q) ||
                 p.partNumber.toLowerCase().contains(q))
             .toList();
+      }
+      if (condition != null && condition.isNotEmpty) {
+        parts = parts.where((p) => p.partCondition == condition).toList();
       }
       return (parts: parts, decodedVehicle: null);
     }

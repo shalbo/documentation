@@ -6,6 +6,7 @@ import '../data/models.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_decorations.dart';
 import '../currency.dart';
+import '../widgets/part_condition_badge.dart';
 
 enum _SearchMode { name, oem, vin }
 
@@ -41,6 +42,7 @@ class _PartsScreenState extends State<PartsScreen> {
   String? _selectedCategory;
   String? _carYearId;
   bool _inStockOnly = true;
+  String? _conditionFilter;
   _SearchMode _mode = _SearchMode.name;
 
   @override
@@ -88,7 +90,8 @@ class _PartsScreenState extends State<PartsScreen> {
     } else if (q.length < 2 &&
         _selectedCategory == null &&
         _carYearId == null &&
-        widget.initialCategoryId == null) {
+        widget.initialCategoryId == null &&
+        _conditionFilter == null) {
       return;
     }
 
@@ -104,6 +107,7 @@ class _PartsScreenState extends State<PartsScreen> {
         carYearId: _carYearId,
         oem: _mode == _SearchMode.oem && q.isNotEmpty ? q : null,
         vin: _mode == _SearchMode.vin ? q : null,
+        condition: _conditionFilter,
         inStockOnly: _inStockOnly,
       );
       setState(() {
@@ -281,6 +285,36 @@ class _PartsScreenState extends State<PartsScreen> {
                   style: const TextStyle(color: AppColors.red),
                 ),
               ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(
+                children: [
+                  _ConditionChip(
+                    label: 'جديد فقط',
+                    selected: _conditionFilter == 'new',
+                    onTap: () {
+                      setState(() {
+                        _conditionFilter =
+                            _conditionFilter == 'new' ? null : 'new';
+                      });
+                      _search();
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _ConditionChip(
+                    label: 'مستعمل فقط',
+                    selected: _conditionFilter == 'used',
+                    onTap: () {
+                      setState(() {
+                        _conditionFilter =
+                            _conditionFilter == 'used' ? null : 'used';
+                      });
+                      _search();
+                    },
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: _results.isEmpty && !_loading
                   ? Center(
@@ -324,20 +358,30 @@ class _PartCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppColors.navy050,
-                  borderRadius: AppDecorations.borderRadius,
-                ),
-                child: Icon(
-                  part.isOem
-                      ? Icons.verified_outlined
-                      : Icons.inventory_2_outlined,
-                  color: AppColors.navy,
-                  size: 22,
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.navy050,
+                      borderRadius: AppDecorations.borderRadius,
+                    ),
+                    child: Icon(
+                      part.isOem
+                          ? Icons.verified_outlined
+                          : Icons.inventory_2_outlined,
+                      color: AppColors.navy,
+                      size: 22,
+                    ),
+                  ),
+                  Positioned(
+                    top: -6,
+                    left: -6,
+                    child: PartConditionBadge(isUsed: part.isUsed),
+                  ),
+                ],
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -406,6 +450,41 @@ class _PartCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ConditionChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ConditionChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: selected ? Colors.white : AppColors.navy,
+        ),
+      ),
+      selected: selected,
+      onSelected: (_) => onTap(),
+      selectedColor: AppColors.navy,
+      backgroundColor: AppColors.navy050,
+      checkmarkColor: Colors.white,
+      side: BorderSide(
+        color: selected ? AppColors.navy : AppColors.line,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 }

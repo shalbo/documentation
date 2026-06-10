@@ -68,6 +68,7 @@ services:
       - ./database/048_uncategorized_category.sql:/docker-entrypoint-initdb.d/048_uncategorized_category.sql:ro
       - ./database/049_spare_part_images_schema.sql:/docker-entrypoint-initdb.d/049_spare_part_images_schema.sql:ro
       - ./database/050_vendor_store_active.sql:/docker-entrypoint-initdb.d/050_vendor_store_active.sql:ro
+      - ./database/051_part_condition.sql:/docker-entrypoint-initdb.d/051_part_condition.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

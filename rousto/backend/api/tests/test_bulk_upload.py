@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.part_condition_services import parse_part_condition
 from app.spare_parts_bulk_services import (
     BULK_COLUMNS,
     TEMPLATE_CSV,
@@ -34,14 +35,22 @@ def test_bulk_columns_match_template():
 def test_parse_csv_rows():
     content = TEMPLATE_CSV.encode("utf-8")
     rows = _parse_rows_from_csv(content)
-    assert len(rows) == 1
+    assert len(rows) == 2
     assert rows[0]["oem_number"] == "TOY-04152-YZZA1"
     assert rows[0]["sub_category"] == "maintenance-filters"
+    assert rows[0]["condition"] == "new"
+    assert rows[1]["oem_number"] == "BOSCH-USED-001"
+    assert parse_part_condition(rows[1]["condition"]) == "used"
 
 
 def test_parse_upload_file_csv():
     rows = parse_upload_file(TEMPLATE_CSV.encode("utf-8"), "parts.csv")
-    assert len(rows) == 1
+    assert len(rows) == 2
+
+
+def test_template_includes_condition_column():
+    assert "condition" in BULK_COLUMNS
+    assert "حالة القطعة" in TEMPLATE_CSV
 
 
 def test_slugify_oem():

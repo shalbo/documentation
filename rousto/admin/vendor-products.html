@@ -128,6 +128,31 @@
       color: var(--ink-500);
       margin-top: 6px;
     }
+    .condition-opt {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 2px solid var(--brand-line);
+      border-radius: var(--r-brand);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--brand-navy);
+      background: var(--brand-surface);
+    }
+    .condition-opt.active {
+      border-color: var(--brand-navy);
+      background: var(--brand-navy-050);
+    }
+    .condition-opt.used-active {
+      border-color: var(--brand-red);
+      background: var(--brand-red-050);
+      color: var(--brand-red);
+    }
+    .condition-opt input { accent-color: var(--brand-navy); }
   </style>
 </head>
 <body>
@@ -204,9 +229,22 @@
             <label for="vinPrefixes">بادئات VIN المتوافقة (11 رمزاً لكل سطر)</label>
             <textarea id="vinPrefixes" rows="3" placeholder="4T1B11HK5JK&#10;2T1BURHE0JC"></textarea>
           </div>
-          <div style="margin-top:12px">
-            <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>
+        <div style="margin-top:12px">
+          <label>حالة القطعة *</label>
+          <div class="condition-segment" style="display:flex;gap:8px;margin-top:8px">
+            <label class="condition-opt active" id="condNewLbl">
+              <input type="radio" name="partCondition" id="condNew" value="new" checked />
+              جديد (New)
+            </label>
+            <label class="condition-opt" id="condUsedLbl">
+              <input type="radio" name="partCondition" id="condUsed" value="used" />
+              مستعمل / ربش (Used)
+            </label>
           </div>
+        </div>
+        <div style="margin-top:12px">
+          <label><input type="checkbox" id="isOem" /> قطعة OEM أصلية</label>
+        </div>
           <button type="submit" class="btn btn-primary" style="margin-top:16px">حفظ المنتج</button>
         </form>
       </div>

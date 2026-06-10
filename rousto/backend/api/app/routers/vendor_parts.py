@@ -29,6 +29,7 @@ class VendorProductIn(BaseModel):
     vin_prefix: str | None = Field(default=None, max_length=17)
     vin_prefixes: list[str] = Field(default_factory=list)
     is_oem: bool = False
+    part_condition: str = Field(default="new", pattern=r"^(new|used)$")
     warranty_months: int = Field(default=6, ge=1, le=36)
 
 
@@ -77,6 +78,7 @@ def vendor_add_product(
             vin_prefix=body.vin_prefix,
             vin_prefixes=body.vin_prefixes,
             is_oem=body.is_oem,
+            part_condition=body.part_condition,
             warranty_months=body.warranty_months,
             locale=locale,
         )

@@ -985,6 +985,7 @@ class Part(Base):
         ForeignKey("part_suppliers.id")
     )
     is_oem: Mapped[bool] = mapped_column(Boolean, default=False)
+    part_condition: Mapped[str] = mapped_column(String(10), default="new")
     price_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     warranty_months: Mapped[int] = mapped_column(SmallInteger, default=6)
     vehicle_compatibility: Mapped[list] = mapped_column(JSONB, default=list)

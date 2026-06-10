@@ -13,6 +13,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models import Part, PartCategory, PartInventory, PartSupplier, Vendor
+from app.part_condition_services import parse_part_condition
 from app.part_image_services import import_part_image_from_url, is_valid_image_url
 from app.parts_services import create_part
 from app.vin_compat_services import add_part_vin_compatibilities, parse_vin_prefixes
@@ -29,14 +30,18 @@ BULK_COLUMNS = [
     "vin_prefixes",
     "description",
     "image_url",
+    "condition",
 ]
 
 TEMPLATE_CSV = (
     "oem_number,name_ar,name_en,part_brand,price,quantity,"
-    "sub_category,compatible_vehicles,vin_prefixes,description,image_url\n"
+    "sub_category,compatible_vehicles,vin_prefixes,description,image_url,condition\n"
+    "# حالة القطعة (condition): new للجديد | used أو مستعمل أو مستعملة للمستعمل\n"
     "TOY-04152-YZZA1,فلتر زيت تويوتا كامري,Toyota Camry Oil Filter,Toyota OEM,45,10,"
     "maintenance-filters,Toyota Camry 2018-2024,4T1B11HK5JK,فلتر أصلي للكامري,"
-    "https://example.com/parts/toyota-filter.jpg\n"
+    "https://example.com/parts/toyota-filter.jpg,new\n"
+    "BOSCH-USED-001,فحمات فرامل مستعملة,Used Brake Pads,Bosch,120,2,"
+    "brakes,Toyota Corolla,,,,مستعمل\n"
 )
 
 MAX_BULK_BYTES = 10 * 1024 * 1024
@@ -109,6 +114,8 @@ def _parse_rows_from_csv(content: bytes) -> list[dict[str, str]]:
             for k, v in row.items()
             if k
         }
+        if normalized.get("oem_number", "").startswith("#"):
+            continue
         if any(normalized.values()):
             rows.append(normalized)
     return rows
@@ -312,6 +319,7 @@ def _validate_row(
         "compatible_vehicles": _parse_compatible_vehicles(row.get("compatible_vehicles")),
         "vin_prefixes": vin_prefixes,
         "image_url": image_url or None,
+        "part_condition": parse_part_condition(row.get("condition")),
         "used_uncategorized": used_uncategorized,
     }
     return parsed, [], used_uncategorized
@@ -379,6 +387,7 @@ def process_bulk_upload(
                 oem_number=data["oem_number"],
                 vin_prefix=prefixes[0] if prefixes else None,
                 vehicle_compatibility=data["compatible_vehicles"],
+                part_condition=data["part_condition"],
                 require_leaf_category=True,
             )
             if prefixes:

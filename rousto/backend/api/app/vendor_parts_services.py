@@ -29,6 +29,7 @@ def vendor_create_product(
     vin_prefix: str | None = None,
     vin_prefixes: list[str] | None = None,
     is_oem: bool = False,
+    part_condition: str = "new",
     warranty_months: int = 6,
     locale: str = "ar",
 ) -> dict:
@@ -47,6 +48,7 @@ def vendor_create_product(
         oem_number=oem_number,
         vin_prefix=prefixes[0] if prefixes else vin_prefix,
         is_oem=is_oem,
+        part_condition=part_condition,
         warranty_months=warranty_months,
         require_leaf_category=True,
     )

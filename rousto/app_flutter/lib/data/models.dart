@@ -741,6 +741,7 @@ class PartListingModel {
   final String nameAr;
   final double priceSar;
   final bool isOem;
+  final String partCondition;
   final String? categorySlug;
   final String? imageUrl;
 
@@ -751,12 +752,18 @@ class PartListingModel {
     required this.nameAr,
     required this.priceSar,
     this.isOem = false,
+    this.partCondition = 'new',
     this.categorySlug,
     this.imageUrl,
   });
 
+  bool get isUsed => partCondition == 'used';
+
   factory PartListingModel.fromJson(Map<String, dynamic> json) {
     final category = json['category'] as Map<String, dynamic>?;
+    final condition = (json['part_condition'] ?? json['condition'] ?? 'new')
+        .toString()
+        .toLowerCase();
     return PartListingModel(
       id: json['id'] as String,
       partNumber: json['part_number'] as String,
@@ -764,6 +771,7 @@ class PartListingModel {
       nameAr: json['name_ar'] as String,
       priceSar: (json['price_sar'] as num).toDouble(),
       isOem: json['is_oem'] as bool? ?? false,
+      partCondition: condition == 'used' ? 'used' : 'new',
       categorySlug: category?['slug'] as String?,
       imageUrl: json['image_url'] as String?,
     );

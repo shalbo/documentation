@@ -12,6 +12,7 @@ from app.models import User
 from app.vin_compat_services import normalize_vin_prefix
 from app.vin_decoder_services import decode_vin
 from app.part_image_services import get_part_image_file
+from app.part_condition_services import normalize_condition_filter
 from app.parts_services import (
     create_warranty_claim,
     get_part_detail,
@@ -63,11 +64,16 @@ def search_parts_catalog(
     vin: str | None = Query(default=None, max_length=17),
     oem_only: bool = Query(default=False),
     in_stock_only: bool = Query(default=False),
+    condition: str | None = Query(
+        default=None,
+        pattern=r"^(new|used)$",
+        description="Filter by part condition: new or used",
+    ),
     limit: int = Query(default=50, ge=1, le=100),
     locale: str = Depends(resolve_locale),
     db: Session = Depends(get_db),
 ):
-    if not any([q, category, category_id, make, model, car_year_id, oem, vin]):
+    if not any([q, category, category_id, make, model, car_year_id, oem, vin, condition]):
         raise HTTPException(
             status_code=400,
             detail={
@@ -84,6 +90,13 @@ def search_parts_catalog(
                 detail={"code": "INVALID_VIN", "message": str(exc)},
             ) from exc
     check_rate_limit(request, suffix="parts_search", limit=60)
+    try:
+        condition_filter = normalize_condition_filter(condition)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "INVALID_CONDITION", "message": str(exc)},
+        ) from exc
     data = search_parts(
         db,
         query=q,
@@ -96,6 +109,7 @@ def search_parts_catalog(
         vin=vin,
         oem_only=oem_only,
         in_stock_only=in_stock_only,
+        condition=condition_filter,
         locale=locale,
         limit=limit,
     )
@@ -114,6 +128,7 @@ def search_parts_catalog(
             "query": q,
             "car_year_id": str(car_year_id) if car_year_id else None,
             "in_stock_only": in_stock_only,
+            "condition": condition_filter,
             "vin_prefix": normalize_vin_prefix(vin) if vin else None,
             "strict_vin_match": bool(vin),
             "decoded_vehicle": vehicle,

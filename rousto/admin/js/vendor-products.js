@@ -329,6 +329,18 @@ $("zipUploadBtn").addEventListener("click", async () => {
   }
 });
 
+function syncConditionUi() {
+  const isUsed = $("condUsed").checked;
+  $("condNewLbl").classList.toggle("active", !isUsed);
+  $("condUsedLbl").classList.toggle("used-active", isUsed);
+  $("condUsedLbl").classList.toggle("active", false);
+}
+
+document.querySelectorAll('input[name="partCondition"]').forEach((el) => {
+  el.addEventListener("change", syncConditionUi);
+});
+syncConditionUi();
+
 $("rootCategory").addEventListener("change", (e) => {
   loadChildren(e.target.value).catch((err) => toast(err.message, true));
 });
@@ -354,6 +366,7 @@ $("productForm").addEventListener("submit", async (e) => {
         oem_number: $("oemNumber").value.trim() || null,
         vin_prefixes: parseVinPrefixes($("vinPrefixes").value),
         is_oem: $("isOem").checked,
+        part_condition: document.querySelector('input[name="partCondition"]:checked')?.value || "new",
       }),
     });
     toast(`تم حفظ المنتج: ${body.data.name_ar || body.data.name}`);

@@ -149,6 +149,7 @@ class ApiClient {
     String? carYearId,
     String? oem,
     String? vin,
+    String? condition,
     bool oemOnly = false,
     bool inStockOnly = false,
     int limit = 50,
@@ -160,6 +161,7 @@ class ApiClient {
       if (carYearId != null && carYearId.isNotEmpty) 'car_year_id': carYearId,
       if (oem != null && oem.isNotEmpty) 'oem': oem,
       if (vin != null && vin.isNotEmpty) 'vin': vin,
+      if (condition != null && condition.isNotEmpty) 'condition': condition,
       if (oemOnly) 'oem_only': 'true',
       if (inStockOnly) 'in_stock_only': 'true',
       'limit': '$limit',
@@ -169,7 +171,8 @@ class ApiClient {
         params.containsKey('q') ||
         params.containsKey('category') ||
         params.containsKey('oem') ||
-        params.containsKey('vin');
+        params.containsKey('vin') ||
+        params.containsKey('condition');
     if (!hasFilter) {
       throw ApiException('أدخل نص بحث أو فئة أو مركبة');
     }

@@ -93,6 +93,8 @@ def part_out(
         "name_ar": part.name_ar,
         "description_ar": part.description_ar,
         "is_oem": part.is_oem,
+        "part_condition": part.part_condition,
+        "condition": part.part_condition,
         "price_sar": float(part.price_sar),
         "warranty_months": part.warranty_months,
         "vehicle_compatibility": part.vehicle_compatibility or [],
@@ -147,6 +149,7 @@ def search_parts(
     vin: str | None = None,
     oem_only: bool = False,
     in_stock_only: bool = False,
+    condition: str | None = None,
     locale: str = "ar",
     limit: int = 50,
 ) -> list[dict]:
@@ -166,6 +169,9 @@ def search_parts(
 
     if oem_only:
         stmt = stmt.where(Part.is_oem.is_(True))
+
+    if condition:
+        stmt = stmt.where(Part.part_condition == condition)
 
     if oem:
         oem_clean = oem.strip().upper()
@@ -415,6 +421,7 @@ def create_part(
     oem_number: str | None = None,
     vin_prefix: str | None = None,
     description_ar: str | None = None,
+    part_condition: str = "new",
     require_leaf_category: bool = False,
 ) -> Part:
     if require_leaf_category and not is_leaf_category(db, category_id):
@@ -431,6 +438,7 @@ def create_part(
         category_id=category_id,
         supplier_id=supplier_id,
         is_oem=is_oem,
+        part_condition=part_condition,
         price_sar=price_sar,
         warranty_months=warranty_months,
         vehicle_compatibility=vehicle_compatibility or [],

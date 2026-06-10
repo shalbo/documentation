@@ -443,6 +443,7 @@ class MockData {
         name: 'فحمات فرامل بوش',
         nameAr: 'فحمات فرامل أمامية بوش',
         priceSar: 185,
+        partCondition: 'used',
         categorySlug: 'brakes',
       ),
       PartListingModel(

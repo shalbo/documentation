@@ -19,6 +19,7 @@
 | `vin_prefixes` | لا | بادئات VIN (فاصلة) → `part_vin_compatibilities` |
 | `description` | لا | وصف عربي |
 | `image_url` | لا | رابط صورة خارجي — يُحمَّل ويُخزَّن في `spare_part_images` |
+| `condition` | لا | حالة القطعة: `new` (افتراضي) أو `used` / `مستعمل` / `مستعملة` / `ربش` |
 
 ---
 

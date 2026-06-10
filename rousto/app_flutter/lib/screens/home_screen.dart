@@ -9,6 +9,7 @@ import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_decorations.dart';
 import '../widgets/common.dart';
+import '../widgets/part_condition_badge.dart';
 import '../widgets/vehicle_selector.dart';
 import 'booking_screen.dart';
 import 'catalog_screen.dart';
@@ -368,43 +369,53 @@ class HomeScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const PartsScreen()),
           ),
           child: SoftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
+              clipBehavior: Clip.none,
               children: [
-                IconBadge(
-                  _iconForCategory(p.categorySlug),
-                  size: 40,
-                ),
-                if (p.isOem)
-                  Container(
-                    margin: const EdgeInsets.only(top: 6),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.red050,
-                      borderRadius: BorderRadius.circular(6),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconBadge(
+                      _iconForCategory(p.categorySlug),
+                      size: 40,
                     ),
-                    child: const Text('OEM',
-                        style: TextStyle(
+                    if (p.isOem)
+                      Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.red050,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text('OEM',
+                            style: TextStyle(
+                                color: AppColors.red600,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800)),
+                      ),
+                    const Spacer(),
+                    Text(p.nameAr,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 13)),
+                    Text(p.partNumber,
+                        style: const TextStyle(
+                            color: AppColors.ink300, fontSize: 10)),
+                    const SizedBox(height: 4),
+                    Text(formatAmount(p.priceSar),
+                        style: const TextStyle(
                             color: AppColors.red600,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800)),
-                  ),
-                const Spacer(),
-                Text(p.nameAr,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w800, fontSize: 13)),
-                Text(p.partNumber,
-                    style: const TextStyle(
-                        color: AppColors.ink300, fontSize: 10)),
-                const SizedBox(height: 4),
-                Text(formatAmount(p.priceSar),
-                    style: const TextStyle(
-                        color: AppColors.red600,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13)),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13)),
+                  ],
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: PartConditionBadge(isUsed: p.isUsed),
+                ),
               ],
             ),
           ),
