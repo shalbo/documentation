@@ -33,7 +33,8 @@ rousto/
 │   ├── 20_NOTIV.md
 │   ├── 22_CENTRALIZED_NOTIFICATION_ENGINE.md
 │   ├── 23_SECURITY_HARDENING.md
-│   └── 24_LOGISTICS_DRIVER_NETWORK.md
+│   ├── 24_LOGISTICS_DRIVER_NETWORK.md
+│   └── 25_CRITICAL_ARCHITECTURE_CORRECTION.md
 ├── backend/               # قاعدة البيانات + REST API
 │   ├── docker-compose.yml
 │   ├── api/               # FastAPI
@@ -121,6 +122,8 @@ cd rousto/backend && docker compose up -d
 - محرك الإشعارات: http://localhost:8080/admin/notifications.html
 - سجل الأمان: http://localhost:8080/admin/security.html
 - شبكة السائقين: http://localhost:8080/admin/drivers.html
+- كتالوج قطع الغيار: http://localhost:8080/admin/parts.html
+- بحث قطع الغيار (ويب): http://localhost:8080/web/parts.html
 
 المواصفات:
 - [`docs/01_DATABASE_SCHEMA.md`](docs/01_DATABASE_SCHEMA.md)

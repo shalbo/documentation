@@ -348,6 +348,10 @@ def assign_tow_driver(
     if not technician:
         raise ValueError("سائق السطحة غير موجود")
 
+    from app.technician_domain import assert_tow_driver
+
+    assert_tow_driver(technician)
+
     now = datetime.now(timezone.utc)
     dispatch.technician_id = technician_id
     dispatch.status = "dispatched"

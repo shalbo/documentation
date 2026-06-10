@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import 'ai_scan_screen.dart';
 import 'booking_screen.dart';
+import 'parts_screen.dart';
 import 'pricing_screen.dart';
 import 'tracking_screen.dart';
 
@@ -136,19 +137,28 @@ class HomeScreen extends StatelessWidget {
                   fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(14),
+            GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PartsScreen()),
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text(l10n.searchService,
-                      style: const TextStyle(color: Color(0xFFE8D0D2))),
-                ],
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'ابحث عن خدمة أو قطعة غيار…',
+                        style: const TextStyle(color: Color(0xFFE8D0D2)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

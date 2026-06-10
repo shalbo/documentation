@@ -116,6 +116,24 @@ X-Vendor-Id: v0000000-0000-4000-8000-000000000001
 | GET | `/api/v1/categories/tree` | شجرة التصنيفات + الخدمات المتداخلة | لا |
 | GET | `/api/v1/services` | قائمة الخدمات (`?category=oil`) | لا |
 | GET | `/api/v1/services/{id}` | تفاصيل خدمة | لا |
+| GET | `/api/v1/services/search?q=` | بحث خدمات | لا |
+
+انظر [`25_CRITICAL_ARCHITECTURE_CORRECTION`](25_CRITICAL_ARCHITECTURE_CORRECTION.md) — **قطع الغيار مجال منفصل عن الخدمات**.
+
+### قطع الغيار (عام)
+
+| Method | Path | الوصف | Auth |
+|--------|------|-------|------|
+| GET | `/api/v1/parts/categories` | فئات القطع | لا |
+| GET | `/api/v1/parts/search?q=` | بحث قطع (`make`, `model`, `oem_only`) | لا |
+| GET | `/api/v1/parts/{id}` | تفاصيل قطعة | لا |
+| GET | `/api/v1/bookings/{id}/parts` | قطع مُركّبة في حجز | Customer |
+| POST | `/api/v1/parts/warranty-claims` | مطالبة ضمان قطعة | Customer |
+| GET | `/api/v1/admin/parts` | كتالوج القطع | Admin |
+| POST | `/api/v1/admin/parts` | إنشاء قطعة | Admin |
+| PATCH | `/api/v1/admin/parts/{id}` | تحديث قطعة | Admin |
+| GET | `/api/v1/admin/part-warranty-claims` | مطالبات الضمان | Admin |
+| POST | `/api/v1/admin/bookings/{id}/parts` | إرفاق قطعة بحجز | Admin |
 
 ---
 
@@ -604,3 +622,4 @@ curl -H "X-User-Id: a0000000-0000-4000-8000-000000000001" \
 - [`22_CENTRALIZED_NOTIFICATION_ENGINE`](../docs/22_CENTRALIZED_NOTIFICATION_ENGINE.md) — محرك إشعارات مركزي + لوحة إدارة ✅
 - [`23_SECURITY_HARDENING`](../docs/23_SECURITY_HARDENING.md) — تصلّب أمني: رؤوس HTTP، تدقيق، rate limit إدارة ✅
 - [`24_LOGISTICS_DRIVER_NETWORK`](../docs/24_LOGISTICS_DRIVER_NETWORK.md) — شبكة السائقين، حوض مهام، تسعير سحب ✅
+- [`25_CRITICAL_ARCHITECTURE_CORRECTION`](../docs/25_CRITICAL_ARCHITECTURE_CORRECTION.md) — قطع غيار + فصل أدوار الفني/السائق ✅

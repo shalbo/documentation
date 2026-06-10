@@ -932,6 +932,105 @@ class NotificationDispatchLog(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class PartSupplier(Base):
+    __tablename__ = "part_suppliers"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(120))
+    name_en: Mapped[str | None] = mapped_column(String(120))
+    is_oem: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class PartCategory(Base):
+    __tablename__ = "part_categories"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(120))
+    name_en: Mapped[str | None] = mapped_column(String(120))
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class Part(Base):
+    __tablename__ = "parts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    part_number: Mapped[str] = mapped_column(String(60), unique=True)
+    slug: Mapped[str] = mapped_column(String(80), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(200))
+    name_en: Mapped[str | None] = mapped_column(String(200))
+    description_ar: Mapped[str | None] = mapped_column(Text)
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("part_categories.id"))
+    supplier_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("part_suppliers.id")
+    )
+    is_oem: Mapped[bool] = mapped_column(Boolean, default=False)
+    price_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    warranty_months: Mapped[int] = mapped_column(SmallInteger, default=6)
+    vehicle_compatibility: Mapped[list] = mapped_column(JSONB, default=list)
+    image_url: Mapped[str | None] = mapped_column(String(300))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    category: Mapped["PartCategory"] = relationship()
+    supplier: Mapped["PartSupplier | None"] = relationship()
+
+
+class PartInventory(Base):
+    __tablename__ = "part_inventory"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    vendor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vendors.id"))
+    part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parts.id"))
+    qty_available: Mapped[int] = mapped_column(Integer, default=0)
+    cost_sar: Mapped[float | None] = mapped_column(Numeric(10, 2))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class BookingPart(Base):
+    __tablename__ = "booking_parts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    booking_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("bookings.id"))
+    part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parts.id"))
+    vendor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("vendors.id"))
+    qty: Mapped[int] = mapped_column(SmallInteger, default=1)
+    unit_price_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    warranty_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    installed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    part: Mapped["Part"] = relationship()
+
+
+class PartWarrantyClaim(Base):
+    __tablename__ = "part_warranty_claims"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    booking_part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("booking_parts.id"))
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    description: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), default="open")
+    admin_notes: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class TowVehicle(Base):
+    __tablename__ = "tow_vehicles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    technician_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("technicians.id"))
+    vehicle_type: Mapped[str] = mapped_column(String(20))
+    plate_number: Mapped[str] = mapped_column(String(20))
+    max_capacity_kg: Mapped[float | None] = mapped_column(Numeric(8, 2))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class MarketingAttributionEvent(Base):
     __tablename__ = "marketing_attribution_events"
 

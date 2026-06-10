@@ -13,6 +13,7 @@ from app.routers import (
     admin_catalog,
     admin_marketing,
     admin_notifications,
+    admin_parts,
     auth,
     bookings,
     catalog,
@@ -24,6 +25,7 @@ from app.routers import (
     marketing,
     monetization,
     notifications,
+    parts,
     profile,
     promotions,
     scans,
@@ -72,10 +74,12 @@ app.include_router(catalog.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(admin_notifications.router, prefix=prefix)
+app.include_router(admin_parts.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)
+app.include_router(parts.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(logistics.router, prefix=prefix)
