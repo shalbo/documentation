@@ -19,7 +19,11 @@ class AppRepository {
     }
   }
 
-  Future<List<PartListingModel>> searchParts({
+  Future<
+      ({
+        List<PartListingModel> parts,
+        DecodedVehicleModel? decodedVehicle,
+      })> searchParts({
     String? query,
     String? category,
     String? categoryId,
@@ -29,7 +33,7 @@ class AppRepository {
     bool inStockOnly = false,
   }) async {
     try {
-      final data = await _api.searchParts(
+      final result = await _api.searchParts(
         query: query,
         category: category,
         categoryId: categoryId,
@@ -38,9 +42,16 @@ class AppRepository {
         vin: vin,
         inStockOnly: inStockOnly,
       );
-      return data
+      DecodedVehicleModel? decoded;
+      final decodedJson =
+          result.meta?['decoded_vehicle'] as Map<String, dynamic>?;
+      if (decodedJson != null) {
+        decoded = DecodedVehicleModel.fromJson(decodedJson);
+      }
+      final parts = result.data
           .map((e) => PartListingModel.fromJson(e as Map<String, dynamic>))
           .toList();
+      return (parts: parts, decodedVehicle: decoded);
     } catch (_) {
       var parts = MockData.marketplaceHome.featuredParts;
       if (category != null) {
@@ -54,7 +65,7 @@ class AppRepository {
                 p.partNumber.toLowerCase().contains(q))
             .toList();
       }
-      return parts;
+      return (parts: parts, decodedVehicle: null);
     }
   }
 

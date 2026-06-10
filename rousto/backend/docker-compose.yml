@@ -48,6 +48,18 @@ services:
       - ./database/035_driver_network_seed.sql:/docker-entrypoint-initdb.d/035_driver_network_seed.sql:ro
       - ./database/036_spare_parts_schema.sql:/docker-entrypoint-initdb.d/036_spare_parts_schema.sql:ro
       - ./database/037_spare_parts_seed.sql:/docker-entrypoint-initdb.d/037_spare_parts_seed.sql:ro
+      - ./database/038_marketplace_geo.sql:/docker-entrypoint-initdb.d/038_marketplace_geo.sql:ro
+      - ./database/039_vehicle_fitment_schema.sql:/docker-entrypoint-initdb.d/039_vehicle_fitment_schema.sql:ro
+      - ./database/039_vehicle_fitment_seed.sql:/docker-entrypoint-initdb.d/039_vehicle_fitment_seed.sql:ro
+      - ./database/040_oem_vin_search.sql:/docker-entrypoint-initdb.d/040_oem_vin_search.sql:ro
+      - ./database/041_hybrid_shipping_schema.sql:/docker-entrypoint-initdb.d/041_hybrid_shipping_schema.sql:ro
+      - ./database/041_hybrid_shipping_seed.sql:/docker-entrypoint-initdb.d/041_hybrid_shipping_seed.sql:ro
+      - ./database/042_hierarchical_categories.sql:/docker-entrypoint-initdb.d/042_hierarchical_categories.sql:ro
+      - ./database/042_hierarchical_categories_seed.sql:/docker-entrypoint-initdb.d/042_hierarchical_categories_seed.sql:ro
+      - ./database/043_part_vin_compatibilities.sql:/docker-entrypoint-initdb.d/043_part_vin_compatibilities.sql:ro
+      - ./database/043_part_vin_compatibilities_seed.sql:/docker-entrypoint-initdb.d/043_part_vin_compatibilities_seed.sql:ro
+      - ./database/044_vin_decoders_schema.sql:/docker-entrypoint-initdb.d/044_vin_decoders_schema.sql:ro
+      - ./database/044_vin_decoders_libya_seed.sql:/docker-entrypoint-initdb.d/044_vin_decoders_libya_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

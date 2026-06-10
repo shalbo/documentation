@@ -704,6 +704,36 @@ class PartCategoryModel {
   }
 }
 
+class DecodedVehicleModel {
+  final String vinPrefix;
+  final String make;
+  final String model;
+  final String? yearRange;
+  final String? engine;
+  final String labelAr;
+
+  const DecodedVehicleModel({
+    required this.vinPrefix,
+    required this.make,
+    required this.model,
+    this.yearRange,
+    this.engine,
+    required this.labelAr,
+  });
+
+  factory DecodedVehicleModel.fromJson(Map<String, dynamic> json) {
+    return DecodedVehicleModel(
+      vinPrefix: json['vin_prefix'] as String,
+      make: json['make'] as String,
+      model: json['model'] as String,
+      yearRange: json['year_range'] as String?,
+      engine: json['engine'] as String?,
+      labelAr: json['label_ar'] as String? ??
+          '${json['make']} ${json['model']}',
+    );
+  }
+}
+
 class PartListingModel {
   final String id;
   final String partNumber;

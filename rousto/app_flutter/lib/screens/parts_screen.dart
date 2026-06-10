@@ -34,6 +34,7 @@ class _PartsScreenState extends State<PartsScreen> {
   final _query = TextEditingController();
   final _repository = AppRepository();
   List<PartListingModel> _results = [];
+  DecodedVehicleModel? _decodedVehicle;
   bool _loading = false;
   String? _error;
   String? _selectedCategory;
@@ -95,7 +96,7 @@ class _PartsScreenState extends State<PartsScreen> {
       _error = null;
     });
     try {
-      final results = await _repository.searchParts(
+      final result = await _repository.searchParts(
         query: _mode == _SearchMode.name && q.isNotEmpty ? q : null,
         category: _selectedCategory,
         categoryId: widget.initialCategoryId,
@@ -105,10 +106,14 @@ class _PartsScreenState extends State<PartsScreen> {
         inStockOnly: _inStockOnly,
       );
       setState(() {
-        _results = results;
+        _results = result.parts;
+        _decodedVehicle =
+            _mode == _SearchMode.vin ? result.decodedVehicle : null;
         _loading = false;
-        if (_mode == _SearchMode.vin && results.isEmpty) {
-          _error = 'لا توجد قطع OEM متوافقة مع هذا الهيكل';
+        if (_mode == _SearchMode.vin && result.parts.isEmpty) {
+          _error = result.decodedVehicle == null
+              ? 'لم نتعرف على رقم الهيكل في قاعدة السوق الليبي'
+              : 'لا توجد قطع OEM متوافقة مع هذا الهيكل';
         }
       });
     } catch (e) {
@@ -154,6 +159,7 @@ class _PartsScreenState extends State<PartsScreen> {
                   _mode = s.first;
                   _error = null;
                   _results = [];
+                  _decodedVehicle = null;
                 });
               },
             ),
@@ -204,6 +210,44 @@ class _PartsScreenState extends State<PartsScreen> {
               ),
               onSubmitted: (_) => _search(),
             ),
+            if (_mode == _SearchMode.vin && _decodedVehicle != null)
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.red050,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.red.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.directions_car, color: AppColors.red),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _decodedVehicle!.labelAr,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                          if (_decodedVehicle!.engine != null)
+                            Text(
+                              _decodedVehicle!.engine!,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.ink500,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (_loading) const LinearProgressIndicator(),
             if (_error != null)
               Padding(

@@ -42,6 +42,7 @@ from app.routers import (
     towing_dispatch,
     vendor_map,
     vendor_parts,
+    vin_decoder,
     vendors,
 )
 
@@ -104,6 +105,7 @@ app.include_router(monetization.router, prefix=prefix)
 app.include_router(split_payments.router, prefix=prefix)
 app.include_router(vendors.router, prefix=prefix)
 app.include_router(vendor_parts.router, prefix=prefix)
+app.include_router(vin_decoder.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)
 app.include_router(towing_dispatch.router, prefix=prefix)
 app.include_router(support.router, prefix=prefix)

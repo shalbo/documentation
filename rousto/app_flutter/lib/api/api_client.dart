@@ -142,7 +142,7 @@ class ApiClient {
     return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
   }
 
-  Future<List<dynamic>> searchParts({
+  Future<({List<dynamic> data, Map<String, dynamic>? meta})> searchParts({
     String? query,
     String? category,
     String? categoryId,
@@ -179,7 +179,10 @@ class ApiClient {
     );
     _ensureSuccess(response);
     final parsed = jsonDecode(response.body) as Map<String, dynamic>;
-    return parsed['data'] as List<dynamic>;
+    return (
+      data: parsed['data'] as List<dynamic>,
+      meta: parsed['meta'] as Map<String, dynamic>?,
+    );
   }
 
   Future<List<dynamic>> getPartCategories() async {

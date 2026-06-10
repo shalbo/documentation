@@ -9,6 +9,7 @@ from app.deps import get_current_user
 from app.i18n import resolve_locale
 from app.models import User
 from app.vin_compat_services import normalize_vin_prefix
+from app.vin_decoder_services import decode_vin
 from app.parts_services import (
     create_warranty_claim,
     get_part_detail,
@@ -85,6 +86,13 @@ def search_parts_catalog(
         locale=locale,
         limit=limit,
     )
+    vehicle = None
+    if vin:
+        try:
+            vehicle = decode_vin(db, vin)
+        except ValueError:
+            vehicle = None
+
     return {
         "data": data,
         "meta": {
@@ -95,6 +103,7 @@ def search_parts_catalog(
             "in_stock_only": in_stock_only,
             "vin_prefix": normalize_vin_prefix(vin) if vin else None,
             "strict_vin_match": bool(vin),
+            "decoded_vehicle": vehicle,
         },
     }
 

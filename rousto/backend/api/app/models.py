@@ -995,6 +995,20 @@ class Part(Base):
     )
 
 
+class VinDecoder(Base):
+    __tablename__ = "vin_decoders"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    vin_prefix: Mapped[str] = mapped_column(String(11), unique=True)
+    make: Mapped[str] = mapped_column(String(60))
+    model: Mapped[str] = mapped_column(String(80))
+    year_range: Mapped[str | None] = mapped_column(String(24))
+    engine: Mapped[str | None] = mapped_column(String(120))
+    market: Mapped[str] = mapped_column(String(40), default="libya")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class PartVinCompatibility(Base):
     __tablename__ = "part_vin_compatibilities"
 
