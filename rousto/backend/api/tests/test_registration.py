@@ -1,6 +1,7 @@
 import pytest
 
-from app.registration_services import LIBYAN_CITIES, normalize_phone, register_customer
+from app.city_seed_data import LIBYAN_CITIES
+from app.registration_services import normalize_phone, register_customer
 
 
 def test_normalize_phone_libya():
@@ -17,7 +18,8 @@ def test_normalize_phone_invalid():
 
 
 def test_libyan_cities_has_tripoli():
-    assert "طرابلس" in LIBYAN_CITIES
+    names_ar = {name_ar for _, name_ar, _, _ in LIBYAN_CITIES}
+    assert "طرابلس" in names_ar
 
 
 def test_register_customer_validation_city():

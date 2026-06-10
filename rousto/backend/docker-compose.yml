@@ -63,6 +63,8 @@ services:
       - ./database/045_part_categories_comprehensive_seed.sql:/docker-entrypoint-initdb.d/045_part_categories_comprehensive_seed.sql:ro
       - ./database/046_registration_profiles_schema.sql:/docker-entrypoint-initdb.d/046_registration_profiles_schema.sql:ro
       - ./database/046_registration_roles_seed.sql:/docker-entrypoint-initdb.d/046_registration_roles_seed.sql:ro
+      - ./database/047_cities_schema.sql:/docker-entrypoint-initdb.d/047_cities_schema.sql:ro
+      - ./database/047_libyan_cities_seed.sql:/docker-entrypoint-initdb.d/047_libyan_cities_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rousto -d rousto"]
       interval: 5s

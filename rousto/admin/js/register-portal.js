@@ -1,11 +1,37 @@
-const cities = ['طرابلس', 'مصراتة', 'بنغازي', 'الزاوية', 'سبها', 'البيضاء'];
 const citySel = document.getElementById('city');
-cities.forEach((c) => {
-  const o = document.createElement('option');
-  o.value = c;
-  o.textContent = c;
-  citySel.appendChild(o);
-});
+const apiBase = 'http://localhost:8000';
+
+async function loadCities() {
+  try {
+    const res = await fetch(`${apiBase}/api/v1/cities`);
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error?.message || 'تعذّر تحميل المدن');
+    const byRegion = { West: [], East: [], South: [] };
+    for (const c of body.data) {
+      if (byRegion[c.region]) byRegion[c.region].push(c);
+    }
+    const regionLabels = { West: '— إقليم الغرب —', East: '— إقليم الشرق —', South: '— إقليم الجنوب —' };
+    for (const region of ['West', 'East', 'South']) {
+      const group = document.createElement('optgroup');
+      group.label = regionLabels[region];
+      for (const c of byRegion[region]) {
+        const o = document.createElement('option');
+        o.value = c.name_ar;
+        o.textContent = c.name_ar;
+        group.appendChild(o);
+      }
+      citySel.appendChild(group);
+    }
+  } catch {
+    ['طرابلس', 'مصراتة', 'بنغازي', 'الزاوية', 'سبها', 'البيضاء'].forEach((c) => {
+      const o = document.createElement('option');
+      o.value = c;
+      o.textContent = c;
+      citySel.appendChild(o);
+    });
+  }
+}
+loadCities();
 
 let role = 'vendor';
 document.getElementById('tabVendor').onclick = () => setRole('vendor');
@@ -40,7 +66,7 @@ function toast(msg, err) {
 
 document.getElementById('regForm').onsubmit = async (e) => {
   e.preventDefault();
-  const base = 'http://localhost:8000';
+  const base = apiBase;
   const path = role === 'vendor' ? '/api/v1/registration/vendor' : '/api/v1/registration/workshop';
   const payload = {
     full_name: document.getElementById('fullName').value,

@@ -62,6 +62,7 @@ class User(Base):
     loyalty_points: Mapped[int] = mapped_column(Integer, default=0)
     locale: Mapped[str] = mapped_column(String(5), default="ar")
     city: Mapped[str | None] = mapped_column(String(60))
+    city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
@@ -459,6 +460,7 @@ class Vendor(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     phone: Mapped[str] = mapped_column(String(20), unique=True)
     city: Mapped[str] = mapped_column(String(60), default="الرياض")
+    city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     national_id: Mapped[str | None] = mapped_column(String(20))
     commercial_reg: Mapped[str | None] = mapped_column(String(40))
     status: Mapped[str] = mapped_column(String(20), default="pending")
@@ -1112,6 +1114,8 @@ class IntercityShippingRate(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     origin_city: Mapped[str] = mapped_column(String(60))
     destination_city: Mapped[str] = mapped_column(String(60))
+    origin_city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
+    destination_city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     flat_fee_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     carrier_name: Mapped[str] = mapped_column(String(80))
     carrier_slug: Mapped[str] = mapped_column(String(40))
@@ -1135,6 +1139,8 @@ class PartOrder(Base):
     total_sar: Mapped[float] = mapped_column(Numeric(10, 2))
     origin_city: Mapped[str | None] = mapped_column(String(60))
     destination_city: Mapped[str] = mapped_column(String(60))
+    origin_city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
+    destination_city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     dest_lat: Mapped[float | None] = mapped_column(Numeric(10, 7))
     dest_lng: Mapped[float | None] = mapped_column(Numeric(10, 7))
     courier_technician_id: Mapped[uuid.UUID | None] = mapped_column(
@@ -1171,6 +1177,18 @@ class TowVehicle(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class City(Base):
+    __tablename__ = "cities"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    name_en: Mapped[str] = mapped_column(String(80), unique=True)
+    region: Mapped[str] = mapped_column(String(20))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class VendorProfile(Base):
     __tablename__ = "vendor_profiles"
 
@@ -1179,6 +1197,7 @@ class VendorProfile(Base):
     shop_name: Mapped[str] = mapped_column(String(120))
     specialty: Mapped[str | None] = mapped_column(String(120))
     city: Mapped[str] = mapped_column(String(60))
+    city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
     longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
     verification_status: Mapped[str] = mapped_column(String(20), default="pending")
@@ -1197,6 +1216,7 @@ class DriverProfile(Base):
     service_type: Mapped[str] = mapped_column(String(20))
     plate_number: Mapped[str] = mapped_column(String(20))
     city: Mapped[str] = mapped_column(String(60))
+    city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     license_doc_path: Mapped[str | None] = mapped_column(String(300))
     id_doc_path: Mapped[str | None] = mapped_column(String(300))
     vehicle_doc_path: Mapped[str | None] = mapped_column(String(300))
@@ -1216,6 +1236,7 @@ class WorkshopProfile(Base):
     center_name: Mapped[str] = mapped_column(String(120))
     specialty: Mapped[str | None] = mapped_column(String(120))
     city: Mapped[str] = mapped_column(String(60))
+    city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     latitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
     longitude: Mapped[float | None] = mapped_column(Numeric(10, 7))
     is_approved: Mapped[bool] = mapped_column(Boolean, default=False)

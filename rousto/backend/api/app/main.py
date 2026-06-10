@@ -20,6 +20,7 @@ from app.routers import (
     auth,
     bookings,
     catalog,
+    cities,
     devices,
     driver_network,
     fitment,
@@ -81,6 +82,7 @@ prefix = settings.api_prefix
 app.include_router(health.router, prefix=prefix)
 app.include_router(auth.router, prefix=prefix)
 app.include_router(catalog.router, prefix=prefix)
+app.include_router(cities.router, prefix=prefix)
 app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(admin_notifications.router, prefix=prefix)

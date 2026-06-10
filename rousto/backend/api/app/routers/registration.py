@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.deps import require_admin_key
 from app.models import User
+from app.city_services import list_cities
 from app.registration_services import (
-    LIBYAN_CITIES,
     approve_registration,
     attach_driver_documents,
     driver_profile_out,
@@ -81,8 +81,9 @@ class RejectIn(BaseModel):
 
 
 @router.get("/registration/cities")
-def registration_cities():
-    return {"data": sorted(LIBYAN_CITIES)}
+def registration_cities(db: Session = Depends(get_db)):
+    data = list_cities(db)
+    return {"data": data, "meta": {"total": len(data)}}
 
 
 @router.post("/registration/customer", status_code=201)

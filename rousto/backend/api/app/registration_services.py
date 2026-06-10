@@ -10,6 +10,7 @@ from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.city_services import validate_city_name
 from app.config import settings
 from app.models import (
     DriverProfile,
@@ -26,14 +27,6 @@ from app.models import (
 PHONE_RE = re.compile(r"^\+(?:9665\d{8}|2189\d{8})$")
 PLATE_RE = re.compile(r"^[A-Za-z0-9\u0600-\u06FF\-]{3,20}$")
 ALLOWED_DOC_MIME = {"image/jpeg", "image/png", "image/webp"}
-LIBYAN_CITIES = {
-    "طرابلس",
-    "مصراتة",
-    "بنغازي",
-    "الزاوية",
-    "سبها",
-    "البيضاء",
-}
 
 
 def normalize_phone(phone: str) -> str:
@@ -113,9 +106,9 @@ def register_customer(
     phone: str,
     city: str,
 ) -> User:
-    if city.strip() not in LIBYAN_CITIES:
-        raise ValueError("اختر مدينة من القائمة المعتمدة")
-    user = _create_user(db, full_name=full_name, phone=phone, city=city)
+    city_row = validate_city_name(db, city)
+    user = _create_user(db, full_name=full_name, phone=phone, city=city_row.name_ar)
+    user.city_id = city_row.id
     _assign_role(db, user.id, "customer")
     return user
 
@@ -132,13 +125,13 @@ def register_vendor(
     latitude: float | None,
     longitude: float | None,
 ) -> VendorProfile:
-    if city.strip() not in LIBYAN_CITIES:
-        raise ValueError("اختر مدينة من القائمة المعتمدة")
+    city_row = validate_city_name(db, city)
     if not shop_name.strip():
         raise ValueError("اسم المحل مطلوب")
     user = _create_user(
-        db, full_name=full_name, phone=phone, city=city, email=email
+        db, full_name=full_name, phone=phone, city=city_row.name_ar, email=email
     )
+    user.city_id = city_row.id
     _assign_role(db, user.id, "vendor")
     now = datetime.now(timezone.utc)
     profile = VendorProfile(
@@ -146,7 +139,8 @@ def register_vendor(
         user_id=user.id,
         shop_name=shop_name.strip(),
         specialty=(specialty or "").strip() or None,
-        city=city.strip(),
+        city=city_row.name_ar,
+        city_id=city_row.id,
         latitude=latitude,
         longitude=longitude,
         verification_status="pending",
@@ -171,11 +165,11 @@ def register_workshop(
     latitude: float | None,
     longitude: float | None,
 ) -> WorkshopProfile:
-    if city.strip() not in LIBYAN_CITIES:
-        raise ValueError("اختر مدينة من القائمة المعتمدة")
+    city_row = validate_city_name(db, city)
     user = _create_user(
-        db, full_name=full_name, phone=phone, city=city, email=email
+        db, full_name=full_name, phone=phone, city=city_row.name_ar, email=email
     )
+    user.city_id = city_row.id
     _assign_role(db, user.id, "workshop")
     now = datetime.now(timezone.utc)
     profile = WorkshopProfile(
@@ -183,7 +177,8 @@ def register_workshop(
         user_id=user.id,
         center_name=center_name.strip(),
         specialty=(specialty or "").strip() or None,
-        city=city.strip(),
+        city=city_row.name_ar,
+        city_id=city_row.id,
         latitude=latitude,
         longitude=longitude,
         verification_status="pending",
@@ -205,14 +200,14 @@ def register_driver(
     service_type: str,
     plate_number: str,
 ) -> DriverProfile:
-    if city.strip() not in LIBYAN_CITIES:
-        raise ValueError("اختر مدينة من القائمة المعتمدة")
+    city_row = validate_city_name(db, city)
     if service_type not in ("courier", "tow"):
         raise ValueError("نوع الخدمة: courier (قطع غيار) أو tow (ساحبة)")
     plate = plate_number.strip().upper()
     if not PLATE_RE.match(plate):
         raise ValueError("رقم اللوحة غير صالح")
-    user = _create_user(db, full_name=full_name, phone=phone, city=city)
+    user = _create_user(db, full_name=full_name, phone=phone, city=city_row.name_ar)
+    user.city_id = city_row.id
     _assign_role(db, user.id, "driver")
     now = datetime.now(timezone.utc)
     profile = DriverProfile(
@@ -220,7 +215,8 @@ def register_driver(
         user_id=user.id,
         service_type=service_type,
         plate_number=plate,
-        city=city.strip(),
+        city=city_row.name_ar,
+        city_id=city_row.id,
         is_approved=False,
         verification_status="pending",
         created_at=now,
@@ -388,6 +384,7 @@ def approve_registration(
             email=user.email if user else f"v{p.id}@rousto.app",
             phone=user.phone if user else "",
             city=p.city,
+            city_id=str(p.city_id) if p.city_id else None,
             status="approved",
             base_lat=p.latitude,
             base_lng=p.longitude,
@@ -450,6 +447,7 @@ def approve_registration(
             email=user.email if user else f"w{p.id}@rousto.app",
             phone=user.phone if user else "",
             city=p.city,
+            city_id=str(p.city_id) if p.city_id else None,
             status="approved",
             base_lat=p.latitude,
             base_lng=p.longitude,
