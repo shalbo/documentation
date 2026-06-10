@@ -64,6 +64,7 @@ class User(Base):
     city: Mapped[str | None] = mapped_column(String(60))
     city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    password_hash: Mapped[str | None] = mapped_column(String(128))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
@@ -855,6 +856,39 @@ class UserVendorLink(Base):
         ForeignKey("vendors.id"), primary_key=True
     )
     linked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class PaymentIntent(Base):
+    __tablename__ = "payment_intents"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    amount_lyd: Mapped[float] = mapped_column(Numeric(12, 2))
+    gateway: Mapped[str] = mapped_column(String(20))
+    order_type: Mapped[str] = mapped_column(String(40))
+    order_ref_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    vendor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("vendors.id"))
+    return_url: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), default="pending_otp")
+    gateway_payment_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("gateway_payments.id")
+    )
+    otp_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class OtpCode(Base):
+    __tablename__ = "otp_codes"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    order_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("payment_intents.id"))
+    code_hash: Mapped[str] = mapped_column(String(128))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    is_used: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class AuthOtpRequest(Base):

@@ -17,50 +17,24 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _phoneCtrl = TextEditingController(text: '+966501234567');
-  final _codeCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController(text: 'Rousto@123');
   final _auth = AuthService();
-  bool _otpSent = false;
   bool _loading = false;
-  String? _devOtp;
+  bool _obscure = true;
 
   @override
   void dispose() {
     _phoneCtrl.dispose();
-    _codeCtrl.dispose();
+    _passwordCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _sendOtp() async {
+  Future<void> _login() async {
     setState(() => _loading = true);
     try {
-      final dev = await _auth.sendOtp(_phoneCtrl.text.trim());
-      setState(() {
-        _otpSent = true;
-        _devOtp = dev.isNotEmpty ? dev : null;
-        if (_devOtp != null) _codeCtrl.text = _devOtp!;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.codeSent)),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _verify() async {
-    setState(() => _loading = true);
-    try {
-      await _auth.verifyOtp(
+      await _auth.login(
         phone: _phoneCtrl.text.trim(),
-        code: _codeCtrl.text.trim(),
+        password: _passwordCtrl.text,
       );
       if (!mounted) return;
       await context.read<AppState>().load();
@@ -96,28 +70,32 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(labelText: l10n.phoneNumber),
             ),
             const SizedBox(height: 16),
-            if (_otpSent) ...[
-              TextField(
-                controller: _codeCtrl,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: l10n.verificationCode,
-                  helperText: _devOtp != null
-                      ? l10n.devOtpHelper(_devOtp!)
-                      : null,
+            TextField(
+              controller: _passwordCtrl,
+              obscureText: _obscure,
+              decoration: InputDecoration(
+                labelText: 'كلمة المرور',
+                suffixIcon: IconButton(
+                  icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => _obscure = !_obscure),
                 ),
               ),
-              const SizedBox(height: 16),
-            ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'تسجيل الدخول بالجوال وكلمة المرور — رمز OTP مطلوب فقط عند الدفع',
+              style: TextStyle(fontSize: 12, color: AppColors.ink500),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _loading ? null : (_otpSent ? _verify : _sendOtp),
+              onPressed: _loading ? null : _login,
               child: _loading
                   ? const SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_otpSent ? l10n.confirmLogin : l10n.sendCode),
+                  : Text(l10n.login),
             ),
             const SizedBox(height: 16),
             OutlinedButton(

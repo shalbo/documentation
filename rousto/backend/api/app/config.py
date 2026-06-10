@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     jwt_refresh_days: int = 7
     otp_dev_mode: bool = True
     otp_dev_code: str = "123456"
+    payment_otp_dev_code: str = "1234"
+    password_pbkdf2_iterations: int = 100_000
 
     # Security
     allow_legacy_headers: bool = True

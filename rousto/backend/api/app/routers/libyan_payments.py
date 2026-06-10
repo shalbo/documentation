@@ -9,17 +9,13 @@ from app.db import get_db
 from app.deps import get_current_user
 from app.gateways.registry import BLOCKED_GATEWAYS
 from app.models import User, Vendor
+from app.payment_otp_services import create_payment_intent, payment_intent_out
 from app.service_layer.payments import (
     checkout_options,
     get_or_create_wallet,
-    initiate_checkout,
     list_wallet_transactions,
     wallet_out,
-    wallet_topup_via_gateway,
 )
-from app.service_layer.payments.edfali_service import edfali_payment_service
-from app.service_layer.payments.muamalat_service import muamalat_payment_service
-from app.service_layer.payments.sadad_service import sadad_payment_service
 
 router = APIRouter(tags=["libyan-payments"])
 
@@ -71,43 +67,19 @@ def _run_checkout(
             },
         )
     try:
-        result = initiate_checkout(
+        intent = create_payment_intent(
             db,
             user,
             amount_lyd=amount_lyd,
             gateway=gateway,
             order_type=order_type,
-            order_id=order_id,
+            order_ref_id=order_id,
             return_url=return_url,
             vendor=vendor,
         )
         db.commit()
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={"code": "CHECKOUT_ERROR", "message": str(exc)},
-        ) from exc
-    return result
-
-
-def _run_gateway_initiate(
-    db: Session,
-    user: User,
-    service,
-    body: GatewayInitiateIn,
-) -> dict:
-    vendor = _resolve_vendor(db, body.vendor_id)
-    try:
-        result = service.initiate(
-            db,
-            user,
-            amount_lyd=body.amount_lyd,
-            order_type=body.order_type,
-            order_id=body.order_id,
-            return_url=body.return_url,
-            vendor=vendor,
-        )
-        db.commit()
+        result = payment_intent_out(intent)
+        result["requires_otp"] = True
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
@@ -160,8 +132,17 @@ def post_muamalat_initiate(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    result = _run_gateway_initiate(db, user, muamalat_payment_service, body)
-    return success(result, message="تم إنشاء جلسة دفع معاملات")
+    result = _run_checkout(
+        db,
+        user,
+        amount_lyd=body.amount_lyd,
+        gateway="muamalat",
+        order_type=body.order_type,
+        order_id=body.order_id,
+        return_url=body.return_url,
+        vendor=_resolve_vendor(db, body.vendor_id),
+    )
+    return success(result, message="تم إنشاء طلب دفع — أكمل OTP المالي")
 
 
 @router.post("/payments/sadad/initiate")
@@ -170,8 +151,17 @@ def post_sadad_initiate(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    result = _run_gateway_initiate(db, user, sadad_payment_service, body)
-    return success(result, message="تم إنشاء جلسة دفع سداد")
+    result = _run_checkout(
+        db,
+        user,
+        amount_lyd=body.amount_lyd,
+        gateway="sadad",
+        order_type=body.order_type,
+        order_id=body.order_id,
+        return_url=body.return_url,
+        vendor=_resolve_vendor(db, body.vendor_id),
+    )
+    return success(result, message="تم إنشاء طلب دفع — أكمل OTP المالي")
 
 
 @router.post("/payments/edfali/initiate")
@@ -180,8 +170,17 @@ def post_edfali_initiate(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    result = _run_gateway_initiate(db, user, edfali_payment_service, body)
-    return success(result, message="تم إنشاء جلسة دفع إدفع لي")
+    result = _run_checkout(
+        db,
+        user,
+        amount_lyd=body.amount_lyd,
+        gateway="edfali",
+        order_type=body.order_type,
+        order_id=body.order_id,
+        return_url=body.return_url,
+        vendor=_resolve_vendor(db, body.vendor_id),
+    )
+    return success(result, message="تم إنشاء طلب دفع — أكمل OTP المالي")
 
 
 @router.post("/me/wallet/topup")
@@ -190,18 +189,14 @@ def post_wallet_topup(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    try:
-        result = wallet_topup_via_gateway(
-            db,
-            user,
-            amount_lyd=body.amount_lyd,
-            gateway=body.gateway,
-            return_url=body.return_url,
-        )
-        db.commit()
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={"code": "TOPUP_ERROR", "message": str(exc)},
-        ) from exc
-    return success(result, message="تم بدء شحن المحفظة")
+    result = _run_checkout(
+        db,
+        user,
+        amount_lyd=body.amount_lyd,
+        gateway=body.gateway,
+        order_type="wallet_topup",
+        order_id=None,
+        return_url=body.return_url,
+        vendor=None,
+    )
+    return success(result, message="تم إنشاء طلب شحن — أكمل OTP المالي")

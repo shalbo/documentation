@@ -106,6 +106,30 @@ class RegistrationService {
     });
   }
 
+  Future<Map<String, dynamic>> generateRegistrationPaymentOtp({
+    required String orderId,
+    required String phone,
+    double? amountLyd,
+  }) async {
+    return _post('/api/v1/payments/otp/generate-registration', {
+      'order_id': orderId,
+      'phone': phone,
+      if (amountLyd != null) 'amount_lyd': amountLyd,
+    });
+  }
+
+  Future<Map<String, dynamic>> verifyRegistrationPaymentOtp({
+    required String orderId,
+    required String phone,
+    required String code,
+  }) async {
+    return _post('/api/v1/payments/otp/verify-registration', {
+      'order_id': orderId,
+      'phone': phone,
+      'code': code,
+    });
+  }
+
   Future<Map<String, dynamic>> getDriverPaymentStatus({
     required String profileId,
     required String phone,
@@ -130,6 +154,12 @@ class RegistrationService {
     final body = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode >= 400) {
       throw Exception(_msg(body));
+    }
+    final data = body['data'];
+    if (data is Map<String, dynamic>) {
+      final out = Map<String, dynamic>.from(data);
+      if (body['meta'] != null) out['meta'] = body['meta'];
+      return out;
     }
     return body;
   }

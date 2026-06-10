@@ -7,11 +7,10 @@ from sqlalchemy.orm import Session
 
 from app.auth_services import (
     assign_user_roles,
-    create_otp_request,
+    authenticate_user,
     issue_tokens,
     refresh_access_token,
     revoke_refresh_token,
-    verify_otp,
 )
 from app.config import settings
 from app.db import get_db
@@ -22,6 +21,11 @@ from app.models import Permission, Role, User, UserRole
 from app.permissions import ROLE_ADMIN, serialize_principal
 
 router = APIRouter(tags=["auth"])
+
+
+class LoginIn(BaseModel):
+    phone: str = Field(min_length=8, max_length=20)
+    password: str = Field(min_length=6, max_length=128)
 
 
 class OtpSendIn(BaseModel):
@@ -46,36 +50,11 @@ class AssignRolesIn(BaseModel):
     roles: list[str] = Field(min_length=1)
 
 
-@router.post("/auth/otp/send")
-def send_otp(body: OtpSendIn, request: Request, db: Session = Depends(get_db)):
-    check_rate_limit(request, suffix=f"otp-send:{body.phone}")
+@router.post("/auth/login")
+def login_with_password(body: LoginIn, request: Request, db: Session = Depends(get_db)):
+    check_rate_limit(request, suffix=f"auth-login:{body.phone}")
     try:
-        otp, code = create_otp_request(db, body.phone)
-        db.commit()
-        meta = {"expires_in_seconds": 300}
-        if settings.otp_dev_mode and not settings.is_production:
-            meta["dev_otp"] = code
-        return {
-            "data": {
-                "request_id": str(otp.id),
-                "phone": otp.phone,
-                "message": "تم إرسال رمز التحقق",
-            },
-            "meta": meta,
-        }
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail={"code": "OTP_SEND_FAILED", "message": str(exc)},
-        ) from exc
-
-
-@router.post("/auth/otp/verify")
-def verify_otp_code(body: OtpVerifyIn, request: Request, db: Session = Depends(get_db)):
-    check_rate_limit(request, suffix=f"otp-verify:{body.phone}")
-    try:
-        request_id = UUID(body.request_id) if body.request_id else None
-        user = verify_otp(db, body.phone, body.code, request_id)
+        user = authenticate_user(db, body.phone, body.password)
         tokens = issue_tokens(db, user)
         db.commit()
         return {"data": tokens}
@@ -84,14 +63,38 @@ def verify_otp_code(body: OtpVerifyIn, request: Request, db: Session = Depends(g
         audit_security_event(
             db,
             request,
-            event_type="auth.otp_verify_failed",
+            event_type="auth.login_failed",
             severity="warn",
             metadata={"phone": body.phone[-4:]},
         )
         raise HTTPException(
-            status_code=400,
-            detail={"code": "OTP_VERIFY_FAILED", "message": str(exc)},
+            status_code=401,
+            detail={"code": "LOGIN_FAILED", "message": str(exc)},
         ) from exc
+
+
+@router.post("/auth/otp/send")
+def send_otp(_: OtpSendIn):
+    """Deprecated — OTP محصور بالعمليات المالية فقط."""
+    raise HTTPException(
+        status_code=410,
+        detail={
+            "code": "OTP_LOGIN_DISABLED",
+            "message": "تم إيقاف OTP لتسجيل الدخول — استخدم رقم الجوال وكلمة المرور",
+        },
+    )
+
+
+@router.post("/auth/otp/verify")
+def verify_otp_code(_: OtpVerifyIn):
+    """Deprecated — OTP محصور بالعمليات المالية فقط."""
+    raise HTTPException(
+        status_code=410,
+        detail={
+            "code": "OTP_LOGIN_DISABLED",
+            "message": "تم إيقاف OTP لتسجيل الدخول — استخدم POST /auth/login",
+        },
+    )
 
 
 @router.post("/auth/refresh")

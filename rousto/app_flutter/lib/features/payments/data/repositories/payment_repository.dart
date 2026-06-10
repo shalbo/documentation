@@ -45,6 +45,20 @@ class PaymentRepository {
     );
   }
 
+  Future<Map<String, dynamic>> generatePaymentOtp({
+    required String orderId,
+    double? amountLyd,
+  }) {
+    return _api.generatePaymentOtp(orderId: orderId, amountLyd: amountLyd);
+  }
+
+  Future<Map<String, dynamic>> verifyPaymentOtp({
+    required String orderId,
+    required String code,
+  }) {
+    return _api.verifyPaymentOtp(orderId: orderId, code: code);
+  }
+
   Future<Map<String, dynamic>> initiateSadad({
     required double amountLyd,
     required String orderType,

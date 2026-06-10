@@ -14,10 +14,61 @@ from app.permissions import AuthPrincipal, build_principal
 OTP_LENGTH = 6
 OTP_TTL_MINUTES = 5
 MAX_OTP_ATTEMPTS = 5
+PASSWORD_SALT = b"rousto_auth_v1"
 
 
 def _hash_value(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def hash_password(password: str) -> str:
+    digest = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        PASSWORD_SALT,
+        settings.password_pbkdf2_iterations,
+    )
+    return f"pbkdf2_sha256${settings.password_pbkdf2_iterations}${digest.hex()}"
+
+
+def verify_password(password: str, stored_hash: str | None) -> bool:
+    if not stored_hash:
+        return False
+    if stored_hash.startswith("pbkdf2_sha256$"):
+        parts = stored_hash.split("$")
+        if len(parts) != 3:
+            return False
+        try:
+            iterations = int(parts[1])
+        except ValueError:
+            return False
+        expected = hashlib.pbkdf2_hmac(
+            "sha256",
+            password.encode("utf-8"),
+            PASSWORD_SALT,
+            iterations,
+        ).hex()
+        return secrets.compare_digest(parts[2], expected)
+    return secrets.compare_digest(_hash_value(password), stored_hash)
+
+
+def authenticate_user(db: Session, phone: str, password: str) -> User:
+    normalized = _normalize_phone(phone)
+    user = db.scalar(
+        select(User).where(User.phone == normalized, User.is_active.is_(True))
+    )
+    if not user:
+        raise ValueError("رقم الجوال أو كلمة المرور غير صحيحة")
+    if not verify_password(password, user.password_hash):
+        raise ValueError("رقم الجوال أو كلمة المرور غير صحيحة")
+    return user
+
+
+def set_user_password(db: Session, user: User, password: str) -> None:
+    if len(password) < 6:
+        raise ValueError("كلمة المرور قصيرة جداً (6 أحرف على الأقل)")
+    user.password_hash = hash_password(password)
+    user.updated_at = datetime.now(timezone.utc)
 
 
 def _normalize_phone(phone: str) -> str:
