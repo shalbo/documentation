@@ -1,0 +1,57 @@
+name: Deploy Rousto to GitHub Pages
+
+# يبني واجهات روستو (الموقع + نموذج HTML + تطبيق Flutter للويب) وينشرها على فرع gh-pages.
+# التفعيل لمرّة واحدة: Settings → Pages → Source: "Deploy from a branch" → Branch: gh-pages / (root).
+
+on:
+  push:
+    branches:
+      - cursor/build-rousto-ui-db36
+    paths:
+      - "rousto/**"
+      - ".github/workflows/deploy-rousto-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rousto-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build Flutter web
+        working-directory: rousto/app_flutter
+        run: |
+          flutter pub get
+          flutter build web --release --base-href "/${GITHUB_REPOSITORY#*/}/flutter/"
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp rousto/index.html _site/index.html
+          cp -r rousto/brand _site/brand
+          cp -r rousto/web   _site/web
+          cp -r rousto/app   _site/app
+          cp -r rousto/app_flutter/build/web _site/flutter
+          touch _site/.nojekyll
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "deploy: rousto site (${{ github.sha }})"

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — محرك الشحن الهجين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>محرك الشحن الهجين</h1>
+      <p>توصيل محلي (GPS) · شحن بين المدن (تعرفة ثابتة)</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="index.html" class="btn btn-ghost-light">لوحة السوق</a>
+      <a href="logistics.html" class="btn btn-ghost-light">لوجستيات</a>
+      <button id="refreshBtn" class="btn btn-secondary">تحديث</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <div class="config-grid">
+        <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label>مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>تعرفة شحن بين المدن</h2>
+      <form id="rateForm" class="config-grid">
+        <div><label>مدينة المنشأ</label><input id="originCity" required placeholder="طرابلس" /></div>
+        <div><label>مدينة الوجهة</label><input id="destCity" required placeholder="مصراتة" /></div>
+        <div><label>التكلفة الثابتة (ر.س)</label><input id="flatFee" type="number" min="1" step="0.01" required /></div>
+        <div><label>شركة الشحن</label><input id="carrierName" required placeholder="ليبيا إكسبريس" /></div>
+        <div><label>slug الشركة</label><input id="carrierSlug" required placeholder="libya-express" /></div>
+        <div><label>أيام التسليم</label><input id="etaDays" type="number" min="1" value="2" /></div>
+        <div style="grid-column:1/-1"><button class="btn btn-primary" type="submit">إضافة تعرفة</button></div>
+      </form>
+      <table style="margin-top:16px">
+        <thead>
+          <tr><th>من</th><th>إلى</th><th>التكلفة</th><th>الناقل</th><th>ETA</th><th>الحالة</th></tr>
+        </thead>
+        <tbody id="ratesBody"><tr><td colspan="6" class="empty">تحديث</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>محاكاة عرض الشحن</h2>
+      <div class="config-grid">
+        <div><label>من</label><input id="quoteOrigin" value="الرياض" /></div>
+        <div><label>إلى</label><input id="quoteDest" value="جدة" /></div>
+      </div>
+      <button id="quoteBtn" class="btn btn-secondary" style="margin-top:10px">احسب العرض</button>
+      <pre id="quoteOut" style="margin-top:12px;background:var(--bg);padding:12px;border-radius:10px;font-size:.85rem"></pre>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/shipping-admin.js"></script>
+</body>
+</html>

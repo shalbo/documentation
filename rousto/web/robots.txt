@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /web/
+Disallow: /admin/
+Sitemap: https://rousto.com/web/sitemap.xml
