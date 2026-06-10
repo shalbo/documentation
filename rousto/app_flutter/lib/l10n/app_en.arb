@@ -1,0 +1,265 @@
+{
+  "@@locale": "en",
+  "appTitle": "Rousto",
+  "login": "Login",
+  "phoneNumber": "Phone Number",
+  "verificationCode": "Verification Code",
+  "devOtpHelper": "Development mode: {otp}",
+  "@devOtpHelper": {
+    "placeholders": {
+      "otp": {"type": "String"}
+    }
+  },
+  "codeSent": "Code sent",
+  "confirmLogin": "Confirm Login",
+  "sendCode": "Send Code",
+  "navHome": "Home",
+  "navOrders": "My Requests",
+  "navOffers": "Offers",
+  "navAccount": "Account",
+  "welcomeBack": "Welcome back 👋",
+  "guest": "Guest",
+  "searchService": "Search for a service…",
+  "activeService": "Active Service",
+  "service": "Service",
+  "popularServices": "Popular Services",
+  "viewAll": "View All",
+  "pricingPlans": "Pricing & Plans",
+  "pricingPlansSubtitle": "Individual · Family · Business — in Dinar",
+  "photoScan": "Photo Scan",
+  "photoScanSubtitle": "AI preliminary diagnosis",
+  "firstBookingDiscount": "First booking discount",
+  "useCode": "Use code {code}",
+  "@useCode": {
+    "placeholders": {
+      "code": {"type": "String"}
+    }
+  },
+  "promoPercent": "25%",
+  "demoMode": "Demo mode",
+  "noActiveBooking": "No active booking",
+  "refresh": "Refresh",
+  "trackService": "Tracking",
+  "messageTechnician": "Message Technician",
+  "distanceKm": "Distance {distance} km",
+  "@distanceKm": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "arrivesInMinutes": "Arrives in {minutes} min",
+  "@arrivesInMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "distanceWithEta": "Distance {distance} km · Arrives in {minutes} min",
+  "@distanceWithEta": {
+    "placeholders": {
+      "distance": {"type": "String"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "bookingStatusLine": "{serviceName} · {status}",
+  "@bookingStatusLine": {
+    "placeholders": {
+      "serviceName": {"type": "String"},
+      "status": {"type": "String"}
+    }
+  },
+  "offersAndSubscriptions": "Offers & Subscriptions",
+  "fullPricingPage": "Full Pricing Page",
+  "fullPricingSubtitle": "Plans · Packages · Service Prices",
+  "yourPointsBalance": "Your Points Balance",
+  "points": "points",
+  "point": "point",
+  "pointsDiscountInfo": "Enough for {discount} off — 100 points = {amount}",
+  "@pointsDiscountInfo": {
+    "placeholders": {
+      "discount": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "membershipPlans": "Membership Plans",
+  "maintenancePackages": "Maintenance Packages",
+  "redeemPoints": "Redeem Points",
+  "exclusiveOffers": "Exclusive Offers",
+  "free": "Free",
+  "subscribeNow": "Subscribe Now",
+  "yourCurrentPlan": "Your Current Plan",
+  "subscribedToPlan": "Subscribed to {planName} plan",
+  "@subscribedToPlan": {
+    "placeholders": {
+      "planName": {"type": "String"}
+    }
+  },
+  "subscribeFailed": "Subscription failed — demo mode",
+  "redeem": "Redeem",
+  "redeemFailed": "Redemption failed",
+  "visitsSave": "{visits} visits · Save {savings}",
+  "@visitsSave": {
+    "placeholders": {
+      "visits": {"type": "int"},
+      "savings": {"type": "String"}
+    }
+  },
+  "pointsCost": "{points} points",
+  "@pointsCost": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "confirmBooking": "Confirm Booking",
+  "yourVehicle": "Your Vehicle",
+  "appointment": "Appointment",
+  "slotSaturday": "Saturday",
+  "slotSunday9am": "Sunday 9 AM",
+  "slotMonday": "Monday",
+  "slotTuesday": "Tuesday",
+  "location": "Location",
+  "paymentMethod": "Payment Method",
+  "wallet": "Wallet",
+  "virtualCard": "Virtual card",
+  "serviceSummary": "Service",
+  "discountLabel": "Discount (ROUSTO)",
+  "total": "Total",
+  "paymentSplit": "Payment Split",
+  "confirmAndPay": "Confirm & Pay {amount}",
+  "@confirmAndPay": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "bookingConfirmed": "Booking confirmed!",
+  "bookingSavedLocally": "Booking saved locally",
+  "bookingConfirmedDetail": "The Rousto team will contact you to confirm details.",
+  "bookingSavedDetail": "Could not reach server — saved in demo mode.",
+  "ok": "OK",
+  "noServicesAvailable": "No services available",
+  "pricing": "Pricing",
+  "plansForEveryNeed": "Plans for every need",
+  "transparentPricing": "Transparent pricing in Dinar — updated from server",
+  "subscriptionPlans": "Subscription Plans",
+  "servicePrices": "Service Prices",
+  "whyRousto": "Why Rousto",
+  "aiScan": "Photo Scan",
+  "artificialIntelligence": "Artificial Intelligence",
+  "aiScanDescription": "Take a photo of the issue and get a preliminary diagnosis and suggested service",
+  "scanType": "Scan Type",
+  "noImageSelected": "No image selected yet",
+  "chooseImage": "Choose Image",
+  "analyzing": "Analyzing...",
+  "analyzeImage": "Analyze Image",
+  "scanResults": "Scan Results",
+  "analysisComplete": "Analysis complete",
+  "estimatedAccuracy": "Estimated accuracy {percent}%",
+  "@estimatedAccuracy": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
+  "severity": "Severity {level}",
+  "@severity": {
+    "placeholders": {
+      "level": {"type": "String"}
+    }
+  },
+  "severityHigh": "High",
+  "severityLow": "Low",
+  "severityMedium": "Medium",
+  "suggestedService": "Suggested Service",
+  "bookService": "Book {serviceName}",
+  "@bookService": {
+    "placeholders": {
+      "serviceName": {"type": "String"}
+    }
+  },
+  "notifications": "Notifications",
+  "markAllRead": "Mark all read",
+  "unreadCount": "{count} unread",
+  "@unreadCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noNotifications": "No notifications",
+  "notificationPreferences": "Notification Preferences",
+  "inApp": "In-app",
+  "push": "Push",
+  "savePreferences": "Save preferences",
+  "preferencesSaved": "Preferences saved",
+  "onboardingTitle": "Smart care for your car",
+  "onboardingSubtitle": "Book maintenance service in seconds and track it live from your phone with certified technicians.",
+  "getStarted": "Get Started",
+  "haveAccount": "Already have an account? ",
+  "settings": "Settings",
+  "settingsSubtitle": "Notifications and language",
+  "myVehicles": "My Vehicles",
+  "vehicleCount": "{count} vehicle(s)",
+  "@vehicleCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "orderHistory": "Order History",
+  "inventory": "Inventory",
+  "previousServicesCount": "{count} previous service(s)",
+  "@previousServicesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "paymentMethods": "Payment Methods",
+  "paymentMethodsSubtitle": "Mada, Apple Pay",
+  "addresses": "Addresses",
+  "addressesSubtitle": "Home, Work",
+  "rewards": "Rewards",
+  "loyaltyPointsAvailable": "{points} points available",
+  "@loyaltyPointsAvailable": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "supportAndSafety": "Support & Safety",
+  "supportSubtitle": "Support tickets and FAQ",
+  "serviceStat": "service",
+  "servicesStat": "services",
+  "vehicleStat": "vehicle",
+  "vehiclesStat": "vehicles",
+  "pointsStat": "points",
+  "savingsStat": "saved",
+  "membership": "Membership {plan}",
+  "@membership": {
+    "placeholders": {
+      "plan": {"type": "String"}
+    }
+  },
+  "membershipDiscount": " · {percent}% discount",
+  "@membershipDiscount": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
+  "language": "Language",
+  "arabic": "Arabic",
+  "english": "English",
+  "legal": "Legal",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "warrantyPolicy": "Warranty Policy",
+  "connectionError": "Connection error",
+  "connectionErrorWithCode": "Connection error ({code})",
+  "@connectionErrorWithCode": {
+    "placeholders": {
+      "code": {"type": "int"}
+    }
+  },
+  "towingRequest": "Towing Request",
+  "privacyContent": "Rousto Privacy Policy\n\nWe collect your phone number, vehicle information, and service history to provide automotive care services. Your data is encrypted in transit and stored securely. We do not sell personal data to third parties. Location data is used only during active service tracking. You may request data deletion by contacting support.\n\nContact: privacy@rousto.com",
+  "termsContent": "Rousto Terms of Service\n\nBy using Rousto you agree to book services at listed prices, provide accurate vehicle information, and allow technicians access to perform requested work. Cancellations within 2 hours of appointment may incur a fee. Rousto acts as a platform connecting you with certified automotive service providers. Disputes are handled through in-app support.\n\nContact: legal@rousto.com",
+  "warrantyContent": "Rousto Service Warranty\n\nServices booked through Rousto include a 7-day workmanship warranty on maintenance and repair work performed by certified technicians. Parts warranty follows manufacturer terms. Towing and emergency services are covered for the duration of the service session. To file a warranty claim, open a support ticket in the app with your booking reference.\n\nContact: warranty@rousto.com",
+  "privacyContentAr": "سياسة الخصوصية — روستو\n\nنجمع رقم جوالك ومعلومات مركبتك وسجل الخدمات لتقديم خدمات العناية بالسيارات. بياناتك مشفّرة أثناء النقل ومخزّنة بأمان. لا نبيع البيانات الشخصية لأطراف ثالثة. بيانات الموقع تُستخدم فقط أثناء تتبّع الخدمة النشطة. يمكنك طلب حذف البيانات عبر الدعم.\n\nالتواصل: privacy@rousto.com",
+  "termsContentAr": "شروط الخدمة — روستو\n\nباستخدام روستو فإنك توافق على حجز الخدمات بالأسعار المعلنة وتقديم معلومات دقيقة عن مركبتك والسماح للفنيين بإنجاز العمل المطلوب. الإلغاء خلال ساعتين من الموعد قد يترتب عليه رسوم. روستو منصة تربطك بمقدّمي خدمات سيارات معتمدين. النزاعات تُعالج عبر دعم التطبيق.\n\nالتواصل: legal@rousto.com",
+  "warrantyContentAr": "ضمان الخدمة — روستو\n\nالخدمات المحجوزة عبر روستو تشمل ضمان إنجاز لمدة 7 أيام على أعمال الصيانة والإصلاح التي ينفّذها فنيون معتمدون. ضمان القطع يتبع شروط الشركة المصنّعة. السحب والخدمات الطارئة مغطاة طوال جلسة الخدمة. لرفع مطالبة ضمان، افتح تذكرة دعم في التطبيق مع رقم الحجز.\n\nالتواصل: warranty@rousto.com",
+  "unknownInitial": "?"
+}
