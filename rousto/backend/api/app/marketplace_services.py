@@ -15,8 +15,9 @@ from app.models import (
     Promotion,
     Vendor,
 )
+from app.category_services import get_category_tree, list_root_categories
 from app.fitment_services import part_ids_for_car_year
-from app.parts_services import list_part_categories, part_out
+from app.parts_services import part_out
 
 DEFAULT_LAT = 24.7136
 DEFAULT_LNG = 46.6753
@@ -89,7 +90,8 @@ def get_marketplace_home(
     ).all()
 
     return {
-        "categories": list_part_categories(db, locale),
+        "categories": list_root_categories(db, locale),
+        "category_tree": get_category_tree(db, locale),
         "featured_parts": list_featured_parts(db, locale, car_year_id=car_year_id),
         "featured_vendors": list_featured_vendors(db, locale),
         "promotions": [

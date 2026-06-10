@@ -952,7 +952,17 @@ class PartCategory(Base):
     name_ar: Mapped[str] = mapped_column(String(120))
     name_en: Mapped[str | None] = mapped_column(String(120))
     sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("part_categories.id")
+    )
+    icon_key: Mapped[str | None] = mapped_column(String(40))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    parent: Mapped["PartCategory | None"] = relationship(
+        remote_side="PartCategory.id",
+        back_populates="children",
+    )
+    children: Mapped[list["PartCategory"]] = relationship(back_populates="parent")
 
 
 class Part(Base):
@@ -1054,7 +1064,7 @@ class CarYear(Base):
     year: Mapped[int] = mapped_column(SmallInteger)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    model: Mapped["CarModel"] = relationship()
+    model: Mapped["CarModel"] = relationship(back_populates="years")
 
 
 class PartVehicleCompatibility(Base):

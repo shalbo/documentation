@@ -9,12 +9,16 @@ class PartsScreen extends StatefulWidget {
   final String? initialQuery;
   final String? initialCategory;
   final String? initialCarYearId;
+  final String? initialCategoryId;
+  final String? categoryLabel;
 
   const PartsScreen({
     super.key,
     this.initialQuery,
     this.initialCategory,
     this.initialCarYearId,
+    this.initialCategoryId,
+    this.categoryLabel,
   });
 
   @override
@@ -41,7 +45,8 @@ class _PartsScreenState extends State<PartsScreen> {
     _carYearId = widget.initialCarYearId;
     if (_query.text.length >= 2 ||
         _selectedCategory != null ||
-        _carYearId != null) {
+        _carYearId != null ||
+        widget.initialCategoryId != null) {
       _search();
     }
   }
@@ -59,6 +64,7 @@ class _PartsScreenState extends State<PartsScreen> {
     if (q.length < 2 &&
         _selectedCategory == null &&
         _carYearId == null &&
+        widget.initialCategoryId == null &&
         !isOem &&
         !isVin) return;
     setState(() {
@@ -69,6 +75,7 @@ class _PartsScreenState extends State<PartsScreen> {
       final results = await _repository.searchParts(
         query: q.isNotEmpty && !isOem && !isVin ? q : null,
         category: _selectedCategory,
+        categoryId: widget.initialCategoryId,
         carYearId: _carYearId,
         oem: isOem ? q.toUpperCase() : null,
         vin: isVin && q.length >= 11 ? q.toUpperCase() : null,
@@ -89,7 +96,9 @@ class _PartsScreenState extends State<PartsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('بحث قطع الغيار')),
+      appBar: AppBar(
+        title: Text(widget.categoryLabel ?? 'بحث قطع الغيار'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

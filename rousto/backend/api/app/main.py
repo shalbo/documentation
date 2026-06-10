@@ -30,6 +30,7 @@ from app.routers import (
     marketing,
     monetization,
     notifications,
+    part_categories,
     parts,
     profile,
     promotions,
@@ -40,6 +41,7 @@ from app.routers import (
     testimonials,
     towing_dispatch,
     vendor_map,
+    vendor_parts,
     vendors,
 )
 
@@ -88,6 +90,7 @@ app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)
+app.include_router(part_categories.router, prefix=prefix)
 app.include_router(parts.router, prefix=prefix)
 app.include_router(marketplace.router, prefix=prefix)
 app.include_router(fitment.router, prefix=prefix)
@@ -100,6 +103,7 @@ app.include_router(testimonials.router, prefix=prefix)
 app.include_router(monetization.router, prefix=prefix)
 app.include_router(split_payments.router, prefix=prefix)
 app.include_router(vendors.router, prefix=prefix)
+app.include_router(vendor_parts.router, prefix=prefix)
 app.include_router(vendor_map.router, prefix=prefix)
 app.include_router(towing_dispatch.router, prefix=prefix)
 app.include_router(support.router, prefix=prefix)

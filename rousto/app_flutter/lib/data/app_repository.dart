@@ -22,6 +22,7 @@ class AppRepository {
   Future<List<PartListingModel>> searchParts({
     String? query,
     String? category,
+    String? categoryId,
     String? carYearId,
     String? oem,
     String? vin,
@@ -31,6 +32,7 @@ class AppRepository {
       final data = await _api.searchParts(
         query: query,
         category: category,
+        categoryId: categoryId,
         carYearId: carYearId,
         oem: oem,
         vin: vin,

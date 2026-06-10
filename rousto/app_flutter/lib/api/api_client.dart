@@ -127,9 +127,25 @@ class ApiClient {
     return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
   }
 
+  Future<List<Map<String, dynamic>>> getCategoryRoots() async {
+    final body = await _get('/parts/categories/roots');
+    return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
+
+  Future<List<Map<String, dynamic>>> getCategoryChildren(String parentId) async {
+    final response = await _client.get(
+      _uri('/parts/categories/$parentId/children'),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
+
   Future<List<dynamic>> searchParts({
     String? query,
     String? category,
+    String? categoryId,
     String? carYearId,
     String? oem,
     String? vin,
@@ -140,6 +156,7 @@ class ApiClient {
     final params = <String, String>{
       if (query != null && query.isNotEmpty) 'q': query,
       if (category != null && category.isNotEmpty) 'category': category,
+      if (categoryId != null && categoryId.isNotEmpty) 'category_id': categoryId,
       if (carYearId != null && carYearId.isNotEmpty) 'car_year_id': carYearId,
       if (oem != null && oem.isNotEmpty) 'oem': oem,
       if (vin != null && vin.isNotEmpty) 'vin': vin,
@@ -148,6 +165,7 @@ class ApiClient {
       'limit': '$limit',
     };
     final hasFilter = params.containsKey('car_year_id') ||
+        params.containsKey('category_id') ||
         params.containsKey('q') ||
         params.containsKey('category') ||
         params.containsKey('oem') ||

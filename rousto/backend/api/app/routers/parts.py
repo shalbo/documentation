@@ -40,6 +40,7 @@ def search_parts_catalog(
     request: Request,
     q: str | None = Query(default=None, max_length=80),
     category: str | None = Query(default=None),
+    category_id: UUID | None = Query(default=None),
     make: str | None = Query(default=None, max_length=40),
     model: str | None = Query(default=None, max_length=40),
     car_year_id: UUID | None = Query(default=None),
@@ -51,7 +52,7 @@ def search_parts_catalog(
     locale: str = Depends(resolve_locale),
     db: Session = Depends(get_db),
 ):
-    if not any([q, category, make, model, car_year_id, oem, vin]):
+    if not any([q, category, category_id, make, model, car_year_id, oem, vin]):
         raise HTTPException(
             status_code=400,
             detail={
@@ -64,6 +65,7 @@ def search_parts_catalog(
         db,
         query=q,
         category=category,
+        category_id=category_id,
         make=make,
         model=model,
         car_year_id=car_year_id,

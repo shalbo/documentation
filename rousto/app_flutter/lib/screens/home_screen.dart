@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../widgets/common.dart';
 import '../widgets/vehicle_selector.dart';
 import 'booking_screen.dart';
+import 'catalog_screen.dart';
 import 'parts_screen.dart';
 import 'tracking_screen.dart';
 
@@ -48,6 +49,44 @@ class HomeScreen extends StatelessWidget {
                     0,
                   ),
                   child: _partCategories(state),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const CatalogScreen()),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.line),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.grid_view_rounded, color: AppColors.red),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('تصفح الكتالوج',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15)),
+                                Text('أقسام رئيسية ← فرعية ← قطع متوافقة',
+                                    style: TextStyle(
+                                        color: AppColors.ink500,
+                                        fontSize: 11)),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_left, color: AppColors.ink300),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),

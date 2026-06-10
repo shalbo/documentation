@@ -7,6 +7,7 @@ from typing import Any
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, joinedload
 
+from app.category_services import collect_filter_category_ids, is_leaf_category
 from app.fitment_services import part_ids_for_car_year
 from app.i18n import pick_localized
 from app.models import (
@@ -105,6 +106,7 @@ def search_parts(
     *,
     query: str | None = None,
     category: str | None = None,
+    category_id: uuid.UUID | None = None,
     make: str | None = None,
     model: str | None = None,
     car_year_id: uuid.UUID | None = None,
@@ -121,7 +123,12 @@ def search_parts(
         .where(Part.is_active.is_(True))
     )
 
-    if category:
+    if category_id:
+        filter_ids = collect_filter_category_ids(db, category_id)
+        if not filter_ids:
+            return []
+        stmt = stmt.where(Part.category_id.in_(filter_ids))
+    elif category:
         stmt = stmt.join(PartCategory).where(PartCategory.slug == category)
 
     if oem_only:
@@ -366,7 +373,10 @@ def create_part(
     vehicle_compatibility: list | None = None,
     oem_number: str | None = None,
     vin_prefix: str | None = None,
+    require_leaf_category: bool = False,
 ) -> Part:
+    if require_leaf_category and not is_leaf_category(db, category_id):
+        raise ValueError("يجب اختيار قسم فرعي قبل حفظ القطعة")
     part = Part(
         id=uuid.uuid4(),
         part_number=part_number.strip(),
