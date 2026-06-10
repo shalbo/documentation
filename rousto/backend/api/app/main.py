@@ -49,6 +49,7 @@ from app.routers import (
     vendor_parts,
     vendor_subscription,
     vendor_wallet,
+    vendor_staff,
     libyan_payments,
     payment_webhooks,
     payment_otp,
@@ -124,6 +125,7 @@ app.include_router(vendors.router, prefix=prefix)
 app.include_router(vendor_parts.router, prefix=prefix)
 app.include_router(vendor_subscription.router, prefix=prefix)
 app.include_router(vendor_wallet.router, prefix=prefix)
+app.include_router(vendor_staff.router, prefix=prefix)
 app.include_router(libyan_payments.router, prefix=prefix)
 app.include_router(payment_otp.router, prefix=prefix)
 app.include_router(payment_webhooks.router, prefix=prefix)

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.deps import get_current_vendor, require_admin_key
+from app.vendor_staff_rbac import require_wallet_access
 from app.models import Vendor
 from app.schemas import (
     VendorApplicationIn,
@@ -91,6 +92,7 @@ def patch_vendor_status_toggle(
 def update_vendor_profile_financials(
     body: VendorFinancialsUpdateIn,
     vendor: Vendor = Depends(get_current_vendor),
+    _: None = Depends(require_wallet_access),
     db: Session = Depends(get_db),
 ):
     try:
@@ -116,6 +118,7 @@ def update_vendor_profile_financials(
 @router.get("/vendor/me/payouts")
 def get_vendor_payouts(
     vendor: Vendor = Depends(get_current_vendor),
+    _: None = Depends(require_wallet_access),
     db: Session = Depends(get_db),
 ):
     try:

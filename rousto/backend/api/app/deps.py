@@ -9,8 +9,9 @@ from app.config import settings
 from app.db import get_db
 from app.rate_limit import check_rate_limit
 from app.security_audit import audit_security_event
-from app.models import User, UserVendorLink, Vendor
-from app.permissions import ROLE_ADMIN, AuthPrincipal, build_principal
+from app.models import User, UserVendorLink, Vendor, VendorStaff
+from app.permissions import ROLE_ADMIN, AuthPrincipal, build_principal, build_staff_principal
+from app.vendor_staff_services import get_active_staff
 
 
 def _user_from_id(db: Session, user_id: str) -> User:
@@ -29,6 +30,23 @@ def _user_from_id(db: Session, user_id: str) -> User:
             detail={"code": "UNAUTHORIZED", "message": "المستخدم غير موجود أو غير نشط"},
         )
     return user
+
+
+def _staff_from_token(db: Session, staff_id: str) -> VendorStaff:
+    try:
+        staff_uuid = uuid.UUID(staff_id)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "INVALID_STAFF_ID", "message": "معرّف الموظف غير صالح"},
+        ) from exc
+    try:
+        return get_active_staff(db, staff_uuid)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "STAFF_INACTIVE", "message": str(exc)},
+        ) from exc
 
 
 def _verify_vendor_link(db: Session, user_id: uuid.UUID, vendor_id: uuid.UUID) -> Vendor:
@@ -52,6 +70,16 @@ def _verify_vendor_link(db: Session, user_id: uuid.UUID, vendor_id: uuid.UUID) -
     return vendor
 
 
+def _vendor_for_staff(db: Session, staff: VendorStaff) -> Vendor:
+    vendor = db.get(Vendor, staff.vendor_id)
+    if not vendor:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "UNAUTHORIZED", "message": "المحل غير موجود"},
+        )
+    return vendor
+
+
 def get_current_principal(
     request: Request,
     authorization: str | None = Header(default=None),
@@ -62,11 +90,19 @@ def get_current_principal(
         token = authorization.split(" ", 1)[1].strip()
         try:
             payload = decode_access_token(token)
+            if payload.get("actor_type") == "vendor_staff":
+                staff = _staff_from_token(db, payload["sub"])
+                principal = build_staff_principal(staff)
+                if payload.get("vendor_id"):
+                    principal.vendor_id = uuid.UUID(payload["vendor_id"])
+                return principal
             user = _user_from_id(db, payload["sub"])
             principal = build_principal(db, user, auth_method="jwt")
             if payload.get("vendor_id") and not principal.vendor_id:
                 principal.vendor_id = uuid.UUID(payload["vendor_id"])
             return principal
+        except HTTPException:
+            raise
         except ValueError as exc:
             audit_security_event(
                 db,
@@ -111,6 +147,11 @@ def get_current_principal(
 def get_current_user(
     principal: AuthPrincipal = Depends(get_current_principal),
 ) -> User:
+    if principal.is_staff or not principal.user:
+        raise HTTPException(
+            status_code=403,
+            detail={"code": "STAFF_ACCOUNT", "message": "حساب موظف — استخدم واجهة التاجر"},
+        )
     return principal.user
 
 
@@ -133,12 +174,14 @@ def require_admin_key(
         token = authorization.split(" ", 1)[1].strip()
         try:
             payload = decode_access_token(token)
+            if payload.get("actor_type") == "vendor_staff":
+                raise ValueError("staff not admin")
             if ROLE_ADMIN in payload.get("roles", []):
                 user = _user_from_id(db, payload["sub"])
                 principal = build_principal(db, user, auth_method="jwt")
                 if principal.has_role(ROLE_ADMIN):
                     return
-        except ValueError:
+        except (ValueError, HTTPException):
             pass
 
     audit_security_event(
@@ -191,6 +234,9 @@ def get_current_vendor(
         token = authorization.split(" ", 1)[1].strip()
         try:
             payload = decode_access_token(token)
+            if payload.get("actor_type") == "vendor_staff":
+                staff = _staff_from_token(db, payload["sub"])
+                return _vendor_for_staff(db, staff)
             user = _user_from_id(db, payload["sub"])
             vendor_claim = payload.get("vendor_id")
             if vendor_claim:
@@ -198,6 +244,8 @@ def get_current_vendor(
             principal = build_principal(db, user, auth_method="jwt")
             if principal.vendor_id:
                 return _verify_vendor_link(db, user.id, principal.vendor_id)
+        except HTTPException:
+            raise
         except ValueError as exc:
             raise HTTPException(
                 status_code=401,

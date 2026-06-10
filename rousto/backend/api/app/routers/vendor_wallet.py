@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.deps import get_current_vendor
+from app.vendor_staff_rbac import require_wallet_access
 from app.models import Vendor, WalletTransaction, WithdrawalRequest
 from app.api_responses import success
 from app.service_layer.payments import (
@@ -41,6 +42,7 @@ def _tx_out_full(tx: WalletTransaction) -> dict:
 @router.get("")
 def vendor_wallet_summary(
     vendor: Vendor = Depends(get_current_vendor),
+    _: None = Depends(require_wallet_access),
     db: Session = Depends(get_db),
 ):
     wallet = get_or_create_wallet(db, owner_type="vendor", owner_id=vendor.id)
@@ -64,6 +66,7 @@ def vendor_wallet_summary(
 def vendor_request_withdrawal(
     body: WithdrawalIn,
     vendor: Vendor = Depends(get_current_vendor),
+    _: None = Depends(require_wallet_access),
     db: Session = Depends(get_db),
 ):
     try:

@@ -8,10 +8,12 @@ from sqlalchemy.orm import Session
 from app.auth_services import (
     assign_user_roles,
     authenticate_user,
+    issue_staff_tokens,
     issue_tokens,
     refresh_access_token,
     revoke_refresh_token,
 )
+from app.vendor_staff_services import authenticate_vendor_staff
 from app.config import settings
 from app.db import get_db
 from app.deps import get_current_principal, require_admin_key
@@ -54,8 +56,12 @@ class AssignRolesIn(BaseModel):
 def login_with_password(body: LoginIn, request: Request, db: Session = Depends(get_db)):
     check_rate_limit(request, suffix=f"auth-login:{body.phone}")
     try:
-        user = authenticate_user(db, body.phone, body.password)
-        tokens = issue_tokens(db, user)
+        try:
+            user = authenticate_user(db, body.phone, body.password)
+            tokens = issue_tokens(db, user)
+        except ValueError:
+            staff = authenticate_vendor_staff(db, body.phone, body.password)
+            tokens = issue_staff_tokens(db, staff)
         db.commit()
         return {"data": tokens}
     except ValueError as exc:

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — إدارة الموظفين</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    :root { --sidebar-w: 240px; }
+    body { margin: 0; display: flex; min-height: 100vh; background: var(--bg); }
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #003049;
+      color: #fff;
+      padding: 24px 16px;
+      flex-shrink: 0;
+    }
+    .sidebar h2 { font-size: 1.1rem; margin: 0 0 6px; }
+    .sidebar p { font-size: .78rem; opacity: .75; margin: 0 0 20px; }
+    .sidebar a {
+      display: block;
+      color: rgba(255,255,255,.9);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: .9rem;
+    }
+    .sidebar a:hover { background: rgba(255,255,255,.08); }
+    .sidebar a.active { background: #C1121F; color: #fff; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .page-header {
+      background: #003049;
+      color: #fff;
+      padding: 18px 28px;
+    }
+    .page-header h1 { margin: 0; font-size: 1.35rem; }
+    .page-header p { margin: 6px 0 0; opacity: .8; font-size: .85rem; }
+    .content { padding: 24px 28px; }
+    .staff-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .staff-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .staff-table th {
+      text-align: right;
+      padding: 12px 10px;
+      background: #003049;
+      color: #fff;
+      font-size: .82rem;
+    }
+    .staff-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: .88rem;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+      background: #E8EEF2;
+      color: #003049;
+    }
+    .role-badge.manager { background: #FCE8EA; color: #C1121F; }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      display: inline-block;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle span {
+      position: absolute;
+      inset: 0;
+      background: #ccc;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: .2s;
+    }
+    .toggle span::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .2s;
+    }
+    .toggle input:checked + span { background: #C1121F; }
+    .toggle input:checked + span::before { transform: translateX(20px); }
+    .btn-danger { background: #C1121F; color: #fff; border: none; }
+    .btn-navy { background: #003049; color: #fff; border: none; }
+    .config-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>بوابة التاجر</h2>
+    <p>روستو — إدارة المحل</p>
+    <a href="vendor-products.html">مخزون القطع</a>
+    <a href="vendor-wallet.html">المحفظة</a>
+    <a href="vendor-staff.html" class="active">إدارة الموظفين</a>
+    <a href="vendor-subscription.html">الاشتراك</a>
+    <a href="index.html">لوحة الإدارة</a>
+  </aside>
+
+  <div class="main">
+    <header class="page-header">
+      <h1>إدارة الموظفين</h1>
+      <p>حسابات فرعية للتجار والورش — أدوار وصلاحيات محددة</p>
+    </header>
+
+    <div class="content">
+      <section class="card">
+        <h2>إعدادات الاتصال</h2>
+        <div class="config-row">
+          <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+          <div><label>معرّف المحل (Vendor ID)</label><input id="vendorId" placeholder="v000..." /></div>
+          <div><label>رمز الدخول (JWT)</label><input id="accessToken" type="password" placeholder="Bearer token للتاجر/المدير" /></div>
+        </div>
+        <button id="saveConfigBtn" class="btn btn-secondary">حفظ الإعدادات</button>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <h2>إضافة موظف جديد</h2>
+        <form id="staffForm" class="staff-form">
+          <div>
+            <label>الاسم</label>
+            <input id="staffName" required minlength="2" placeholder="أحمد محمد" />
+          </div>
+          <div>
+            <label>الهاتف</label>
+            <input id="staffPhone" required placeholder="+2189..." />
+          </div>
+          <div>
+            <label>كلمة المرور</label>
+            <input id="staffPassword" type="password" required minlength="6" />
+          </div>
+          <div>
+            <label>الدور</label>
+            <select id="staffRole" required>
+              <option value="manager">مدير (Manager)</option>
+              <option value="sales">مبيعات (Sales)</option>
+              <option value="accountant">محاسب (Accountant)</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-navy">إضافة الموظف</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <h2>الموظفون الحاليون <button id="refreshBtn" class="btn btn-secondary">تحديث</button></h2>
+        <div id="staffTableWrap">
+          <p class="empty">جاري التحميل…</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/vendor-staff.js"></script>
+</body>
+</html>
