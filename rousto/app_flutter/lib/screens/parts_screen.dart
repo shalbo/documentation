@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../api/api_client.dart';
-import '../config/app_config.dart';
+import '../data/app_repository.dart';
+import '../data/models.dart';
 import '../theme/app_colors.dart';
+import '../currency.dart';
 
 class PartsScreen extends StatefulWidget {
-  const PartsScreen({super.key});
+  final String? initialQuery;
+  final String? initialCategory;
+
+  const PartsScreen({super.key, this.initialQuery, this.initialCategory});
 
   @override
   State<PartsScreen> createState() => _PartsScreenState();
@@ -13,22 +17,44 @@ class PartsScreen extends StatefulWidget {
 
 class _PartsScreenState extends State<PartsScreen> {
   final _query = TextEditingController();
-  List<Map<String, dynamic>> _results = [];
+  final _repository = AppRepository();
+  List<PartListingModel> _results = [];
   bool _loading = false;
   String? _error;
+  String? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialQuery != null) {
+      _query.text = widget.initialQuery!;
+    }
+    _selectedCategory = widget.initialCategory;
+    if (_query.text.length >= 2 || _selectedCategory != null) {
+      _search();
+    }
+  }
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
 
   Future<void> _search() async {
     final q = _query.text.trim();
-    if (q.length < 2) return;
+    if (q.length < 2 && _selectedCategory == null) return;
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final client = ApiClient(baseUrl: AppConfig.apiBaseUrl);
-      final res = await client.get('/parts/search?q=${Uri.encodeComponent(q)}');
+      final results = await _repository.searchParts(
+        query: q.isNotEmpty ? q : null,
+        category: _selectedCategory,
+      );
       setState(() {
-        _results = List<Map<String, dynamic>>.from(res['data'] ?? []);
+        _results = results;
         _loading = false;
       });
     } catch (e) {
@@ -42,7 +68,7 @@ class _PartsScreenState extends State<PartsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('قطع الغيار')),
+      appBar: AppBar(title: const Text('بحث قطع الغيار')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -50,7 +76,7 @@ class _PartsScreenState extends State<PartsScreen> {
             TextField(
               controller: _query,
               decoration: InputDecoration(
-                hintText: 'ابحث برقم القطعة أو الاسم…',
+                hintText: 'رقم القطعة OEM أو اسم القطعة أو ماركة السيارة…',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.arrow_forward),
@@ -66,26 +92,37 @@ class _PartsScreenState extends State<PartsScreen> {
                 child: Text(_error!, style: const TextStyle(color: Colors.red)),
               ),
             Expanded(
-              child: ListView.builder(
-                itemCount: _results.length,
-                itemBuilder: (context, i) {
-                  final p = _results[i];
-                  return Card(
-                    margin: const EdgeInsets.only(top: 8),
-                    child: ListTile(
-                      title: Text(p['name']?.toString() ?? p['name_ar']?.toString() ?? ''),
-                      subtitle: Text(p['part_number']?.toString() ?? ''),
-                      trailing: Text(
-                        '${p['price_sar']} ر.س',
-                        style: const TextStyle(
-                          color: AppColors.red,
-                          fontWeight: FontWeight.w700,
-                        ),
+              child: _results.isEmpty && !_loading
+                  ? const Center(
+                      child: Text(
+                        'ابحث برقم القطعة أو اختر تصنيفاً',
+                        style: TextStyle(color: AppColors.ink500),
                       ),
+                    )
+                  : ListView.builder(
+                      itemCount: _results.length,
+                      itemBuilder: (context, i) {
+                        final p = _results[i];
+                        return Card(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: ListTile(
+                            leading: p.isOem
+                                ? const Icon(Icons.verified_outlined,
+                                    color: AppColors.red)
+                                : const Icon(Icons.inventory_2_outlined),
+                            title: Text(p.nameAr),
+                            subtitle: Text(p.partNumber),
+                            trailing: Text(
+                              formatAmount(p.priceSar),
+                              style: const TextStyle(
+                                color: AppColors.red,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

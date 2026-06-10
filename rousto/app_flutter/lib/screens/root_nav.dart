@@ -52,10 +52,11 @@ class _RootNavState extends State<RootNav> {
         ),
         child: FloatingActionButton(
           onPressed: _openBooking,
+          tooltip: 'حجز ورشة أو ساحبة',
           backgroundColor: AppColors.red,
           elevation: 0,
           shape: const CircleBorder(),
-          child: const Icon(Icons.add, color: Colors.white, size: 30),
+          child: const Icon(Icons.handyman, color: Colors.white, size: 28),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -68,7 +69,7 @@ class _RootNavState extends State<RootNav> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _tab(0, Icons.home_filled, l10n.navHome),
+            _tab(0, Icons.storefront_outlined, 'السوق'),
             _tab(1, Icons.receipt_long_outlined, l10n.navOrders),
             const SizedBox(width: 48),
             _tab(2, Icons.card_giftcard_outlined, l10n.navOffers),

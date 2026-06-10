@@ -15,26 +15,37 @@ class AppState extends ChangeNotifier {
   bool usingMockData = false;
 
   UserModel? user;
-  List<CategoryModel> categories = [];
+  MarketplaceHomeModel? marketplace;
   BookingModel? activeBooking;
-  List<PromotionModel> promotions = [];
   int loyaltyPoints = 0;
   List<MembershipPlanModel> membershipPlans = [];
   List<ServicePackageModel> servicePackages = [];
   List<LoyaltyRewardModel> loyaltyRewards = [];
   MonetizationSummary? monetization;
 
-  List<ServiceModel> get currentServices {
-    if (categories.isEmpty) return [];
-    final index = _categoryIndex.clamp(0, categories.length - 1);
-    return categories[index].services;
+  // Legacy service catalog — loaded lazily for booking flows only
+  List<CategoryModel> serviceCategories = [];
+
+  int _partCategoryIndex = 0;
+  int get partCategoryIndex => _partCategoryIndex;
+
+  List<PartCategoryModel> get partCategories => marketplace?.categories ?? [];
+
+  List<PartListingModel> get visibleParts {
+    final parts = marketplace?.featuredParts ?? [];
+    if (partCategories.isEmpty) return parts;
+    final idx = _partCategoryIndex.clamp(0, partCategories.length - 1);
+    final slug = partCategories[idx].slug;
+    return parts.where((p) => p.categorySlug == slug).toList();
   }
 
-  int _categoryIndex = 0;
-  int get categoryIndex => _categoryIndex;
+  List<MarketplaceVendorModel> get featuredVendors =>
+      marketplace?.featuredVendors ?? [];
 
-  void selectCategory(int index) {
-    _categoryIndex = index;
+  List<PromotionModel> get promotions => marketplace?.promotions ?? [];
+
+  void selectPartCategory(int index) {
+    _partCategoryIndex = index;
     notifyListeners();
   }
 
@@ -44,10 +55,9 @@ class AppState extends ChangeNotifier {
 
     final apiLive = await _repository.isApiAvailable();
     final results = await Future.wait([
-      _repository.loadCategories(),
+      _repository.loadMarketplaceHome(),
       _repository.loadUser(),
       _repository.loadActiveBooking(),
-      _repository.loadPromotions(),
       _repository.loadLoyaltyBalance(),
       _repository.loadMembershipPlans(),
       _repository.loadServicePackages(),
@@ -55,19 +65,24 @@ class AppState extends ChangeNotifier {
       _repository.loadMonetizationSummary(),
     ]);
 
-    categories = results[0] as List<CategoryModel>;
+    marketplace = results[0] as MarketplaceHomeModel;
     user = results[1] as UserModel;
     activeBooking = results[2] as BookingModel?;
-    promotions = results[3] as List<PromotionModel>;
-    loyaltyPoints = results[4] as int;
-    membershipPlans = results[5] as List<MembershipPlanModel>;
-    servicePackages = results[6] as List<ServicePackageModel>;
-    loyaltyRewards = results[7] as List<LoyaltyRewardModel>;
-    monetization = results[8] as MonetizationSummary;
+    loyaltyPoints = results[3] as int;
+    membershipPlans = results[4] as List<MembershipPlanModel>;
+    servicePackages = results[5] as List<ServicePackageModel>;
+    loyaltyRewards = results[6] as List<LoyaltyRewardModel>;
+    monetization = results[7] as MonetizationSummary;
     usingMockData = !apiLive;
     loading = false;
     notifyListeners();
     await PushNotifications.instance.registerWithBackend(_repository.api);
+  }
+
+  Future<void> ensureServiceCatalog() async {
+    if (serviceCategories.isNotEmpty) return;
+    serviceCategories = await _repository.loadCategories();
+    notifyListeners();
   }
 
   Future<void> refreshActiveBooking() async {

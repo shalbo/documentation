@@ -10,6 +10,41 @@ class AppRepository {
 
   Future<bool> isApiAvailable() => _api.ping();
 
+  Future<MarketplaceHomeModel> loadMarketplaceHome() async {
+    try {
+      final data = await _api.getMarketplaceHome();
+      return MarketplaceHomeModel.fromJson(data);
+    } catch (_) {
+      return MockData.marketplaceHome;
+    }
+  }
+
+  Future<List<PartListingModel>> searchParts({
+    String? query,
+    String? category,
+  }) async {
+    try {
+      final data = await _api.searchParts(query: query, category: category);
+      return data
+          .map((e) => PartListingModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      var parts = MockData.marketplaceHome.featuredParts;
+      if (category != null) {
+        parts = parts.where((p) => p.categorySlug == category).toList();
+      }
+      if (query != null && query.isNotEmpty) {
+        final q = query.toLowerCase();
+        parts = parts
+            .where((p) =>
+                p.nameAr.contains(q) ||
+                p.partNumber.toLowerCase().contains(q))
+            .toList();
+      }
+      return parts;
+    }
+  }
+
   Future<List<CategoryModel>> loadCategories() async {
     try {
       final data = await _api.getCategoriesTree();

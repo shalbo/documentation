@@ -38,6 +38,8 @@ class _BookingScreenState extends State<BookingScreen> {
         l10n.slotTuesday,
       ];
 
+  ServiceModel? _fallbackService;
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +47,17 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _load() async {
-    final service = widget.service;
+    if (widget.service == null) {
+      final state = context.read<AppState>();
+      await state.ensureServiceCatalog();
+      for (final cat in state.serviceCategories) {
+        if (cat.services.isNotEmpty) {
+          _fallbackService = cat.services.first;
+          break;
+        }
+      }
+    }
+    final service = widget.service ?? _fallbackService;
     final price = service?.priceSar ?? 120.0;
     final contextData = await _repository.loadBookingContext();
     final promo = await _repository.validatePromo('ROUSTO', price);
@@ -63,11 +75,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
   ServiceModel get _service {
     if (widget.service != null) return widget.service!;
-    final state = context.read<AppState>();
-    if (state.currentServices.isNotEmpty) return state.currentServices.first;
-    if (state.categories.isNotEmpty && state.categories.first.services.isNotEmpty) {
-      return state.categories.first.services.first;
-    }
+    if (_fallbackService != null) return _fallbackService!;
     throw StateError(AppLocalizations.of(context)!.noServicesAvailable);
   }
 

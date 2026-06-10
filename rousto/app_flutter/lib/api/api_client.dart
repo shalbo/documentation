@@ -91,6 +91,40 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> getMarketplaceHome() async {
+    final body = await _get('/marketplace/home');
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<List<dynamic>> searchParts({
+    String? query,
+    String? category,
+    bool oemOnly = false,
+    int limit = 50,
+  }) async {
+    final params = <String, String>{
+      if (query != null && query.isNotEmpty) 'q': query,
+      if (category != null && category.isNotEmpty) 'category': category,
+      if (oemOnly) 'oem_only': 'true',
+      'limit': '$limit',
+    };
+    if (params.isEmpty || (params.length == 1 && params.containsKey('limit'))) {
+      throw ApiException('أدخل نص بحث أو فئة');
+    }
+    final response = await _client.get(
+      _uri('/parts/search', params),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    final parsed = jsonDecode(response.body) as Map<String, dynamic>;
+    return parsed['data'] as List<dynamic>;
+  }
+
+  Future<List<dynamic>> getPartCategories() async {
+    final body = await _get('/parts/categories');
+    return body['data'] as List<dynamic>;
+  }
+
   Future<List<dynamic>> getCategoriesTree() async {
     final body = await _get('/categories/tree');
     return body['data'] as List<dynamic>;

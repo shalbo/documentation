@@ -320,7 +320,7 @@ class PromotionModel {
   factory PromotionModel.fromJson(Map<String, dynamic> json) {
     return PromotionModel(
       code: json['code'] as String,
-      title: json['title_ar'] as String,
+      title: (json['title_ar'] ?? json['title']) as String,
       description: json['description_ar'] as String? ?? '',
     );
   }
@@ -677,6 +677,120 @@ class LandingFeatureModel {
       slug: json['slug'] as String,
       titleAr: json['title_ar'] as String,
       descriptionAr: json['description_ar'] as String? ?? '',
+    );
+  }
+}
+
+class PartCategoryModel {
+  final String id;
+  final String slug;
+  final String name;
+  final String nameAr;
+
+  const PartCategoryModel({
+    required this.id,
+    required this.slug,
+    required this.name,
+    required this.nameAr,
+  });
+
+  factory PartCategoryModel.fromJson(Map<String, dynamic> json) {
+    return PartCategoryModel(
+      id: json['id'] as String,
+      slug: json['slug'] as String,
+      name: json['name'] as String? ?? json['name_ar'] as String,
+      nameAr: json['name_ar'] as String,
+    );
+  }
+}
+
+class PartListingModel {
+  final String id;
+  final String partNumber;
+  final String name;
+  final String nameAr;
+  final double priceSar;
+  final bool isOem;
+  final String? categorySlug;
+  final String? imageUrl;
+
+  const PartListingModel({
+    required this.id,
+    required this.partNumber,
+    required this.name,
+    required this.nameAr,
+    required this.priceSar,
+    this.isOem = false,
+    this.categorySlug,
+    this.imageUrl,
+  });
+
+  factory PartListingModel.fromJson(Map<String, dynamic> json) {
+    final category = json['category'] as Map<String, dynamic>?;
+    return PartListingModel(
+      id: json['id'] as String,
+      partNumber: json['part_number'] as String,
+      name: json['name'] as String? ?? json['name_ar'] as String,
+      nameAr: json['name_ar'] as String,
+      priceSar: (json['price_sar'] as num).toDouble(),
+      isOem: json['is_oem'] as bool? ?? false,
+      categorySlug: category?['slug'] as String?,
+      imageUrl: json['image_url'] as String?,
+    );
+  }
+}
+
+class MarketplaceVendorModel {
+  final String id;
+  final String businessName;
+  final String city;
+  final double? distanceKm;
+
+  const MarketplaceVendorModel({
+    required this.id,
+    required this.businessName,
+    required this.city,
+    this.distanceKm,
+  });
+
+  factory MarketplaceVendorModel.fromJson(Map<String, dynamic> json) {
+    return MarketplaceVendorModel(
+      id: json['id'] as String,
+      businessName: json['business_name'] as String,
+      city: json['city'] as String? ?? '',
+      distanceKm: (json['distance_km'] as num?)?.toDouble(),
+    );
+  }
+}
+
+class MarketplaceHomeModel {
+  final List<PartCategoryModel> categories;
+  final List<PartListingModel> featuredParts;
+  final List<MarketplaceVendorModel> featuredVendors;
+  final List<PromotionModel> promotions;
+
+  const MarketplaceHomeModel({
+    required this.categories,
+    required this.featuredParts,
+    required this.featuredVendors,
+    required this.promotions,
+  });
+
+  factory MarketplaceHomeModel.fromJson(Map<String, dynamic> json) {
+    return MarketplaceHomeModel(
+      categories: (json['categories'] as List<dynamic>? ?? [])
+          .map((e) => PartCategoryModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      featuredParts: (json['featured_parts'] as List<dynamic>? ?? [])
+          .map((e) => PartListingModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      featuredVendors: (json['featured_vendors'] as List<dynamic>? ?? [])
+          .map((e) =>
+              MarketplaceVendorModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      promotions: (json['promotions'] as List<dynamic>? ?? [])
+          .map((e) => PromotionModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

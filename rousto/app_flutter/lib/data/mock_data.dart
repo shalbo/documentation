@@ -391,4 +391,76 @@ class MockData {
       description: 'وفّر حتى 120 دينار سنوياً',
     ),
   ];
+
+  static final marketplaceHome = MarketplaceHomeModel(
+    categories: const [
+      PartCategoryModel(
+        id: 'pc1',
+        slug: 'filters',
+        name: 'فلاتر وزيوت',
+        nameAr: 'فلاتر وزيوت',
+      ),
+      PartCategoryModel(
+        id: 'pc2',
+        slug: 'brakes',
+        name: 'فرامل',
+        nameAr: 'فرامل',
+      ),
+      PartCategoryModel(
+        id: 'pc3',
+        slug: 'electrical',
+        name: 'كهرباء',
+        nameAr: 'كهرباء وبطاريات',
+      ),
+      PartCategoryModel(
+        id: 'pc4',
+        slug: 'belts',
+        name: 'سيور',
+        nameAr: 'سيور ومضخات',
+      ),
+    ],
+    featuredParts: const [
+      PartListingModel(
+        id: 'pt1',
+        partNumber: 'TOY-04152-YZZA1',
+        name: 'فلتر زيت تويوتا كامري',
+        nameAr: 'فلتر زيت تويوتا كامري',
+        priceSar: 45,
+        isOem: true,
+        categorySlug: 'filters',
+      ),
+      PartListingModel(
+        id: 'pt2',
+        partNumber: 'MOB-5W30-4L',
+        name: 'زيت موبيل 5W-30',
+        nameAr: 'زيت موبيل 5W-30 (4 لتر)',
+        priceSar: 120,
+        categorySlug: 'filters',
+      ),
+      PartListingModel(
+        id: 'pt3',
+        partNumber: 'BOSCH-0986AB1234',
+        name: 'فحمات فرامل بوش',
+        nameAr: 'فحمات فرامل أمامية بوش',
+        priceSar: 185,
+        categorySlug: 'brakes',
+      ),
+      PartListingModel(
+        id: 'pt4',
+        partNumber: 'NGK-LFR5A-11',
+        name: 'شمعة احتراق NGK',
+        nameAr: 'شمعة احتراق NGK',
+        priceSar: 35,
+        categorySlug: 'electrical',
+      ),
+    ],
+    featuredVendors: const [
+      MarketplaceVendorModel(
+        id: 'v1',
+        businessName: 'ورشة روستو المعتمدة',
+        city: 'الرياض',
+      ),
+    ],
+    promotions: promotions,
+  );
 }

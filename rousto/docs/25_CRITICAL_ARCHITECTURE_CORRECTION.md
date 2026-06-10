@@ -85,3 +85,17 @@ bookings → service tech only    towing_dispatches → tow drivers only
 | Web | `web/parts.html` |
 | Flutter | `screens/parts_screen.dart` |
 | Tests | `tests/test_architecture_correction.py` |
+
+---
+
+## Marketplace-First (Module 26)
+
+المنصة = **سوق قطع غيار مركزي**؛ الصيانة والسطحات خدمة مكمّلة.
+
+| المكوّن | التغيير |
+|---------|---------|
+| API افتراضي | `GET /api/v1/marketplace/home` |
+| بحث جغرافي | `GET /api/v1/parts/{id}/vendors-nearby?lat=&lng=` |
+| إدارة | `admin/index.html` → إحصائيات السوق؛ `admin/logistics.html` للوجستيات |
+| Flutter | `home_screen.dart` = سوق قطع؛ FAB = حجز ورشة/ساحبة |
+| Geo indexes | `database/038_marketplace_geo.sql` |

@@ -12,6 +12,7 @@ from app.security_middleware import SecurityHeadersMiddleware
 from app.routers import (
     admin_catalog,
     admin_marketing,
+    admin_marketplace,
     admin_notifications,
     admin_parts,
     auth,
@@ -22,6 +23,7 @@ from app.routers import (
     health,
     landing,
     logistics,
+    marketplace,
     marketing,
     monetization,
     notifications,
@@ -75,11 +77,13 @@ app.include_router(admin_catalog.router, prefix=prefix)
 app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(admin_notifications.router, prefix=prefix)
 app.include_router(admin_parts.router, prefix=prefix)
+app.include_router(admin_marketplace.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)
 app.include_router(parts.router, prefix=prefix)
+app.include_router(marketplace.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(logistics.router, prefix=prefix)
