@@ -16,12 +16,16 @@ router = APIRouter(tags=["marketplace"])
 
 @router.get("/marketplace/home")
 def marketplace_home(
+    car_year_id: UUID | None = Query(default=None),
     locale: str = Depends(resolve_locale),
     db: Session = Depends(get_db),
 ):
     """Default bootstrap payload — spare parts marketplace first."""
-    data = get_marketplace_home(db, locale)
-    return {"data": data, "meta": {"locale": locale}}
+    data = get_marketplace_home(db, locale, car_year_id=car_year_id)
+    return {
+        "data": data,
+        "meta": {"locale": locale, "car_year_id": str(car_year_id) if car_year_id else None},
+    }
 
 
 @router.get("/parts/{part_id}/vendors-nearby")

@@ -11,15 +11,18 @@ from app.error_reporting import capture_exception, init_error_reporting
 from app.security_middleware import SecurityHeadersMiddleware
 from app.routers import (
     admin_catalog,
+    admin_fitment,
     admin_marketing,
     admin_marketplace,
     admin_notifications,
     admin_parts,
+    admin_shipping,
     auth,
     bookings,
     catalog,
     devices,
     driver_network,
+    fitment,
     health,
     landing,
     logistics,
@@ -31,6 +34,7 @@ from app.routers import (
     profile,
     promotions,
     scans,
+    shipping,
     split_payments,
     support,
     testimonials,
@@ -78,12 +82,16 @@ app.include_router(admin_marketing.router, prefix=prefix)
 app.include_router(admin_notifications.router, prefix=prefix)
 app.include_router(admin_parts.router, prefix=prefix)
 app.include_router(admin_marketplace.router, prefix=prefix)
+app.include_router(admin_fitment.router, prefix=prefix)
+app.include_router(admin_shipping.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)
 app.include_router(notifications.router, prefix=prefix)
 app.include_router(parts.router, prefix=prefix)
 app.include_router(marketplace.router, prefix=prefix)
+app.include_router(fitment.router, prefix=prefix)
+app.include_router(shipping.router, prefix=prefix)
 app.include_router(scans.router, prefix=prefix)
 app.include_router(bookings.router, prefix=prefix)
 app.include_router(logistics.router, prefix=prefix)

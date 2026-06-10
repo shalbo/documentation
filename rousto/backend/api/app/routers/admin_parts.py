@@ -32,6 +32,8 @@ class PartCreateIn(BaseModel):
     is_oem: bool = False
     warranty_months: int = Field(default=6, ge=1, le=36)
     vehicle_compatibility: list[dict] = Field(default_factory=list)
+    oem_number: str | None = Field(default=None, max_length=60)
+    vin_prefix: str | None = Field(default=None, max_length=11)
 
 
 class PartPatchIn(BaseModel):

@@ -15,6 +15,7 @@ from app.models import (
     Promotion,
     Vendor,
 )
+from app.fitment_services import part_ids_for_car_year
 from app.parts_services import list_part_categories, part_out
 
 DEFAULT_LAT = 24.7136
@@ -51,18 +52,35 @@ def list_featured_vendors(db: Session, locale: str, *, limit: int = 6) -> list[d
     return [_vendor_out(v, locale) for v, _ in rows]
 
 
-def list_featured_parts(db: Session, locale: str, *, limit: int = 8) -> list[dict]:
-    parts = db.scalars(
+def list_featured_parts(
+    db: Session,
+    locale: str,
+    *,
+    car_year_id: uuid.UUID | None = None,
+    limit: int = 8,
+) -> list[dict]:
+    stmt = (
         select(Part)
         .options(joinedload(Part.category), joinedload(Part.supplier))
         .where(Part.is_active.is_(True))
-        .order_by(Part.is_oem.desc(), Part.name_ar)
-        .limit(limit)
+    )
+    if car_year_id:
+        fit_ids = part_ids_for_car_year(db, car_year_id)
+        if not fit_ids:
+            return []
+        stmt = stmt.where(Part.id.in_(fit_ids))
+    parts = db.scalars(
+        stmt.order_by(Part.is_oem.desc(), Part.name_ar).limit(limit)
     ).unique().all()
     return [part_out(p, locale) for p in parts]
 
 
-def get_marketplace_home(db: Session, locale: str) -> dict:
+def get_marketplace_home(
+    db: Session,
+    locale: str,
+    *,
+    car_year_id: uuid.UUID | None = None,
+) -> dict:
     promotions = db.scalars(
         select(Promotion)
         .where(Promotion.is_active.is_(True))
@@ -72,7 +90,7 @@ def get_marketplace_home(db: Session, locale: str) -> dict:
 
     return {
         "categories": list_part_categories(db, locale),
-        "featured_parts": list_featured_parts(db, locale),
+        "featured_parts": list_featured_parts(db, locale, car_year_id=car_year_id),
         "featured_vendors": list_featured_vendors(db, locale),
         "promotions": [
             {

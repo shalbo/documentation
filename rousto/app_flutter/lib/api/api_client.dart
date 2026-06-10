@@ -91,25 +91,69 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, dynamic>> getMarketplaceHome() async {
-    final body = await _get('/marketplace/home');
+  Future<Map<String, dynamic>> getMarketplaceHome({String? carYearId}) async {
+    final query = carYearId != null ? {'car_year_id': carYearId} : null;
+    final response = await _client.get(
+      _uri('/marketplace/home', query),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
     return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<List<Map<String, dynamic>>> getFitmentMakes() async {
+    final body = await _get('/fitment/makes');
+    return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
+
+  Future<List<Map<String, dynamic>>> getFitmentModels(String makeId) async {
+    final response = await _client.get(
+      _uri('/fitment/models', {'make_id': makeId}),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
+
+  Future<List<Map<String, dynamic>>> getFitmentYears(String modelId) async {
+    final response = await _client.get(
+      _uri('/fitment/years', {'model_id': modelId}),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return (body['data'] as List<dynamic>).cast<Map<String, dynamic>>();
   }
 
   Future<List<dynamic>> searchParts({
     String? query,
     String? category,
+    String? carYearId,
+    String? oem,
+    String? vin,
     bool oemOnly = false,
+    bool inStockOnly = false,
     int limit = 50,
   }) async {
     final params = <String, String>{
       if (query != null && query.isNotEmpty) 'q': query,
       if (category != null && category.isNotEmpty) 'category': category,
+      if (carYearId != null && carYearId.isNotEmpty) 'car_year_id': carYearId,
+      if (oem != null && oem.isNotEmpty) 'oem': oem,
+      if (vin != null && vin.isNotEmpty) 'vin': vin,
       if (oemOnly) 'oem_only': 'true',
+      if (inStockOnly) 'in_stock_only': 'true',
       'limit': '$limit',
     };
-    if (params.isEmpty || (params.length == 1 && params.containsKey('limit'))) {
-      throw ApiException('أدخل نص بحث أو فئة');
+    final hasFilter = params.containsKey('car_year_id') ||
+        params.containsKey('q') ||
+        params.containsKey('category') ||
+        params.containsKey('oem') ||
+        params.containsKey('vin');
+    if (!hasFilter) {
+      throw ApiException('أدخل نص بحث أو فئة أو مركبة');
     }
     final response = await _client.get(
       _uri('/parts/search', params),

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../currency.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
+import '../services/fitment_storage.dart';
 import '../services/push_notifications.dart';
 
 class AppState extends ChangeNotifier {
@@ -22,6 +23,7 @@ class AppState extends ChangeNotifier {
   List<ServicePackageModel> servicePackages = [];
   List<LoyaltyRewardModel> loyaltyRewards = [];
   MonetizationSummary? monetization;
+  FitmentSelection? fitment;
 
   // Legacy service catalog — loaded lazily for booking flows only
   List<CategoryModel> serviceCategories = [];
@@ -49,13 +51,31 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setFitment(FitmentSelection? selection) async {
+    fitment = selection;
+    if (selection != null) {
+      await FitmentStorage.instance.save(selection);
+    } else {
+      await FitmentStorage.instance.clear();
+    }
+    await reloadMarketplace();
+  }
+
+  Future<void> reloadMarketplace() async {
+    marketplace = await _repository.loadMarketplaceHome(
+      carYearId: fitment?.carYearId,
+    );
+    notifyListeners();
+  }
+
   Future<void> load() async {
     loading = true;
     notifyListeners();
 
+    fitment = await FitmentStorage.instance.load();
     final apiLive = await _repository.isApiAvailable();
     final results = await Future.wait([
-      _repository.loadMarketplaceHome(),
+      _repository.loadMarketplaceHome(carYearId: fitment?.carYearId),
       _repository.loadUser(),
       _repository.loadActiveBooking(),
       _repository.loadLoyaltyBalance(),

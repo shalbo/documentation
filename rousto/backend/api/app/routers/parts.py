@@ -42,17 +42,21 @@ def search_parts_catalog(
     category: str | None = Query(default=None),
     make: str | None = Query(default=None, max_length=40),
     model: str | None = Query(default=None, max_length=40),
+    car_year_id: UUID | None = Query(default=None),
+    oem: str | None = Query(default=None, max_length=60),
+    vin: str | None = Query(default=None, max_length=17),
     oem_only: bool = Query(default=False),
+    in_stock_only: bool = Query(default=False),
     limit: int = Query(default=50, ge=1, le=100),
     locale: str = Depends(resolve_locale),
     db: Session = Depends(get_db),
 ):
-    if not q and not category and not make and not model:
+    if not any([q, category, make, model, car_year_id, oem, vin]):
         raise HTTPException(
             status_code=400,
             detail={
                 "code": "QUERY_REQUIRED",
-                "message": "أدخل نص بحث أو فئة أو ماركة المركبة",
+                "message": "أدخل نص بحث أو فئة أو مركبة أو رقم OEM أو VIN",
             },
         )
     check_rate_limit(request, suffix="parts_search", limit=60)
@@ -62,13 +66,23 @@ def search_parts_catalog(
         category=category,
         make=make,
         model=model,
+        car_year_id=car_year_id,
+        oem=oem,
+        vin=vin,
         oem_only=oem_only,
+        in_stock_only=in_stock_only,
         locale=locale,
         limit=limit,
     )
     return {
         "data": data,
-        "meta": {"total": len(data), "locale": locale, "query": q},
+        "meta": {
+            "total": len(data),
+            "locale": locale,
+            "query": q,
+            "car_year_id": str(car_year_id) if car_year_id else None,
+            "in_stock_only": in_stock_only,
+        },
     }
 
 

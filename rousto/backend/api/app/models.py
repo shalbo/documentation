@@ -960,6 +960,8 @@ class Part(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     part_number: Mapped[str] = mapped_column(String(60), unique=True)
+    oem_number: Mapped[str | None] = mapped_column(String(60))
+    vin_prefix: Mapped[str | None] = mapped_column(String(11))
     slug: Mapped[str] = mapped_column(String(80), unique=True)
     name_ar: Mapped[str] = mapped_column(String(200))
     name_en: Mapped[str | None] = mapped_column(String(200))
@@ -1017,6 +1019,105 @@ class PartWarrantyClaim(Base):
     admin_notes: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CarMake(Base):
+    __tablename__ = "car_makes"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    name_en: Mapped[str | None] = mapped_column(String(80))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+
+
+class CarModel(Base):
+    __tablename__ = "car_models"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    make_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("car_makes.id"))
+    slug: Mapped[str] = mapped_column(String(40))
+    name_ar: Mapped[str] = mapped_column(String(80))
+    name_en: Mapped[str | None] = mapped_column(String(80))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    make: Mapped["CarMake"] = relationship()
+    years: Mapped[list["CarYear"]] = relationship(back_populates="model")
+
+
+class CarYear(Base):
+    __tablename__ = "car_years"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    model_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("car_models.id"))
+    year: Mapped[int] = mapped_column(SmallInteger)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    model: Mapped["CarModel"] = relationship()
+
+
+class PartVehicleCompatibility(Base):
+    __tablename__ = "part_vehicle_compatibilities"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parts.id"))
+    car_year_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("car_years.id"))
+    fitment_note_ar: Mapped[str | None] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class IntercityShippingRate(Base):
+    __tablename__ = "intercity_shipping_rates"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    origin_city: Mapped[str] = mapped_column(String(60))
+    destination_city: Mapped[str] = mapped_column(String(60))
+    flat_fee_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    carrier_name: Mapped[str] = mapped_column(String(80))
+    carrier_slug: Mapped[str] = mapped_column(String(40))
+    eta_days: Mapped[int] = mapped_column(SmallInteger, default=2)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class PartOrder(Base):
+    __tablename__ = "part_orders"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    reference: Mapped[str] = mapped_column(String(12), unique=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    part_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parts.id"))
+    vendor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("vendors.id"))
+    qty: Mapped[int] = mapped_column(SmallInteger, default=1)
+    subtotal_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    shipping_type: Mapped[str] = mapped_column(String(24))
+    shipping_fee_sar: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    total_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    origin_city: Mapped[str | None] = mapped_column(String(60))
+    destination_city: Mapped[str] = mapped_column(String(60))
+    dest_lat: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    dest_lng: Mapped[float | None] = mapped_column(Numeric(10, 7))
+    courier_technician_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("technicians.id")
+    )
+    intercity_carrier: Mapped[str | None] = mapped_column(String(80))
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class PartOrderSettlement(Base):
+    __tablename__ = "part_order_settlements"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    part_order_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("part_orders.id"))
+    recipient_type: Mapped[str] = mapped_column(String(20))
+    recipient_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    amount_sar: Mapped[float] = mapped_column(Numeric(10, 2))
+    label_ar: Mapped[str] = mapped_column(String(80))
+    status: Mapped[str] = mapped_column(String(20), default="held")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class TowVehicle(Base):

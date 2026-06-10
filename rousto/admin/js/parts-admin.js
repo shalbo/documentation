@@ -35,12 +35,12 @@ async function refresh() {
     tbody.innerHTML = parts.data.length
       ? parts.data.map((p) => `
         <tr>
-          <td><code>${p.part_number}</code></td>
+          <td><code>${p.oem_number || p.part_number}</code></td>
           <td>${p.name_ar || p.name}</td>
+          <td>${p.vin_prefix || "—"}</td>
           <td>${p.category?.name_ar || p.category?.slug || "—"}</td>
           <td>${p.is_oem ? "✓ OEM" : "—"}</td>
           <td>${p.price_sar} ر.س</td>
-          <td>${p.warranty_months} ش</td>
         </tr>`).join("")
       : '<tr><td colspan="6" class="empty">لا قطع</td></tr>';
 

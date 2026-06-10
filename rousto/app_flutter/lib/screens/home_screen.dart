@@ -8,6 +8,7 @@ import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
+import '../widgets/vehicle_selector.dart';
 import 'booking_screen.dart';
 import 'parts_screen.dart';
 import 'tracking_screen.dart';
@@ -135,10 +136,26 @@ class HomeScreen extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
+            VehicleSelector(
+              onChanged: (sel) => state.setFitment(sel),
+            ),
+            const SizedBox(height: 12),
+            if (state.fitment?.isComplete == true)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'عرض القطع المتوافقة مع: ${state.fitment!.label}',
+                  style: const TextStyle(color: Color(0xFFE8D0D2), fontSize: 11),
+                ),
+              ),
             GestureDetector(
               onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const PartsScreen()),
+                MaterialPageRoute(
+                  builder: (_) => PartsScreen(
+                    initialCarYearId: state.fitment?.carYearId,
+                  ),
+                ),
               ),
               child: Container(
                 padding:

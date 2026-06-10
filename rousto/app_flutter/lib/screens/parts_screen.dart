@@ -8,8 +8,14 @@ import '../currency.dart';
 class PartsScreen extends StatefulWidget {
   final String? initialQuery;
   final String? initialCategory;
+  final String? initialCarYearId;
 
-  const PartsScreen({super.key, this.initialQuery, this.initialCategory});
+  const PartsScreen({
+    super.key,
+    this.initialQuery,
+    this.initialCategory,
+    this.initialCarYearId,
+  });
 
   @override
   State<PartsScreen> createState() => _PartsScreenState();
@@ -22,6 +28,8 @@ class _PartsScreenState extends State<PartsScreen> {
   bool _loading = false;
   String? _error;
   String? _selectedCategory;
+  String? _carYearId;
+  bool _inStockOnly = true;
 
   @override
   void initState() {
@@ -30,7 +38,10 @@ class _PartsScreenState extends State<PartsScreen> {
       _query.text = widget.initialQuery!;
     }
     _selectedCategory = widget.initialCategory;
-    if (_query.text.length >= 2 || _selectedCategory != null) {
+    _carYearId = widget.initialCarYearId;
+    if (_query.text.length >= 2 ||
+        _selectedCategory != null ||
+        _carYearId != null) {
       _search();
     }
   }
@@ -43,15 +54,25 @@ class _PartsScreenState extends State<PartsScreen> {
 
   Future<void> _search() async {
     final q = _query.text.trim();
-    if (q.length < 2 && _selectedCategory == null) return;
+    final isOem = q.length >= 3 && RegExp(r'^[A-Z0-9-]+$').hasMatch(q.toUpperCase());
+    final isVin = q.length >= 8;
+    if (q.length < 2 &&
+        _selectedCategory == null &&
+        _carYearId == null &&
+        !isOem &&
+        !isVin) return;
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
       final results = await _repository.searchParts(
-        query: q.isNotEmpty ? q : null,
+        query: q.isNotEmpty && !isOem && !isVin ? q : null,
         category: _selectedCategory,
+        carYearId: _carYearId,
+        oem: isOem ? q.toUpperCase() : null,
+        vin: isVin && q.length >= 11 ? q.toUpperCase() : null,
+        inStockOnly: _inStockOnly,
       );
       setState(() {
         _results = results;
@@ -73,10 +94,19 @@ class _PartsScreenState extends State<PartsScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('متوفر في المخزون فقط', style: TextStyle(fontSize: 13)),
+              value: _inStockOnly,
+              onChanged: (v) {
+                setState(() => _inStockOnly = v);
+                _search();
+              },
+            ),
             TextField(
               controller: _query,
               decoration: InputDecoration(
-                hintText: 'رقم القطعة OEM أو اسم القطعة أو ماركة السيارة…',
+                hintText: 'OEM أو VIN أو اسم القطعة…',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.arrow_forward),

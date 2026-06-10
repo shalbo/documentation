@@ -10,9 +10,9 @@ class AppRepository {
 
   Future<bool> isApiAvailable() => _api.ping();
 
-  Future<MarketplaceHomeModel> loadMarketplaceHome() async {
+  Future<MarketplaceHomeModel> loadMarketplaceHome({String? carYearId}) async {
     try {
-      final data = await _api.getMarketplaceHome();
+      final data = await _api.getMarketplaceHome(carYearId: carYearId);
       return MarketplaceHomeModel.fromJson(data);
     } catch (_) {
       return MockData.marketplaceHome;
@@ -22,9 +22,20 @@ class AppRepository {
   Future<List<PartListingModel>> searchParts({
     String? query,
     String? category,
+    String? carYearId,
+    String? oem,
+    String? vin,
+    bool inStockOnly = false,
   }) async {
     try {
-      final data = await _api.searchParts(query: query, category: category);
+      final data = await _api.searchParts(
+        query: query,
+        category: category,
+        carYearId: carYearId,
+        oem: oem,
+        vin: vin,
+        inStockOnly: inStockOnly,
+      );
       return data
           .map((e) => PartListingModel.fromJson(e as Map<String, dynamic>))
           .toList();
