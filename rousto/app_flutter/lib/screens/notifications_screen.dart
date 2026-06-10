@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../api/api_client.dart';
+import '../features/notifications/data/repositories/notification_repository.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -13,7 +13,7 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final _api = ApiClient();
+  final _notifications = NotificationRepository();
   bool _loading = true;
   String? _error;
   int _unread = 0;
@@ -32,9 +32,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       _error = null;
     });
     try {
-      final notifs = await _api.getNotifications();
-      final count = await _api.getNotificationUnreadCount();
-      final prefs = await _api.getNotificationPreferences();
+      final notifs = await _notifications.getNotifications();
+      final count = await _notifications.getUnreadCount();
+      final prefs = await _notifications.getPreferences();
       if (!mounted) return;
       setState(() {
         _items = notifs;
@@ -52,17 +52,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Future<void> _markRead(String id) async {
-    await _api.markNotificationRead(id);
+    await _notifications.markRead(id);
     await _load();
   }
 
   Future<void> _markAllRead() async {
-    await _api.markAllNotificationsRead();
+    await _notifications.markAllRead();
     await _load();
   }
 
   Future<void> _savePrefs() async {
-    await _api.updateNotificationPreferences(_prefs);
+    await _notifications.updatePreferences(_prefs);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context)!.preferencesSaved)),

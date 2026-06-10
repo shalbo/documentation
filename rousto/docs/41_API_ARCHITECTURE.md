@@ -128,7 +128,22 @@ sequenceDiagram
 
 ---
 
-## 5. مبادئ التنفيذ
+## 5. الموديولات الموسّعة (بعد المدفوعات)
+
+| الموديول | Backend | Flutter | Admin |
+|----------|---------|---------|-------|
+| قطع الغيار | `service_layer/parts/` | `features/parts/` | `parts-service.js` |
+| الحجوزات | `service_layer/bookings/` | `features/bookings/` | — |
+| الإشعارات | `service_layer/notifications/` | `features/notifications/` | `notifications-service.js` |
+| الدعم/التذاكر | `service_layer/support/` | `features/support/` | `support-service.js` |
+| التاجر | `service_layer/vendors/` | — | `vendor-parts-service.js` |
+| التوافق المركبات | — | `features/fitment/` | — |
+
+`AppRepository` يفوّض الآن إلى `PartsRepository` و `BookingRepository` للحفاظ على التوافق.
+
+---
+
+## 6. مبادئ التنفيذ
 
 1. **عزل المسؤوليات** — Router ≠ Service ≠ Gateway Adapter
 2. **معاملات ذرية** — كل تسوية مالية داخل session واحدة

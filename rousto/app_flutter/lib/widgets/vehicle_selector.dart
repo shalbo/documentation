@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../api/api_client.dart';
-import '../config/app_config.dart';
+import '../features/fitment/data/repositories/fitment_repository.dart';
 import '../services/fitment_storage.dart';
 import '../theme/app_colors.dart';
 
@@ -15,7 +14,7 @@ class VehicleSelector extends StatefulWidget {
 }
 
 class _VehicleSelectorState extends State<VehicleSelector> {
-  final _api = ApiClient(baseUrl: AppConfig.apiBaseUrl);
+  final _fitment = FitmentRepository();
 
   List<Map<String, dynamic>> _makes = [];
   List<Map<String, dynamic>> _models = [];
@@ -51,14 +50,14 @@ class _VehicleSelectorState extends State<VehicleSelector> {
 
   Future<void> _loadMakes() async {
     try {
-      final res = await _api.getFitmentMakes();
+      final res = await _fitment.getMakes();
       _makes = res;
     } catch (_) {}
   }
 
   Future<void> _loadModels(String makeId) async {
     try {
-      _models = await _api.getFitmentModels(makeId);
+      _models = await _fitment.getModels(makeId);
     } catch (_) {
       _models = [];
     }
@@ -66,7 +65,7 @@ class _VehicleSelectorState extends State<VehicleSelector> {
 
   Future<void> _loadYears(String modelId) async {
     try {
-      _years = await _api.getFitmentYears(modelId);
+      _years = await _fitment.getYears(modelId);
     } catch (_) {
       _years = [];
     }

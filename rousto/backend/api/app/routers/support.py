@@ -15,7 +15,8 @@ from app.schemas import (
     SupportTicketReplyIn,
     SupportTicketUpdateIn,
 )
-from app.support_services import (
+from app.api_responses import success, success_list
+from app.service_layer.support import (
     add_ticket_message,
     create_support_ticket,
     faq_out,
@@ -52,7 +53,7 @@ def list_faq(
 
     items = db.scalars(query).all()
     data = [faq_out(item) for item in items]
-    return {"data": data, "meta": {"total": len(data)}}
+    return success(data, meta={"total": len(data)})
 
 
 @router.post("/support/tickets", status_code=201)
@@ -83,7 +84,7 @@ def post_support_ticket(
         ) from exc
 
     ticket = load_ticket(db, ticket.id, user_id=user.id)
-    return {"data": ticket_detail(ticket)}
+    return success(ticket_detail(ticket))
 
 
 @router.get("/support/tickets")
@@ -97,7 +98,7 @@ def list_my_tickets(
         .order_by(SupportTicket.created_at.desc())
     ).all()
     data = [ticket_summary(t) for t in tickets]
-    return {"data": data, "meta": {"total": len(data)}}
+    return success(data, meta={"total": len(data)})
 
 
 @router.get("/support/tickets/{ticket_id}")
@@ -112,7 +113,7 @@ def get_support_ticket(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "التذكرة غير موجودة"},
         )
-    return {"data": ticket_detail(ticket)}
+    return success(ticket_detail(ticket))
 
 
 @router.post("/support/tickets/{ticket_id}/messages")
@@ -144,7 +145,7 @@ def post_ticket_message(
     )
     db.commit()
     ticket = load_ticket(db, ticket_id, user_id=user.id)
-    return {"data": ticket_detail(ticket)}
+    return success(ticket_detail(ticket))
 
 
 @router.get("/me/security")
@@ -152,7 +153,7 @@ def get_my_security(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return {"data": get_user_security_summary(db, user.id)}
+    return success(get_user_security_summary(db, user.id))
 
 
 @router.post("/me/security/report")
@@ -171,7 +172,7 @@ def post_security_report(
         user_agent=ua,
     )
     db.commit()
-    return {"data": data}
+    return success(data, message="تم تسجيل البلاغ الأمني")
 
 
 @router.get("/admin/support/tickets")
@@ -186,7 +187,7 @@ def admin_list_tickets(
 
     tickets = db.scalars(query).all()
     data = [ticket_summary(t) for t in tickets]
-    return {"data": data, "meta": {"total": len(data)}}
+    return success(data, meta={"total": len(data)})
 
 
 @router.get("/admin/support/tickets/{ticket_id}")
@@ -201,7 +202,7 @@ def admin_get_ticket(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "التذكرة غير موجودة"},
         )
-    return {"data": ticket_detail(ticket)}
+    return success(ticket_detail(ticket))
 
 
 @router.patch("/admin/support/tickets/{ticket_id}")
@@ -231,7 +232,7 @@ def admin_update_ticket(
     )
     db.commit()
     ticket = load_ticket(db, ticket_id)
-    return {"data": ticket_detail(ticket)}
+    return success(ticket_detail(ticket))
 
 
 @router.post("/admin/support/tickets/{ticket_id}/reply")
@@ -281,7 +282,7 @@ def admin_reply_ticket(
         pass
 
     ticket = load_ticket(db, ticket_id)
-    return {"data": ticket_detail(ticket)}
+    return success(ticket_detail(ticket))
 
 
 @router.get("/admin/security/status")
@@ -335,4 +336,4 @@ def admin_security_events(
         }
         for e in events
     ]
-    return {"data": data, "meta": {"total": len(data)}}
+    return success(data, meta={"total": len(data)})

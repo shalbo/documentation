@@ -13,7 +13,8 @@ from app.vin_compat_services import normalize_vin_prefix
 from app.vin_decoder_services import decode_vin
 from app.part_image_services import get_part_image_file
 from app.part_condition_services import normalize_condition_filter
-from app.parts_services import (
+from app.api_responses import success, success_list
+from app.service_layer.parts import (
     create_warranty_claim,
     get_part_detail,
     list_booking_parts,
@@ -21,7 +22,7 @@ from app.parts_services import (
     search_parts,
 )
 from app.rate_limit import check_rate_limit
-from app.services import load_booking
+from app.service_layer.bookings import load_booking
 
 router = APIRouter(tags=["parts"])
 
@@ -48,7 +49,7 @@ def get_part_categories(
     db: Session = Depends(get_db),
 ):
     data = list_part_categories(db, locale)
-    return {"data": data, "meta": {"total": len(data), "locale": locale}}
+    return success(data, meta={"total": len(data), "locale": locale})
 
 
 @router.get("/parts/search")
@@ -120,9 +121,9 @@ def search_parts_catalog(
         except ValueError:
             vehicle = None
 
-    return {
-        "data": data,
-        "meta": {
+    return success(
+        data,
+        meta={
             "total": len(data),
             "locale": locale,
             "query": q,
@@ -133,7 +134,7 @@ def search_parts_catalog(
             "strict_vin_match": bool(vin),
             "decoded_vehicle": vehicle,
         },
-    }
+    )
 
 
 @router.get("/parts/{part_id}")
@@ -148,7 +149,7 @@ def get_part(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "القطعة غير موجودة"},
         )
-    return {"data": data}
+    return success(data)
 
 
 @router.get("/bookings/{booking_id}/parts")
@@ -165,7 +166,7 @@ def get_booking_parts(
             detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
         )
     data = list_booking_parts(db, booking_id, locale)
-    return {"data": data, "meta": {"total": len(data)}}
+    return success(data, meta={"total": len(data)})
 
 
 @router.post("/parts/warranty-claims", status_code=201)
@@ -187,10 +188,11 @@ def post_warranty_claim(
             status_code=400,
             detail={"code": "CLAIM_ERROR", "message": str(exc)},
         ) from exc
-    return {
-        "data": {
+    return success(
+        {
             "id": claim.id,
             "status": claim.status,
             "booking_part_id": claim.booking_part_id,
-        }
-    }
+        },
+        message="تم تسجيل مطالبة الضمان",
+    )

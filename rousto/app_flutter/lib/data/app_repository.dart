@@ -1,18 +1,28 @@
 import '../api/api_client.dart';
+import '../features/bookings/data/repositories/booking_repository.dart';
+import '../features/parts/data/repositories/parts_repository.dart';
 import 'mock_data.dart';
 import 'models.dart';
 
 class AppRepository {
-  AppRepository({ApiClient? api}) : _api = api ?? ApiClient();
+  AppRepository({
+    ApiClient? api,
+    PartsRepository? parts,
+    BookingRepository? bookings,
+  })  : _api = api ?? ApiClient(),
+        _parts = parts ?? PartsRepository(api: api),
+        _bookings = bookings ?? BookingRepository(api: api);
 
   final ApiClient _api;
+  final PartsRepository _parts;
+  final BookingRepository _bookings;
   ApiClient get api => _api;
 
   Future<bool> isApiAvailable() => _api.ping();
 
   Future<MarketplaceHomeModel> loadMarketplaceHome({String? carYearId}) async {
     try {
-      final data = await _api.getMarketplaceHome(carYearId: carYearId);
+      final data = await _parts.getMarketplaceHome(carYearId: carYearId);
       return MarketplaceHomeModel.fromJson(data);
     } catch (_) {
       return MockData.marketplaceHome;
@@ -34,7 +44,7 @@ class AppRepository {
     bool inStockOnly = false,
   }) async {
     try {
-      final result = await _api.searchParts(
+      final result = await _parts.searchParts(
         query: query,
         category: category,
         categoryId: categoryId,
@@ -76,7 +86,7 @@ class AppRepository {
 
   Future<List<CategoryModel>> loadCategories() async {
     try {
-      final data = await _api.getCategoriesTree();
+      final data = await _parts.getCategoriesTree();
       return data
           .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -95,7 +105,7 @@ class AppRepository {
 
   Future<BookingModel?> loadActiveBooking() async {
     try {
-      final data = await _api.getActiveBooking();
+      final data = await _bookings.getActiveBooking();
       if (data != null) return BookingModel.fromJson(data);
       return null;
     } catch (_) {
@@ -117,7 +127,7 @@ class AppRepository {
         int? refreshIntervalSeconds,
       })> loadTracking(String bookingId) async {
     try {
-      final data = await _api.getBookingDeliveryMap(bookingId);
+      final data = await _bookings.getDeliveryMap(bookingId);
       final bookingJson = data['booking'] as Map<String, dynamic>;
       final booking = BookingModel(
         id: bookingId,
@@ -218,9 +228,9 @@ class AppRepository {
     PaymentMethodModel payment,
   })> loadBookingContext() async {
     try {
-      final vehicles = await _api.getVehicles();
-      final addresses = await _api.getAddresses();
-      final payments = await _api.getPaymentMethods();
+      final vehicles = await _bookings.getVehicles();
+      final addresses = await _bookings.getAddresses();
+      final payments = await _bookings.getPaymentMethods();
 
       final vehicleJson = vehicles.firstWhere(
         (v) => (v as Map<String, dynamic>)['is_default'] == true,
@@ -254,7 +264,7 @@ class AppRepository {
     double price,
   ) async {
     try {
-      final data = await _api.validatePromotion(code, price);
+      final data = await _bookings.validatePromotion(code, price);
       return (
         valid: data['valid'] as bool? ?? false,
         discount: (data['discount_sar'] as num?)?.toDouble() ?? 0,
@@ -347,7 +357,7 @@ class AppRepository {
 
   Future<SplitPreviewModel> previewPaymentSplit(double amountSar) async {
     try {
-      final data = await _api.previewPaymentSplit(amountSar);
+      final data = await _bookings.previewPaymentSplit(amountSar);
       return SplitPreviewModel.fromJson(data);
     } catch (_) {
       return MockData.splitPreviewFor(amountSar);
@@ -411,7 +421,7 @@ class AppRepository {
     String? scanId,
   }) async {
     try {
-      await _api.createBooking({
+      await _bookings.createBooking({
         'service_id': serviceId,
         'vehicle_id': vehicleId,
         'address_id': addressId,

@@ -8,7 +8,8 @@ from app.db import get_db
 from app.i18n import resolve_locale
 from app.deps import get_current_user, require_admin_key
 from app.models import User
-from app.notification_inbox_services import (
+from app.api_responses import success, success_list
+from app.service_layer.notifications import (
     NOTIFICATION_CATEGORIES,
     list_notifications,
     list_user_preferences,
@@ -55,10 +56,10 @@ def get_my_notifications(
         offset=offset,
         locale=locale,
     )
-    return {
-        "data": data,
-        "meta": {"total": total, "unread": unread_count(db, user.id), "locale": locale},
-    }
+    return success(
+        data,
+        meta={"total": total, "unread": unread_count(db, user.id), "locale": locale},
+    )
 
 
 @router.get("/me/notifications/unread-count")
@@ -66,7 +67,7 @@ def get_unread_count(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return {"data": {"count": unread_count(db, user.id)}}
+    return success({"count": unread_count(db, user.id)})
 
 
 @router.patch("/me/notifications/{notification_id}/read")
@@ -82,7 +83,7 @@ def patch_notification_read(
             detail={"code": "NOT_FOUND", "message": "الإشعار غير موجود"},
         )
     db.commit()
-    return {"data": row}
+    return success(row)
 
 
 @router.post("/me/notifications/read-all")
@@ -92,7 +93,7 @@ def post_read_all(
 ):
     count = mark_all_read(db, user.id)
     db.commit()
-    return {"data": {"marked_read": count}}
+    return success({"marked_read": count})
 
 
 @router.get("/me/notification-preferences")
@@ -102,7 +103,7 @@ def get_preferences(
     db: Session = Depends(get_db),
 ):
     data = list_user_preferences(db, user.id, locale)
-    return {"data": data, "meta": {"total": len(data)}}
+    return success(data, meta={"total": len(data)})
 
 
 @router.put("/me/notification-preferences")
@@ -125,6 +126,6 @@ def put_preferences(
             status_code=400,
             detail={"code": "PREFERENCES_ERROR", "message": str(exc)},
         ) from exc
-    return {"data": data}
+    return success(data, message="تم تحديث تفضيلات الإشعارات")
 
 

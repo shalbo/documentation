@@ -12,13 +12,13 @@ from app.i18n import resolve_locale
 from app.models import Vendor
 from app.part_image_services import process_bulk_images_zip
 from app.spare_parts_bulk_services import BULK_COLUMNS, TEMPLATE_CSV, process_bulk_upload
-from app.tier_services import (
+from app.api_responses import success
+from app.service_layer.vendors import (
     PRODUCTS_LIMIT_EXCEEDED_MSG,
-    require_excel_upload,
-    tier_limit_http_detail,
+    vendor_create_product,
     vendor_tier_summary,
 )
-from app.vendor_parts_services import vendor_create_product
+from app.tier_services import require_excel_upload, tier_limit_http_detail
 
 router = APIRouter(prefix="/vendor/parts", tags=["vendor-parts"])
 

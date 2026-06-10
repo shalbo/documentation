@@ -9,7 +9,8 @@ from app.deps import get_current_user
 from app.models import Booking, User
 from app.schemas import BookingCreateIn
 from app.customer_delivery_services import build_customer_delivery_map
-from app.services import (
+from app.api_responses import success, success_list
+from app.service_layer.bookings import (
     ACTIVE_STATUSES,
     build_tracking,
     create_booking,
@@ -35,7 +36,7 @@ def list_bookings(user: User = Depends(get_current_user), db: Session = Depends(
         .order_by(Booking.created_at.desc())
     ).unique().all()
     data = [serialize_booking(b) for b in bookings]
-    return {"data": data, "meta": {"total": len(data)}}
+    return success_list(data)
 
 
 @router.get("/active")
@@ -49,9 +50,9 @@ def get_active_booking(
         .limit(1)
     )
     if not booking:
-        return {"data": None}
+        return success(None)
     full = load_booking(db, booking.id, user.id)
-    return {"data": serialize_booking(full) if full else None}
+    return success(serialize_booking(full) if full else None)
 
 
 @router.get("/active/delivery-map")
@@ -65,11 +66,11 @@ def get_active_delivery_map(
         .limit(1)
     )
     if not booking:
-        return {"data": None}
+        return success(None)
     full = load_booking(db, booking.id, user.id)
     if not full:
-        return {"data": None}
-    return {"data": build_customer_delivery_map(db, full)}
+        return success(None)
+    return success(build_customer_delivery_map(db, full))
 
 
 @router.get("/{booking_id}")
@@ -84,7 +85,7 @@ def get_booking(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
         )
-    return {"data": serialize_booking(booking)}
+    return success(serialize_booking(booking))
 
 
 @router.get("/{booking_id}/payment-split")
@@ -105,7 +106,7 @@ def get_booking_payment_split(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "لا يوجد تقسيم لهذا الحجز"},
         )
-    return {"data": data}
+    return success(data)
 
 
 @router.get("/{booking_id}/tracking")
@@ -120,7 +121,7 @@ def get_booking_tracking(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
         )
-    return {"data": build_tracking(booking)}
+    return success(build_tracking(booking))
 
 
 @router.get("/{booking_id}/delivery-map")
@@ -135,7 +136,7 @@ def get_booking_delivery_map(
             status_code=404,
             detail={"code": "NOT_FOUND", "message": "الحجز غير موجود"},
         )
-    return {"data": build_customer_delivery_map(db, booking)}
+    return success(build_customer_delivery_map(db, booking))
 
 
 @router.post("", status_code=201)
@@ -165,4 +166,4 @@ def post_booking(
             status_code=400,
             detail={"code": "INVALID_BOOKING", "message": str(exc)},
         ) from exc
-    return {"data": serialize_booking(booking)}
+    return success(serialize_booking(booking), message="تم إنشاء الحجز بنجاح")

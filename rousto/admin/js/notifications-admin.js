@@ -25,19 +25,36 @@ function toast(msg, isError) {
   setTimeout(() => el.classList.remove("show"), 2800);
 }
 
+function createNotificationsService() {
+  return new NotificationsService(
+    RoustoApiClient.createAdminClient({
+      getApiBase: () => {
+        saveConfig();
+        return state.apiBase;
+      },
+      getAdminKey: () => {
+        saveConfig();
+        return state.adminKey;
+      },
+    })
+  );
+}
+
 async function api(path, options = {}) {
-  saveConfig();
-  const res = await fetch(`${state.apiBase}/api/v1${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Key": state.adminKey,
-      ...(options.headers || {}),
+  const client = RoustoApiClient.createAdminClient({
+    getApiBase: () => {
+      saveConfig();
+      return state.apiBase;
+    },
+    getAdminKey: () => {
+      saveConfig();
+      return state.adminKey;
     },
   });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.error?.message || `خطأ ${res.status}`);
-  return body;
+  if (options.method === "POST") {
+    return client.post(path, JSON.parse(options.body || "{}"));
+  }
+  return client.get(path);
 }
 
 function fmtDate(iso) {
@@ -174,7 +191,7 @@ async function refresh() {
 async function searchUsers(q) {
   if (!q || q.length < 2) return;
   try {
-    const res = await api(`/admin/notifications/users/search?q=${encodeURIComponent(q)}`);
+    const res = await createNotificationsService().searchUsers(q);
     const sel = $("#userSelect");
     sel.innerHTML = res.data
       .map(
@@ -209,15 +226,12 @@ $("#sendForm").addEventListener("submit", async (e) => {
   const userId = $("#userSelect").value;
   if (!userId) return toast("اختر مستخدماً", true);
   try {
-    await api("/admin/notifications/send", {
-      method: "POST",
-      body: JSON.stringify({
-        user_id: userId,
-        category: $("#sendCategory").value,
-        title: $("#sendTitle").value,
-        body: $("#sendBody").value,
-        send_push: $("#sendPush").checked,
-      }),
+    await createNotificationsService().sendTest({
+      user_id: userId,
+      category: $("#sendCategory").value,
+      title: $("#sendTitle").value,
+      body: $("#sendBody").value,
+      send_push: $("#sendPush").checked,
     });
     toast("تم الإرسال");
     refresh();
@@ -229,15 +243,12 @@ $("#sendForm").addEventListener("submit", async (e) => {
 $("#broadcastForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
-    const res = await api("/admin/notifications/broadcast", {
-      method: "POST",
-      body: JSON.stringify({
-        target_segment: $("#broadcastSegment").value,
-        category: $("#broadcastCategory").value,
-        title: $("#broadcastTitle").value,
-        body: $("#broadcastBody").value,
-        send_push: $("#broadcastPush").checked,
-      }),
+    const res = await createNotificationsService().broadcast({
+      target_segment: $("#broadcastSegment").value,
+      category: $("#broadcastCategory").value,
+      title: $("#broadcastTitle").value,
+      body: $("#broadcastBody").value,
+      send_push: $("#broadcastPush").checked,
     });
     toast(`بث ${res.data.reference}: ${res.data.recipients_count} مستلم`);
     refresh();

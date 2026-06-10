@@ -460,6 +460,55 @@ class ApiClient {
     return body['data'] as Map<String, dynamic>;
   }
 
+  Future<List<dynamic>> getSupportFaq({String? category}) async {
+    final query = category != null ? {'category': category} : null;
+    final response = await _client.get(
+      _uri('/support/faq', query),
+      headers: _headers(),
+    );
+    _ensureSuccess(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return body['data'] as List<dynamic>;
+  }
+
+  Future<Map<String, dynamic>> createSupportTicket({
+    required String category,
+    required String subject,
+    required String message,
+    String priority = 'normal',
+    String? bookingId,
+  }) async {
+    final body = await _post('/support/tickets', {
+      'category': category,
+      'subject': subject,
+      'message': message,
+      'priority': priority,
+      if (bookingId != null) 'booking_id': bookingId,
+    });
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<List<dynamic>> getSupportTickets() async {
+    final body = await _get('/support/tickets', auth: true);
+    return body['data'] as List<dynamic>;
+  }
+
+  Future<Map<String, dynamic>> getSupportTicket(String ticketId) async {
+    final body = await _get('/support/tickets/$ticketId', auth: true);
+    return body['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> addSupportTicketMessage(
+    String ticketId,
+    String message,
+  ) async {
+    final body = await _post(
+      '/support/tickets/$ticketId/messages',
+      {'message': message},
+    );
+    return body['data'] as Map<String, dynamic>;
+  }
+
   Future<Map<String, dynamic>> initiateGatewayPayment({
     required String gateway,
     required double amountLyd,

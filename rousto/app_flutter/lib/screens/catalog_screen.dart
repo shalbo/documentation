@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../api/api_client.dart';
-import '../config/app_config.dart';
+import '../features/parts/data/repositories/parts_repository.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common.dart';
@@ -16,7 +15,7 @@ class CatalogScreen extends StatefulWidget {
 }
 
 class _CatalogScreenState extends State<CatalogScreen> {
-  final _api = ApiClient(baseUrl: AppConfig.apiBaseUrl);
+  final _parts = PartsRepository();
   List<Map<String, dynamic>> _roots = [];
   bool _loading = true;
 
@@ -61,7 +60,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   Future<void> _load() async {
     try {
-      final data = await _api.getCategoryRoots();
+      final data = await _parts.getCategoryRoots();
       setState(() {
         _roots = data;
         _loading = false;
@@ -194,7 +193,7 @@ class CatalogSubcategoriesScreen extends StatefulWidget {
 }
 
 class _CatalogSubcategoriesScreenState extends State<CatalogSubcategoriesScreen> {
-  final _api = ApiClient(baseUrl: AppConfig.apiBaseUrl);
+  final _parts = PartsRepository();
   List<Map<String, dynamic>> _children = [];
   bool _loading = true;
 
@@ -206,7 +205,7 @@ class _CatalogSubcategoriesScreenState extends State<CatalogSubcategoriesScreen>
 
   Future<void> _load() async {
     try {
-      final data = await _api.getCategoryChildren(widget.parentId);
+      final data = await _parts.getCategoryChildren(widget.parentId);
       setState(() {
         _children = data;
         _loading = false;

@@ -26,19 +26,19 @@ function toast(msg, err = false) {
   setTimeout(() => el.classList.remove("show"), 2800);
 }
 
-async function api(path, options = {}) {
-  saveConfig();
-  const res = await fetch(`${state.apiBase}/api/v1${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Key": state.adminKey,
-      ...(options.headers || {}),
-    },
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.error?.message || `خطأ ${res.status}`);
-  return body;
+function createSupportService() {
+  return new SupportService(
+    RoustoApiClient.createAdminClient({
+      getApiBase: () => {
+        saveConfig();
+        return state.apiBase;
+      },
+      getAdminKey: () => {
+        saveConfig();
+        return state.adminKey;
+      },
+    })
+  );
 }
 
 function renderTable() {
@@ -64,13 +64,13 @@ function renderDetail(ticket) {
 }
 
 async function openTicket(id) {
-  const body = await api(`/admin/support/tickets/${id}`);
+  const body = await createSupportService().getTicket(id);
   state.selectedId = id;
   renderDetail(body.data);
 }
 
 async function refresh() {
-  const body = await api("/admin/support/tickets");
+  const body = await createSupportService().listTickets();
   state.tickets = body.data || [];
   renderTable();
   if (state.selectedId) await openTicket(state.selectedId);
@@ -87,12 +87,9 @@ $("replyForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!state.selectedId) return;
   try {
-    await api(`/admin/support/tickets/${state.selectedId}/reply`, {
-      method: "POST",
-      body: JSON.stringify({
-        message: $("replyText").value.trim(),
-        status: $("replyStatus").value,
-      }),
+    await createSupportService().reply(state.selectedId, {
+      message: $("replyText").value.trim(),
+      status: $("replyStatus").value,
     });
     $("replyText").value = "";
     await refresh();

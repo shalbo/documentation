@@ -8,6 +8,18 @@ function cfg() {
   return { apiBase, adminKey };
 }
 
+function createPartsService() {
+  return new PartsService(
+    RoustoApiClient.createAdminClient({
+      getApiBase: () => $("apiBase").value.replace(/\/$/, ""),
+      getAdminKey: () => $("adminKey").value.trim(),
+      onConfigSave: ({ apiBase, adminKey }) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ apiBase, adminKey }));
+      },
+    })
+  );
+}
+
 function toast(msg) {
   const el = $("toast");
   el.textContent = msg;
@@ -15,21 +27,12 @@ function toast(msg) {
   setTimeout(() => el.classList.remove("show"), 2400);
 }
 
-async function api(path) {
-  const { apiBase, adminKey } = cfg();
-  const res = await fetch(`${apiBase}/api/v1${path}`, {
-    headers: { "X-Admin-Key": adminKey },
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.error?.message || `خطأ ${res.status}`);
-  return body;
-}
-
 async function refresh() {
+  const partsSvc = createPartsService();
   try {
     const [parts, claims] = await Promise.all([
-      api("/admin/parts"),
-      api("/admin/part-warranty-claims"),
+      partsSvc.listParts(),
+      partsSvc.listWarrantyClaims(),
     ]);
     const tbody = $("partsBody");
     tbody.innerHTML = parts.data.length
@@ -48,23 +51,22 @@ async function refresh() {
     cbody.innerHTML = claims.data.length
       ? claims.data.map((c) => `
         <tr>
-          <td><small>${String(c.user_id).slice(0, 8)}…</small></td>
-          <td>${c.description}</td>
+          <td>${c.id}</td>
           <td>${c.status}</td>
-          <td><small>${new Date(c.created_at).toLocaleString("ar-SA")}</small></td>
+          <td>${c.description?.slice(0, 60) || "—"}</td>
         </tr>`).join("")
-      : '<tr><td colspan="4" class="empty">لا مطالبات</td></tr>';
-
-    toast(`تم تحميل ${parts.data.length} قطعة`);
+      : '<tr><td colspan="3" class="empty">لا مطالبات</td></tr>';
   } catch (e) {
     toast(e.message);
   }
 }
 
-$("refreshBtn").addEventListener("click", refresh);
-try {
-  const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-  if (s.apiBase) $("apiBase").value = s.apiBase;
-  if (s.adminKey) $("adminKey").value = s.adminKey;
-} catch (_) {}
-refresh();
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    if (saved.apiBase) $("apiBase").value = saved.apiBase;
+    if (saved.adminKey) $("adminKey").value = saved.adminKey;
+  } catch (_) {}
+  refresh();
+  $("refreshBtn")?.addEventListener("click", refresh);
+});
