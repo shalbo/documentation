@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../data/app_repository.dart';
 import '../data/models.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_decorations.dart';
 import '../currency.dart';
 
 enum _SearchMode { name, oem, vin }
@@ -166,20 +167,24 @@ class _PartsScreenState extends State<PartsScreen> {
             const SizedBox(height: 10),
             if (_mode == _SearchMode.vin)
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.red050,
-                  borderRadius: BorderRadius.circular(10),
+                  color: AppColors.navy050,
+                  borderRadius: AppDecorations.borderRadius,
+                  border: Border.all(color: AppColors.navy.withValues(alpha: 0.12)),
                 ),
                 child: const Text(
                   'البحث برقم الهيكل: نطابق أول 11 رمزاً (WMI+VDS) مع القطع المسجّلة لضمان التوافق التام.',
-                  style: TextStyle(fontSize: 11, color: AppColors.red600),
+                  style: TextStyle(fontSize: 11, color: AppColors.navy),
                 ),
               ),
             if (_mode == _SearchMode.vin) const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('متوفر في المخزون فقط', style: TextStyle(fontSize: 13)),
+              title: const Text(
+                'متوفر في المخزون فقط',
+                style: TextStyle(fontSize: 13, color: AppColors.navy),
+              ),
               value: _inStockOnly,
               onChanged: (v) {
                 setState(() => _inStockOnly = v);
@@ -189,6 +194,7 @@ class _PartsScreenState extends State<PartsScreen> {
             TextField(
               controller: _query,
               maxLength: _mode == _SearchMode.vin ? 17 : null,
+              style: const TextStyle(color: AppColors.navy),
               inputFormatters: _mode == _SearchMode.vin
                   ? [
                       FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
@@ -201,9 +207,10 @@ class _PartsScreenState extends State<PartsScreen> {
                   _mode == _SearchMode.vin
                       ? Icons.qr_code_scanner
                       : Icons.search,
+                  color: AppColors.navy,
                 ),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward, color: AppColors.red),
                   onPressed: _search,
                 ),
                 counterText: _mode == _SearchMode.vin ? '17' : null,
@@ -214,24 +221,41 @@ class _PartsScreenState extends State<PartsScreen> {
               Container(
                 margin: const EdgeInsets.only(top: 8),
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.red050,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.red.withValues(alpha: 0.2)),
-                ),
+                decoration: AppDecorations.vinMatchBadge(matched: true),
                 child: Row(
                   children: [
-                    const Icon(Icons.directions_car, color: AppColors.red),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppColors.green.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.check_circle_outline,
+                        color: AppColors.green,
+                        size: 20,
+                      ),
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
+                            'تطابق مع رقم الهيكل',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                              color: AppColors.navy,
+                            ),
+                          ),
+                          Text(
                             _decodedVehicle!.labelAr,
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,
+                              color: AppColors.navy,
                             ),
                           ),
                           if (_decodedVehicle!.engine != null)
@@ -252,7 +276,10 @@ class _PartsScreenState extends State<PartsScreen> {
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: AppColors.red),
+                ),
               ),
             Expanded(
               child: _results.isEmpty && !_loading
@@ -266,31 +293,118 @@ class _PartsScreenState extends State<PartsScreen> {
                     )
                   : ListView.builder(
                       itemCount: _results.length,
-                      itemBuilder: (context, i) {
-                        final p = _results[i];
-                        return Card(
-                          margin: const EdgeInsets.only(top: 8),
-                          child: ListTile(
-                            leading: p.isOem
-                                ? const Icon(Icons.verified_outlined,
-                                    color: AppColors.red)
-                                : const Icon(Icons.inventory_2_outlined),
-                            title: Text(p.nameAr),
-                            subtitle: Text(p.partNumber),
-                            trailing: Text(
-                              formatAmount(p.priceSar),
-                              style: const TextStyle(
-                                color: AppColors.red,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                      itemBuilder: (context, i) => _PartCard(
+                        part: _results[i],
+                        showVinMatch: _mode == _SearchMode.vin,
+                      ),
                     ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PartCard extends StatelessWidget {
+  final PartListingModel part;
+  final bool showVinMatch;
+
+  const _PartCard({required this.part, this.showVinMatch = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: AppDecorations.card(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.navy050,
+                  borderRadius: AppDecorations.borderRadius,
+                ),
+                child: Icon(
+                  part.isOem
+                      ? Icons.verified_outlined
+                      : Icons.inventory_2_outlined,
+                  color: AppColors.navy,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      part.nameAr,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: AppColors.navy,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      part.partNumber,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.ink500,
+                      ),
+                    ),
+                    if (showVinMatch && part.isOem)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              size: 14,
+                              color: AppColors.green,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'متوافق مع الهيكل',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Text(
+                formatAmount(part.priceSar),
+                style: const TextStyle(
+                  color: AppColors.navy,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 42,
+            child: ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.add_shopping_cart_outlined, size: 18),
+              label: const Text('أضف للسلة'),
+            ),
+          ),
+        ],
       ),
     );
   }

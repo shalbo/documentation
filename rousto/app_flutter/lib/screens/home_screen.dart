@@ -7,6 +7,7 @@ import '../data/models.dart';
 import '../l10n/app_localizations.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_decorations.dart';
 import '../widgets/common.dart';
 import '../widgets/vehicle_selector.dart';
 import 'booking_screen.dart';
@@ -58,14 +59,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.line),
-                      ),
+                      decoration: AppDecorations.card(),
                       child: const Row(
                         children: [
-                          Icon(Icons.grid_view_rounded, color: AppColors.red),
+                          Icon(Icons.grid_view_rounded, color: AppColors.navy),
                           SizedBox(width: 10),
                           Expanded(
                             child: Column(
@@ -126,8 +123,8 @@ class HomeScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 30),
       decoration: const BoxDecoration(
-        gradient: AppColors.redGradient,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+        gradient: AppColors.navyGradient,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
       ),
       child: SafeArea(
         bottom: false,
@@ -257,15 +254,9 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: AppDecorations.borderRadius,
             border: Border.all(color: AppColors.line),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x0F15161A),
-                blurRadius: 14,
-                offset: Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppDecorations.cardShadow,
           ),
           child: Row(
             children: [

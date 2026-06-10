@@ -1,41 +1,23 @@
-# هوية روستو البصرية — Rousto Brand Guide
+# Rousto Brand Colors (col.png)
 
-الهوية مستوحاة مباشرةً من الشعار: سيارة رياضية مرسومة بخط متّصل ينتهي بمفتاح ربط،
-باللون الأحمر القرمزي على خلفية رمادية فاتحة.
+| Token | Hex | Usage |
+|-------|-----|--------|
+| **brand-red** | `#C1121F` | CTA buttons, alerts, primary actions |
+| **brand-navy** | `#003049` | Headers, titles, active icons, structural cards |
+| **brand-bg** | `#F8F9FA` | App & admin backgrounds |
+| brand-red-050 | `#FCE8EA` | Soft red tint badges |
+| brand-navy-050 | `#E8EEF2` | Soft navy tint panels |
+| brand-green | `#2D9F6F` | VIN match / success badges |
 
-## الألوان الأساسية
+## Flutter
 
-| الاسم | الكود | الاستخدام |
-|------|-------|-----------|
-| Rousto Red (الأساسي) | `#E11B22` | الشعار، الأزرار الرئيسية، التمييز |
-| Red 600 | `#C2161C` | حالات التحويم (hover) |
-| Red 700 | `#A3141A` | التدرّجات، الظلال الحمراء |
-| Red 800 | `#7A0F14` | نهايات التدرّج الداكنة |
-| Red 050 | `#FDECEC` | خلفيات الأيقونات والوسوم |
+`app_flutter/lib/theme/app_colors.dart` + `app_theme.dart` + `app_decorations.dart`
 
-## المحايدة (Neutrals)
+## Admin / Web
 
-| الاسم | الكود | الاستخدام |
-|------|-------|-----------|
-| Ink 900 | `#15161A` | النصوص الأساسية، الخلفيات الداكنة |
-| Ink 700 | `#2B2D34` | النصوص الثانوية |
-| Ink 500 | `#5B5E66` | النصوص الباهتة |
-| Background | `#F2F1ED` | خلفية الصفحة (رمادي الشعار) |
-| Surface | `#FFFFFF` | البطاقات |
-| Line | `#E4E2DD` | الحدود والفواصل |
+- `admin/css/admin.css` — CSS variables `--brand-red`, `--brand-navy`
+- `admin/tailwind.config.js` — `brand-red`, `brand-navy` Tailwind tokens
 
-## ألوان مساعدة
-- الذهبي (التقييمات): `#F2B705`
-- الأخضر (النجاح): `#1E9E6A`
+## Radius
 
-## التدرّجات
-- أحمر: `linear-gradient(135deg, #E11B22, #A3141A)`
-- داكن: `linear-gradient(135deg, #1D1E24, #2B2D34)`
-
-## الخطوط
-- العربية: **Tajawal**
-- اللاتينية: **Poppins**
-
-## ملفات الشعار
-- `logo.svg` — الرمز (البادج) للاستخدام كأيقونة/فافيكون.
-- `logo-wordmark.svg` — الشعار مع الاسم والشعار النصي.
+All cards and buttons: **14px** (`BorderRadius.circular(14)` / `rounded-brand`)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_decorations.dart';
 
 /// شارة صغيرة (eyebrow) بخلفية حمراء فاتحة.
 class Eyebrow extends StatelessWidget {
@@ -79,26 +80,14 @@ class SoftCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDecorations.borderRadius,
         border: Border.all(
           color: featured ? AppColors.red : AppColors.line,
-          width: featured ? 1.4 : 0.6,
+          width: featured ? 1.2 : 0.8,
         ),
         boxShadow: featured
-            ? [
-                BoxShadow(
-                  color: AppColors.red.withValues(alpha: 0.22),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-              ]
-            : const [
-                BoxShadow(
-                  color: Color(0x0F15161A),
-                  blurRadius: 14,
-                  offset: Offset(0, 4),
-                ),
-              ],
+            ? AppDecorations.elevatedShadow
+            : AppDecorations.cardShadow,
       ),
       child: child,
     );

@@ -846,7 +846,7 @@ Color trackStatusColor(TrackStatus status) {
     case TrackStatus.done:
       return const Color(0xFF16A34A);
     case TrackStatus.current:
-      return const Color(0xFFD31E28);
+      return const Color(0xFFC1121F);
     case TrackStatus.todo:
       return const Color(0xFF5C7080);
   }

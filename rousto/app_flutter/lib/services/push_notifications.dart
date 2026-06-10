@@ -81,7 +81,7 @@ class PushNotifications {
         child: Material(
           elevation: 6,
           borderRadius: BorderRadius.circular(12),
-          color: const Color(0xFF0B2C44),
+          color: const Color(0xFF003049),
           child: InkWell(
             onTap: () {
               _bannerEntry?.remove();

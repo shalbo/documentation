@@ -4,7 +4,7 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F2F1ED",
-    "theme_color": "#E11B22",
+    "theme_color": "#003049",
     "description": "روستو — تطبيق العناية الذكية بالسيارات.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,

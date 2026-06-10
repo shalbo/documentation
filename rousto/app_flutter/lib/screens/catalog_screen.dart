@@ -144,8 +144,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           IconBadge(
                             _icon(root['icon_key'] as String?),
                             size: 56,
-                            bg: AppColors.red050,
-                            fg: AppColors.red,
+                            bg: AppColors.navy050,
+                            fg: AppColors.navy,
                           ),
                           const SizedBox(height: 14),
                           Text(
@@ -154,6 +154,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 15,
+                              color: AppColors.navy,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -236,10 +237,13 @@ class _CatalogSubcategoriesScreenState extends State<CatalogSubcategoriesScreen>
                         side: const BorderSide(color: AppColors.line),
                       ),
                       leading: const Icon(Icons.inventory_2_outlined,
-                          color: AppColors.red),
+                          color: AppColors.navy),
                       title: Text(
                         (c['name_ar'] ?? c['name']).toString(),
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.navy,
+                        ),
                       ),
                       trailing: const Icon(Icons.chevron_left),
                       onTap: () {
