@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول | روستو</title>
+  <link rel="icon" href="../brand/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/portal.css" />
+</head>
+<body data-portal-page="login">
+  <div id="portalHeader"></div>
+
+  <main class="portal-main" style="max-width:480px">
+    <div id="portalConfig"></div>
+
+    <section class="portal-card">
+      <h1 style="margin:0 0 8px;font-size:1.4rem">تسجيل الدخول</h1>
+      <p class="muted" style="margin:0 0 18px">أدخل رقم جوالك وسنرسل لك رمز تحقق</p>
+
+      <form id="phoneForm">
+        <div class="portal-field">
+          <label for="phone">رقم الجوال</label>
+          <input id="phone" type="tel" value="+966501234567" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">إرسال الرمز</button>
+      </form>
+
+      <form id="otpForm" style="display:none;margin-top:18px">
+        <div class="portal-field">
+          <label for="otpCode">رمز التحقق</label>
+          <input id="otpCode" type="text" inputmode="numeric" maxlength="6" placeholder="123456" required />
+          <small id="devOtpHint" class="muted" style="display:none"></small>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">تأكيد الدخول</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="portalFooter"></div>
+  <div id="portalToast" class="portal-toast"></div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/portal-layout.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
