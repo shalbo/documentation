@@ -30,6 +30,7 @@ PLATE_RE = re.compile(r"^[A-Za-z0-9\u0600-\u06FF\-]{3,20}$")
 ALLOWED_DOC_MIME = {"image/jpeg", "image/png", "image/webp"}
 DRIVER_REGISTRATION_FEE_ORDER_TYPE = "driver_registration_fee"
 DRIVER_PAYMENT_GATEWAYS = frozenset({"muamalat", "sadad"})
+VEHICLE_TYPES = frozenset({"tow_truck", "flatbed"})
 
 
 def normalize_phone(phone: str) -> str:
@@ -202,6 +203,16 @@ def register_workshop(
     return profile
 
 
+def _validate_vehicle_type(service_type: str, vehicle_type: str | None) -> str | None:
+    if service_type == "tow":
+        if not vehicle_type or vehicle_type not in VEHICLE_TYPES:
+            raise ValueError("نوع الآلية مطلوب — tow_truck (ساحبة) أو flatbed (رافعة)")
+        return vehicle_type
+    if vehicle_type:
+        raise ValueError("نوع الآلية يخص سائقي الساحبات فقط")
+    return None
+
+
 def register_driver(
     db: Session,
     *,
@@ -210,10 +221,12 @@ def register_driver(
     city: str,
     service_type: str,
     plate_number: str,
+    vehicle_type: str | None = None,
 ) -> DriverProfile:
     city_row = validate_city_name(db, city)
     if service_type not in ("courier", "tow"):
         raise ValueError("نوع الخدمة: courier (قطع غيار) أو tow (ساحبة)")
+    resolved_vehicle_type = _validate_vehicle_type(service_type, vehicle_type)
     plate = plate_number.strip().upper()
     if not PLATE_RE.match(plate):
         raise ValueError("رقم اللوحة غير صالح")
@@ -226,6 +239,7 @@ def register_driver(
         id=uuid.uuid4(),
         user_id=user.id,
         service_type=service_type,
+        vehicle_type=resolved_vehicle_type,
         plate_number=plate,
         city=city_row.name_ar,
         city_id=city_row.id,
@@ -320,6 +334,7 @@ def driver_profile_out(p: DriverProfile, user: User) -> dict:
         "role": "driver",
         "user": _profile_user_out(user),
         "service_type": p.service_type,
+        "vehicle_type": p.vehicle_type,
         "plate_number": p.plate_number,
         "city": p.city,
         "license_doc_path": p.license_doc_path,

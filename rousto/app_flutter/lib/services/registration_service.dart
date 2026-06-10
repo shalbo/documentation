@@ -38,14 +38,19 @@ class RegistrationService {
     required String city,
     required String serviceType,
     required String plateNumber,
+    String? vehicleType,
   }) async {
-    return _post('/api/v1/registration/driver', {
+    final body = <String, dynamic>{
       'full_name': fullName,
       'phone': phone,
       'city': city,
       'service_type': serviceType,
       'plate_number': plateNumber,
-    });
+    };
+    if (vehicleType != null) {
+      body['vehicle_type'] = vehicleType;
+    }
+    return _post('/api/v1/registration/driver', body);
   }
 
   Future<Map<String, dynamic>> uploadDriverDocuments({
