@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روستو — طلبات اعتماد السائقين والتجار</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <style>
+    .doc-thumb { max-width: 120px; max-height: 80px; border-radius: 10px; border: 1px solid var(--brand-line); }
+    .actions-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .btn-approve { background: var(--brand-navy); color: #fff; }
+    .btn-reject { background: var(--brand-red); color: #fff; }
+    .pending-card { border-right: 4px solid var(--brand-red); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>طلبات اعتماد السائقين والتجار</h1>
+      <p>مراجعة الوثائق واعتماد أو رفض الحسابات</p>
+    </div>
+    <div class="topbar-actions">
+      <a href="register-portal.html" class="btn btn-ghost-light">تسجيل تاجر/ورشة</a>
+      <a href="index.html" class="btn btn-ghost-light">الرئيسية</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card">
+      <h2>إعدادات API <button id="refreshBtn" class="btn btn-secondary">تحديث</button></h2>
+      <div class="config-grid">
+        <div><label>API</label><input id="apiBase" value="http://localhost:8000" /></div>
+        <div><label>مفتاح الإدارة</label><input id="adminKey" type="password" value="rousto_admin_dev" /></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>طلبات قيد المراجعة <span id="countBadge" class="badge badge-warn">0</span></h2>
+      <div id="pendingList" class="empty">جاري التحميل…</div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/registration-approvals.js"></script>
+</body>
+</html>

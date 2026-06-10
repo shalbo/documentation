@@ -1,0 +1,82 @@
+# 19 — صقل الإنتاج والأمان | Production Hardening
+
+مراجعة أمنية وأداء لمنصة روستو قبل الإطلاق.
+
+> **ملاحظة:** المشروع مبني على **FastAPI + PostgreSQL + Flutter + HTML/CSS/JS** — وليس Laravel أو Next.js. المكافئات مُطبّقة أدناه.
+
+---
+
+> **توسّع:** [`23_SECURITY_HARDENING`](23_SECURITY_HARDENING.md) — رؤوس HTTP، Trusted Hosts، تدقيق الدخول، rate limit إدارة.
+
+## 1. الأمان والمصادقة
+
+| إجراء | التطبيق |
+|-------|---------|
+| حماية Mass Assignment | Pydantic schemas تُحدد الحقول المسموحة؛ لا تحديث مباشر من `request.json` |
+| فحص الملكية | حجوزات، تذاكر دعم (`booking_id`)، موقع الفني (`booking_id`) |
+| Rate Limiting | 5 طلبات/دقيقة على OTP وrefresh والنشرة (`app/rate_limit.py`) |
+| تعطيل رؤوس التطوير | `ALLOW_LEGACY_HEADERS=false` يُعطّل `X-User-Id` و`X-Vendor-Id` |
+| JWT إلزامي | ربط الفني بـ `UserVendorLink` عند استخدام Bearer |
+| رفع الملفات | حد `MAX_UPLOAD_BYTES` (5MB) على صور الفحص |
+
+### متغيرات الإنتاج
+
+```bash
+ENVIRONMENT=production
+ALLOW_LEGACY_HEADERS=false
+OTP_DEV_MODE=false
+DISABLE_OPENAPI=true
+JWT_SECRET=<secret>
+ADMIN_API_KEY=<secret>
+CORS_ORIGINS=https://rousto.com
+```
+
+---
+
+## 2. تتبع الأخطاء والإشعارات (مربوط)
+
+| المكوّن | الملف | التفعيل |
+|---------|-------|---------|
+| Sentry Backend | `app/error_reporting.py` | `SENTRY_DSN` |
+| FCM Backend | `app/notifications.py` + `firebase-admin` | `FCM_ENABLED=true` + `FCM_CREDENTIALS_PATH` |
+| Device tokens | `027_device_tokens_schema.sql` | `POST /me/devices/register` |
+| إشعار الحجز | `logistics_services.py` | تلقائي عند تغيير الحالة |
+| Sentry Flutter | `lib/services/error_reporter.dart` | `--dart-define=SENTRY_DSN=...` |
+| FCM Flutter | `lib/services/push_notifications.dart` | `--dart-define=ENABLE_FCM=true` + `flutterfire configure` |
+| JWT Flutter | `lib/services/auth_storage.dart` + `login_screen.dart` | OTP → حفظ token |
+
+---
+
+## 3. الأداء والتخزين المؤقت
+
+| البيانات | TTL | الملف |
+|----------|-----|-------|
+| شجرة التصنيفات | 300ث | `routers/catalog.py` + `app/cache.py` |
+| صفحة الهبوط | 120ث | `routers/landing.py` |
+| Eager loading | موجود | `joinedload` في catalog وscans |
+
+### Flutter
+- إيقاف polling التتبّع عند مغادرة التبويب (`TrackingScreen.active`)
+- دعم JWT عبر `--dart-define=ACCESS_TOKEN=...`
+
+---
+
+## 4. القانوني وSEO
+
+| الصفحة | الملف |
+|--------|-------|
+| سياسة الخصوصية | `web/privacy.html` |
+| الشروط والأحكام | `web/terms.html` |
+| الضمان والاسترجاع | `web/warranty.html` |
+| Sitemap | `web/sitemap.xml` |
+| Robots | `web/robots.txt` |
+
+---
+
+## التحقق
+
+```bash
+cd rousto/backend/api
+pip install -r requirements.txt
+pytest tests/ -k unit -q
+```

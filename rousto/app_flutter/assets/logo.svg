@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-label="Rousto">
+  <defs>
+    <linearGradient id="roustoBadge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E11B22"/>
+      <stop offset="1" stop-color="#B0141A"/>
+    </linearGradient>
+  </defs>
+  <!-- Tilted rounded badge inspired by the Rousto mark -->
+  <path fill="url(#roustoBadge)"
+        d="M250 40 H840 a70 70 0 0 1 70 70 v300 a70 70 0 0 1 -70 70 H160
+           a40 40 0 0 1 -38 -52 L210 92 A70 70 0 0 1 250 40 Z"/>
+  <!-- Continuous white line: sports car silhouette ending in an open wrench -->
+  <g fill="none" stroke="#F1EFEA" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+    <!-- roofline + hood -->
+    <path d="M120 300
+             C 180 296 230 290 280 280
+             C 360 264 420 210 470 196
+             C 520 182 560 196 590 232
+             C 612 258 640 276 690 282"/>
+    <!-- front splitter -->
+    <path d="M120 300 L70 318 L150 330"/>
+    <!-- lower body line -->
+    <path d="M250 372
+             C 330 372 470 366 560 348
+             C 620 336 660 330 700 326"/>
+    <!-- front wheel arch -->
+    <path d="M196 360 a46 46 0 0 1 86 6"/>
+    <!-- rear wheel arch flowing into wrench -->
+    <path d="M690 282
+             C 740 286 778 312 792 352"/>
+    <!-- open-end wrench head -->
+    <path d="M792 352
+             a72 72 0 1 1 -36 92
+             L724 470"/>
+    <path d="M820 300 L860 264"/>
+    <path d="M838 330 L884 300"/>
+  </g>
+</svg>
