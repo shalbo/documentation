@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models import PartInventory, Vendor
 from app.parts_services import create_part, part_out
+from app.tier_services import ensure_products_capacity, require_vin_decoder
 from app.vin_compat_services import add_part_vin_compatibilities, parse_vin_prefixes
 
 
@@ -36,7 +37,10 @@ def vendor_create_product(
     if vendor.status != "approved":
         raise ValueError("المحل غير معتمد بعد")
 
+    ensure_products_capacity(db, vendor)
     prefixes = parse_vin_prefixes(vin_prefixes or vin_prefix)
+    if prefixes:
+        require_vin_decoder(db, vendor)
     part = create_part(
         db,
         part_number=part_number,

@@ -18,18 +18,31 @@ from app.models import (
 from app.category_services import get_category_tree, list_root_categories
 from app.fitment_services import part_ids_for_car_year
 from app.parts_services import _part_has_only_inactive_vendor_stock, _vendors_in_stock, part_out
+from app.tier_services import vendor_has_gold_badge
 
 DEFAULT_LAT = 24.7136
 DEFAULT_LNG = 46.6753
 
 
-def _vendor_out(vendor: Vendor, locale: str, *, distance_km: float | None = None) -> dict:
+def _vendor_out(
+    vendor: Vendor,
+    locale: str,
+    db: Session | None = None,
+    *,
+    distance_km: float | None = None,
+) -> dict:
+    has_gold = False
+    if db is not None:
+        has_gold = vendor_has_gold_badge(db, vendor)
+    elif vendor.tier is not None:
+        has_gold = vendor.tier.has_gold_badge
     data: dict[str, Any] = {
         "id": vendor.id,
         "business_name": vendor.business_name,
         "city": vendor.city,
         "status": vendor.status,
         "is_active": vendor.is_active,
+        "has_gold_badge": has_gold,
     }
     if vendor.base_lat is not None and vendor.base_lng is not None:
         data["location"] = {
@@ -55,7 +68,7 @@ def list_featured_vendors(db: Session, locale: str, *, limit: int = 6) -> list[d
         .limit(limit)
     )
     rows = db.execute(stmt).all()
-    return [_vendor_out(v, locale) for v, _ in rows]
+    return [_vendor_out(v, locale, db) for v, _ in rows]
 
 
 def list_featured_parts(
@@ -160,7 +173,7 @@ def find_vendors_nearby_for_part(
         radius = float(vendor.service_radius_km or max_radius_km)
         if dist > max(radius, max_radius_km):
             continue
-        entry = _vendor_out(vendor, locale, distance_km=dist)
+        entry = _vendor_out(vendor, locale, db, distance_km=dist)
         entry["qty_available"] = inv.qty_available
         entry["part_price_sar"] = float(part.price_sar)
         results.append(entry)

@@ -18,6 +18,7 @@ from app.routers import (
     admin_notifications,
     admin_parts,
     admin_shipping,
+    admin_tiers,
     auth,
     bookings,
     catalog,
@@ -92,6 +93,7 @@ app.include_router(admin_parts.router, prefix=prefix)
 app.include_router(admin_marketplace.router, prefix=prefix)
 app.include_router(admin_fitment.router, prefix=prefix)
 app.include_router(admin_shipping.router, prefix=prefix)
+app.include_router(admin_tiers.router, prefix=prefix)
 app.include_router(profile.router, prefix=prefix)
 app.include_router(devices.router, prefix=prefix)
 app.include_router(driver_network.router, prefix=prefix)

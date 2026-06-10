@@ -12,6 +12,7 @@ from app.i18n import resolve_locale
 from app.models import Vendor
 from app.part_image_services import process_bulk_images_zip
 from app.spare_parts_bulk_services import BULK_COLUMNS, TEMPLATE_CSV, process_bulk_upload
+from app.tier_services import require_excel_upload, vendor_tier_summary
 from app.vendor_parts_services import vendor_create_product
 
 router = APIRouter(prefix="/vendor/parts", tags=["vendor-parts"])
@@ -97,11 +98,33 @@ def vendor_add_product(
     return {"data": data}
 
 
+@router.get("/tier")
+def vendor_get_tier(
+    vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db),
+):
+    try:
+        data = vendor_tier_summary(db, vendor)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "TIER_ERROR", "message": str(exc)},
+        ) from exc
+    return {"data": data}
+
+
 @router.get("/bulk-upload/template")
 def vendor_bulk_upload_template(
     vendor: Vendor = Depends(get_current_vendor),
+    db: Session = Depends(get_db),
 ):
-    _ = vendor
+    try:
+        require_excel_upload(db, vendor)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=403,
+            detail={"code": "TIER_FEATURE", "message": str(exc)},
+        ) from exc
     return Response(
         content=TEMPLATE_CSV.encode("utf-8-sig"),
         media_type="text/csv; charset=utf-8",

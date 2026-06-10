@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import PaymentSplitLeg, Technician, Vendor, VendorBankAccount, VendorProfile
+from app.tier_services import get_default_tier
 
 IBAN_PATTERN = re.compile(r"^SA\d{22}$")
 RELEASED_STATUSES = frozenset({"released", "paid"})
@@ -127,6 +128,7 @@ def submit_application(
     normalized_iban = validate_iban(iban)
     now = datetime.now(timezone.utc)
 
+    default_tier = get_default_tier(db)
     vendor = Vendor(
         id=uuid.uuid4(),
         business_name=business_name,
@@ -137,6 +139,7 @@ def submit_application(
         national_id=national_id,
         commercial_reg=commercial_reg,
         status="pending",
+        tier_id=default_tier.id if default_tier else None,
         created_at=now,
         updated_at=now,
     )
@@ -188,6 +191,10 @@ def approve_vendor(db: Session, vendor: Vendor, *, approved_by: str = "admin") -
 
     vendor.status = "approved"
     vendor.technician_id = technician.id
+    if not vendor.tier_id:
+        default_tier = get_default_tier(db)
+        if default_tier:
+            vendor.tier_id = default_tier.id
     vendor.approved_at = now
     vendor.approved_by = approved_by
     vendor.rejection_reason = None

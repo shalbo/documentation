@@ -451,6 +451,27 @@ class TechnicianLocationUpdate(Base):
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class Tier(Base):
+    __tablename__ = "tiers"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True)
+    name_ar: Mapped[str] = mapped_column(String(80))
+    name_en: Mapped[str] = mapped_column(String(80))
+    price: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
+    products_limit: Mapped[int] = mapped_column(Integer, default=50)
+    allow_excel_upload: Mapped[bool] = mapped_column(Boolean, default=False)
+    allow_vin_decoder: Mapped[bool] = mapped_column(Boolean, default=False)
+    allow_unlimited_chat: Mapped[bool] = mapped_column(Boolean, default=False)
+    has_gold_badge: Mapped[bool] = mapped_column(Boolean, default=False)
+    sort_order: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    vendors: Mapped[list["Vendor"]] = relationship(back_populates="tier")
+
+
 class Vendor(Base):
     __tablename__ = "vendors"
 
@@ -465,6 +486,7 @@ class Vendor(Base):
     commercial_reg: Mapped[str | None] = mapped_column(String(40))
     status: Mapped[str] = mapped_column(String(20), default="pending")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    tier_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("tiers.id"))
     technician_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("technicians.id"))
     rejection_reason: Mapped[str | None] = mapped_column(Text)
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -475,6 +497,7 @@ class Vendor(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
+    tier: Mapped["Tier | None"] = relationship(back_populates="vendors")
     bank_accounts: Mapped[list["VendorBankAccount"]] = relationship(back_populates="vendor")
 
 

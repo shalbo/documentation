@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Part, PartCategory, PartInventory, PartSupplier, Vendor
 from app.part_condition_services import parse_part_condition
+from app.tier_services import ensure_products_capacity, require_excel_upload, require_vin_decoder
 from app.part_image_services import import_part_image_from_url, is_valid_image_url
 from app.parts_services import create_part
 from app.vin_compat_services import add_part_vin_compatibilities, parse_vin_prefixes
@@ -333,6 +334,7 @@ def process_bulk_upload(
 ) -> BulkUploadResult:
     if vendor.status != "approved":
         raise ValueError("المحل غير معتمد بعد")
+    require_excel_upload(db, vendor)
     if len(content) > MAX_BULK_BYTES:
         raise ValueError("حجم الملف يتجاوز الحد المسموح (10 ميجابايت)")
 
@@ -340,6 +342,10 @@ def process_bulk_upload(
     result = BulkUploadResult(total_rows=len(raw_rows))
     if not raw_rows:
         raise ValueError("لا توجد صفوف بيانات في الملف")
+
+    ensure_products_capacity(db, vendor, additional=len(raw_rows))
+    if any((row.get("vin_prefixes") or "").strip() for row in raw_rows):
+        require_vin_decoder(db, vendor)
 
     category_resolver = _CategoryResolver(db)
     existing_parts = {
