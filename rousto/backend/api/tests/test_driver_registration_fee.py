@@ -28,6 +28,7 @@ class _FakeDriverProfile:
         self.id = uuid.uuid4()
         self.user_id = uuid.uuid4()
         self.service_type = service_type
+        self.vehicle_type = "tow_truck" if service_type == "tow" else None
         self.plate_number = "ABC-123"
         self.city = "طرابلس"
         self.license_doc_path = "registrations/x/license.jpg"
@@ -74,6 +75,7 @@ def test_driver_profile_out_includes_fee_fields():
     assert out["is_verified"] is False
     assert out["registration_fee_status"] == "unpaid"
     assert out["registration_fee_lyd"] == 150.0
+    assert out["vehicle_type"] == "tow_truck"
 
 
 def test_approve_tow_driver_blocks_unpaid_fee():

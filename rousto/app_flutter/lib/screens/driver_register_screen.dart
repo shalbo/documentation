@@ -28,6 +28,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
   int _step = 0;
   String? _city;
   String _serviceType = 'tow';
+  String _vehicleType = 'tow_truck';
   List<String> _cities = [];
   String? _profileId;
   Uint8List? _license;
@@ -76,6 +77,12 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
       if (_name.text.trim().length < 2 || _city == null || _plate.text.trim().isEmpty) {
         return;
       }
+      if (_requiresPayment && _vehicleType.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('اختر نوع الآلية (ساحبة أو رافعة)')),
+        );
+        return;
+      }
       setState(() => _loading = true);
       try {
         final res = await _service.registerDriverStep1(
@@ -84,6 +91,7 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
           city: _city!,
           serviceType: _serviceType,
           plateNumber: _plate.text.trim(),
+          vehicleType: _requiresPayment ? _vehicleType : null,
         );
         _profileId = (res['data'] as Map)['id'] as String;
         setState(() => _step = 1);
@@ -282,6 +290,35 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
                 ],
                 onChanged: (v) => setState(() => _serviceType = v ?? 'tow'),
               ),
+              if (_requiresPayment) ...[
+                const SizedBox(height: 20),
+                const Text(
+                  'بيانات المركبة',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                    color: AppColors.navy,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _VehicleTypeOption(
+                  value: 'tow_truck',
+                  groupValue: _vehicleType,
+                  title: 'ساحبة عادية',
+                  subtitle: 'سحب المركبة المعطلة بالخطاف',
+                  accentColor: AppColors.red,
+                  onChanged: (v) => setState(() => _vehicleType = v!),
+                ),
+                const SizedBox(height: 8),
+                _VehicleTypeOption(
+                  value: 'flatbed',
+                  groupValue: _vehicleType,
+                  title: 'رافعة (سطحة)',
+                  subtitle: 'نقل المركبة على منصة مسطحة',
+                  accentColor: AppColors.navy,
+                  onChanged: (v) => setState(() => _vehicleType = v!),
+                ),
+              ],
               const SizedBox(height: 12),
               TextField(
                 controller: _plate,
@@ -383,6 +420,78 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
             if (_step == 2 && _loading)
               const Center(child: CircularProgressIndicator()),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VehicleTypeOption extends StatelessWidget {
+  final String value;
+  final String groupValue;
+  final String title;
+  final String subtitle;
+  final Color accentColor;
+  final ValueChanged<String?> onChanged;
+
+  const _VehicleTypeOption({
+    required this.value,
+    required this.groupValue,
+    required this.title,
+    required this.subtitle,
+    required this.accentColor,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = value == groupValue;
+    return Material(
+      color: selected ? accentColor.withValues(alpha: 0.08) : AppColors.surface,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => onChanged(value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: selected ? accentColor : AppColors.line,
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Radio<String>(
+                value: value,
+                groupValue: groupValue,
+                activeColor: accentColor,
+                onChanged: onChanged,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: selected ? accentColor : AppColors.navy,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.ink500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

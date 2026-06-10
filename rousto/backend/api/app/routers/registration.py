@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from pydantic import BaseModel, Field, field_validator  # noqa: F401 used by validators
+from pydantic import BaseModel, Field, field_validator, model_validator  # noqa: F401
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -74,6 +74,15 @@ class DriverRegisterIn(BaseModel):
     city: str = Field(min_length=2, max_length=60)
     service_type: str = Field(pattern=r"^(courier|tow)$")
     plate_number: str = Field(min_length=3, max_length=20)
+    vehicle_type: str | None = Field(default=None, pattern=r"^(tow_truck|flatbed)$")
+
+    @model_validator(mode="after")
+    def _require_vehicle_type_for_tow(self) -> "DriverRegisterIn":
+        if self.service_type == "tow" and not self.vehicle_type:
+            raise ValueError("نوع الآلية إلزامي لسائقي الساحبات")
+        if self.service_type == "courier" and self.vehicle_type:
+            raise ValueError("نوع الآلية لا ينطبق على مندوبي التوصيل")
+        return self
 
 
 class RejectIn(BaseModel):

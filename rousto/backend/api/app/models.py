@@ -1416,6 +1416,7 @@ class DriverProfile(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), unique=True)
     service_type: Mapped[str] = mapped_column(String(20))
+    vehicle_type: Mapped[str | None] = mapped_column(String(20))
     plate_number: Mapped[str] = mapped_column(String(20))
     city: Mapped[str] = mapped_column(String(60))
     city_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("cities.id"))

@@ -8,6 +8,18 @@ function toast(msg, isError = false) {
   setTimeout(() => el.classList.remove('show'), 2800);
 }
 
+function vehicleTypeBadge(item) {
+  if (item.role !== 'driver' || item.service_type !== 'tow') return '';
+  const vt = item.vehicle_type;
+  if (vt === 'flatbed') {
+    return '<span class="badge badge-flatbed">رافعة (سطحة)</span>';
+  }
+  if (vt === 'tow_truck') {
+    return '<span class="badge badge-tow-truck">ساحبة عادية</span>';
+  }
+  return '<span class="badge badge-off">نوع الآلية: غير محدد</span>';
+}
+
 function feeBadge(item) {
   if (item.role !== 'driver' || item.service_type !== 'tow') return '';
   const status = item.registration_fee_status || 'unpaid';
@@ -66,6 +78,7 @@ function renderCard(item) {
       </div>`
     : '';
   const fee = feeBadge(item);
+  const vehicleBadge = vehicleTypeBadge(item);
   const approveDisabled = !canApproveDriver(item);
   const approveBtn = approveDisabled
     ? `<button class="btn btn-approve" disabled title="يجب سداد رسوم التفعيل أولاً">اعتماد الحساب (الرسوم غير مدفوعة)</button>`
@@ -74,6 +87,7 @@ function renderCard(item) {
     <strong>${title}</strong>
     <div class="subheading">${roleLabel} · ${u.phone} · ${item.city || u.city || ''}</div>
     ${item.plate_number ? `<div>اللوحة: ${item.plate_number} · ${item.service_type}</div>` : ''}
+    ${vehicleBadge ? `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${vehicleBadge}</div>` : ''}
     ${item.specialty ? `<div>التخصص: ${item.specialty}</div>` : ''}
     ${fee ? `<div style="margin-top:8px">${fee}</div>` : ''}
     ${docs}

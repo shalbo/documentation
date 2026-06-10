@@ -32,6 +32,7 @@ async def auth_register_driver(
     city: str = Form(..., min_length=2, max_length=60),
     service_type: str = Form(..., pattern=r"^(courier|tow)$"),
     plate_number: str = Form(..., min_length=3, max_length=20),
+    vehicle_type: str | None = Form(default=None, pattern=r"^(tow_truck|flatbed)$"),
     license_doc: UploadFile = File(...),
     id_doc: UploadFile = File(...),
     vehicle_doc: UploadFile = File(...),
@@ -46,6 +47,7 @@ async def auth_register_driver(
             city=city,
             service_type=service_type,
             plate_number=plate_number,
+            vehicle_type=vehicle_type,
         )
         profile = await attach_driver_documents(
             db,
