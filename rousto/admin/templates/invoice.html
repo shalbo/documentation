@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>فاتورة روستو</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="stylesheet" href="../css/invoice.css" />
+</head>
+<body class="invoice-doc">
+  <header class="invoice-header">
+    <img src="../static/images/logo.png" alt="Rousto" class="invoice-logo" width="180" height="68" />
+    <div class="invoice-meta">
+      <h1>فاتورة مبيعات</h1>
+      <p>رقم المرجع: <span id="invRef">—</span></p>
+      <p>التاريخ: <span id="invDate">—</span></p>
+    </div>
+  </header>
+
+  <section class="invoice-parties">
+    <div>
+      <h2>البائع</h2>
+      <p id="vendorName">—</p>
+      <p id="vendorCity">—</p>
+    </div>
+    <div>
+      <h2>العميل</h2>
+      <p id="customerName">—</p>
+      <p id="customerPhone">—</p>
+    </div>
+  </section>
+
+  <table class="invoice-table">
+    <thead>
+      <tr>
+        <th>الوصف</th>
+        <th>الكمية</th>
+        <th>السعر (د.ل)</th>
+        <th>الإجمالي (د.ل)</th>
+      </tr>
+    </thead>
+    <tbody id="invLines">
+      <tr><td colspan="4" class="empty">لا بنود</td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td colspan="3">الإجمالي</td><td id="invTotal">0.00</td></tr>
+      <tr><td colspan="3">عمولة المنصة</td><td id="invCommission">0.00</td></tr>
+      <tr class="invoice-net"><td colspan="3">صافي التاجر</td><td id="invNet">0.00</td></tr>
+    </tfoot>
+  </table>
+
+  <footer class="invoice-footer">
+    <p>روستو — منصة العناية الذكية بالسيارات · العملة: LYD</p>
+    <button type="button" class="btn btn-primary no-print" onclick="window.print()">طباعة / PDF</button>
+  </footer>
+
+  <script src="../js/invoice-template.js"></script>
+</body>
+</html>

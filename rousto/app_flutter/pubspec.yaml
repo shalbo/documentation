@@ -28,6 +28,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   generate: true
@@ -35,3 +36,6 @@ flutter:
   assets:
     - assets/logo.svg
     - assets/logo_wordmark.svg
+    - assets/logo.png
+    - assets/app_icon.png
+    - assets/app_icon_foreground.png

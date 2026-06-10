@@ -1,15 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" role="img" aria-label="Rousto - Auto Care">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" role="img" aria-label="Rousto">
   <defs>
     <linearGradient id="wmBadge" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#E11B22"/>
-      <stop offset="1" stop-color="#B0141A"/>
+      <stop offset="0" stop-color="#C1121F"/>
+      <stop offset="1" stop-color="#9A0E18"/>
     </linearGradient>
   </defs>
-  <g transform="translate(8,18) scale(0.32)">
+  <!-- Icon mark -->
+  <g transform="translate(200,10) scale(0.42)">
     <path fill="url(#wmBadge)"
           d="M250 40 H840 a70 70 0 0 1 70 70 v300 a70 70 0 0 1 -70 70 H160
              a40 40 0 0 1 -38 -52 L210 92 A70 70 0 0 1 250 40 Z"/>
-    <g fill="none" stroke="#F1EFEA" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="none" stroke="#F8F9FA" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
       <path d="M120 300 C 180 296 230 290 280 280 C 360 264 420 210 470 196 C 520 182 560 196 590 232 C 612 258 640 276 690 282"/>
       <path d="M120 300 L70 318 L150 330"/>
       <path d="M250 372 C 330 372 470 366 560 348 C 620 336 660 330 700 326"/>
@@ -20,6 +21,8 @@
       <path d="M838 330 L884 300"/>
     </g>
   </g>
-  <text x="330" y="118" font-family="'Poppins','Segoe UI',sans-serif" font-size="92" font-weight="800" fill="#1A1A1D" letter-spacing="2">ROUSTO</text>
-  <text x="334" y="168" font-family="'Poppins','Segoe UI',sans-serif" font-size="30" font-weight="600" fill="#E11B22" letter-spacing="8">AUTO&#160;CARE</text>
+  <!-- Wordmark: Rou + s(red) + to -->
+  <text x="60" y="210" font-family="'Tajawal','Poppins','Segoe UI',sans-serif" font-size="96" font-weight="800" letter-spacing="1">
+    <tspan fill="#003049">Rou</tspan><tspan fill="#C1121F">s</tspan><tspan fill="#003049">to</tspan>
+  </text>
 </svg>
